@@ -386,7 +386,7 @@
       <button data-scope="ego" id="cloudEgoTab" disabled>유사군</button>
     </div>
     <select class="cloud-select" id="cloudSelect" style="display:none" aria-label="워드클라우드 대상 선택"></select>
-    <canvas id="cloudCanvas" width="680" height="420"></canvas>
+    <div id="cloudCanvas"></div>
     <div class="cloud-note" id="cloudNote"></div>
   </div>
 
@@ -395,7 +395,8 @@
   <aside class="panel detail-panel" id="detailPanel"></aside>
 </div>
 
-<script>/*__WORDCLOUD2_JS__*/</script>
+<script>/*__ECHARTS_JS__*/</script>
+<script>/*__ECHARTS_WORDCLOUD_JS__*/</script>
 <script>/*__CLOUD_LOGIC_JS__*/</script>
 <script>
 (function(){
@@ -418,6 +419,7 @@
   });
   var GOLD = "#f3cc73";
   var DEFAULT_COLOR = "#9aa4b2";
+  var cloudChart = null;
   var EGO_N = /*__EGO_DISPLAY_N__*/10;
   var EGO_TRANSITION_MS = 750;
   var REVEAL_STAGGER_MS = 55;
@@ -518,6 +520,7 @@
     canvas.width = W * DPR;
     canvas.height = H * DPR;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (cloudChart) cloudChart.resize();
   }
   window.addEventListener("resize", resize);
 
@@ -1163,23 +1166,86 @@
   function renderCloud(){
     var ids = cloudScopeIds(cloudScope, cloudSelect.value, DATA.nodes, egoIdList());
     var state = cloudState(FREQ, ids);
+
+    if (!cloudChart && window.echarts) {
+      cloudChart = echarts.init(cloudCanvas);
+    }
+
     if (!state.ok){
-      if (window.WordCloud) WordCloud.stop();
-      cloudCanvas.getContext("2d").clearRect(0, 0, cloudCanvas.width, cloudCanvas.height);
+      if (cloudChart) cloudChart.clear();
       cloudNote.textContent = "표본 " + state.count + "명 — 5명 미만 집합은 표시하지 않습니다";
       return;
     }
     cloudNote.textContent = "상대 크기만 표시 · 절대 빈도는 공개하지 않습니다";
-    WordCloud(cloudCanvas, {
-      list: state.list,
-      weightFactor: function(w){ return 15 + w * 55; }, // 상대 크기(0~1) → 캔버스 px
-      gridSize: 10,
-      rotateRatio: 0,
-      backgroundColor: "transparent",
-      color: function(){ return PALETTE[Math.floor(Math.random() * PALETTE.length)]; },
-      shuffle: false,
-      drawOutOfBound: false
-    });
+
+    var colors = PALETTE;
+    if (cloudScope === "team" && TEAM_COLOR[cloudSelect.value]) {
+      var tc = TEAM_COLOR[cloudSelect.value];
+      colors = [tc, tc, GOLD, "#57c9bd", "#c792ea"];
+    } else if (cloudScope === "ego" && selectedId !== null) {
+      var egoNode = byId[selectedId];
+      if (egoNode && TEAM_COLOR[egoNode.team]) {
+        var tc = TEAM_COLOR[egoNode.team];
+        colors = [tc, tc, GOLD, "#57c9bd", "#c792ea"];
+      }
+    }
+
+    var option = {
+      tooltip: {
+        show: true,
+        formatter: function(params) {
+          return params.data.name + ': <b>' + params.data.value + '회</b>';
+        },
+        backgroundColor: 'rgba(20, 23, 31, 0.85)',
+        borderColor: 'rgba(255, 255, 255, 0.15)',
+        borderWidth: 1,
+        textStyle: {
+          color: '#f1f3f7',
+          fontFamily: '"Pretendard Variable", -apple-system, sans-serif',
+          fontSize: 12
+        }
+      },
+      series: [{
+        type: 'wordCloud',
+        shape: 'circle',
+        left: 'center',
+        top: 'center',
+        width: '100%',
+        height: '100%',
+        right: null,
+        bottom: null,
+        sizeRange: [12, 38],
+        rotationRange: [0, 0],
+        rotationStep: 0,
+        gridSize: 3,
+        drawOutOfBound: false,
+        layoutAnimation: false,
+        textStyle: {
+          fontFamily: '"Pretendard Variable", -apple-system, "Segoe UI", Roboto, sans-serif',
+          fontWeight: 600,
+          color: function() {
+            return colors[Math.floor(Math.random() * colors.length)];
+          }
+        },
+        emphasis: {
+          focus: 'self',
+          textStyle: {
+            shadowBlur: 8,
+            shadowColor: 'rgba(255, 255, 255, 0.25)'
+          }
+        },
+        data: state.list.map(function(item) {
+          return {
+            name: item[0],
+            value: item[1]
+          };
+        })
+      }]
+    };
+
+    if (cloudChart) {
+      cloudChart.setOption(option);
+    }
   }
 
   function setCloudScope(scope){

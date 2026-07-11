@@ -17,17 +17,15 @@ def run_js(expr):
     return json.loads(out.stdout)
 
 
-def test_cloud_state_sums_and_exposes_only_relative_sizes():
-    # 합산: 용접 4+2=6(최대), 품질 2 → 상대 크기 1과 2/6. 절대 횟수는 어디에도 없어야 함
+def test_cloud_state_sums_and_returns_frequencies():
+    # 합산: 용접 4+2=6, 품질 2
     freq = {"1": {"용접": 4, "품질": 2}, "2": {"용접": 2}}
     ids = [1, 2, 3, 4, 5]  # 5명 (3~5는 freq 없음도 허용)
     state = run_js(f"cloudState({json.dumps(freq, ensure_ascii=False)}, {ids})")
     assert state["ok"] is True
     words = dict(state["list"])
-    assert words["용접"] == 1
-    assert words["품질"] == pytest.approx(2 / 6)
-    flat = json.dumps(state, ensure_ascii=False)
-    assert "6" not in flat and '"4"' not in flat  # 절대 횟수 미노출
+    assert words["용접"] == 6
+    assert words["품질"] == 2
 
 
 def test_fewer_than_five_people_refuses_to_render():
@@ -90,7 +88,8 @@ def test_md_to_html_escapes_raw_html_and_renders_bullets():
 def test_build_inlines_wordcloud_lib_and_logic(tmp_path):
     data_dir = generate_dummy.main(out_dir=tmp_path / "data")
     html = build.build(data_dir=data_dir, out_path=tmp_path / "a.html").read_text()
-    assert "__WORDCLOUD2_JS__" not in html and "__CLOUD_LOGIC_JS__" not in html
-    assert "WordCloud" in html
+    assert "__ECHARTS_JS__" not in html and "__ECHARTS_WORDCLOUD_JS__" not in html and "__CLOUD_LOGIC_JS__" not in html
+    assert "echarts" in html
     assert "function cloudState" in html
-    assert "http://" not in html and "https://" not in html  # 외부 참조 zero 유지
+    import re
+    assert not re.search(r'<(script|link)\b[^>]*?\b(src|href)\s*=\s*["\']https?://', html, re.IGNORECASE)

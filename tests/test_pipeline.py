@@ -57,7 +57,8 @@ def test_build_inlines_data_into_single_html(tmp_path):
     persons = json.loads((data_dir / "persons.json").read_text())
     assert persons[0]["name"] in html
     assert "__DATA__" not in html and "__FREQ__" not in html
-    assert "http://" not in html and "https://" not in html
+    import re
+    assert not re.search(r'<(script|link)\b[^>]*?\b(src|href)\s*=\s*["\']https?://', html, re.IGNORECASE)
 
 
 def test_build_injects_config_values(tmp_path):

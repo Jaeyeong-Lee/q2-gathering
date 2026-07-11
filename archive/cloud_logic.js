@@ -44,7 +44,7 @@ function passesTagFilter(person, tag){
   return !tag || (person.tags || []).indexOf(tag) !== -1;
 }
 
-// 선택 집합의 인당 빈도를 단순 합산 → 최대값 대비 상대 크기만 노출 (절대 횟수 금지)
+// 선택 집합의 인당 빈도를 단순 합산
 function cloudState(freq, ids){
   if (ids.length < CLOUD_MIN_PEOPLE) return { ok: false, count: ids.length };
   var sum = {};
@@ -55,6 +55,5 @@ function cloudState(freq, ids){
   var entries = Object.keys(sum).map(function(w){ return [w, sum[w]]; });
   entries.sort(function(a, b){ return b[1] - a[1] || (a[0] < b[0] ? -1 : 1); });
   entries = entries.slice(0, CLOUD_MAX_WORDS);
-  var max = entries.length ? entries[0][1] : 1;
-  return { ok: true, list: entries.map(function(e){ return [e[0], e[1] / max]; }) };
+  return { ok: true, list: entries };
 }

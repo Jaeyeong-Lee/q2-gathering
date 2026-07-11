@@ -20,7 +20,8 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
     nb = {k: [{"id": e["id"], "w": e["similarity"]} for e in v] for k, v in neighbors.items()}
 
     html = TEMPLATE.read_text()
-    html = html.replace("/*__WORDCLOUD2_JS__*/", (ROOT / "archive" / "wordcloud2.min.js").read_text())
+    html = html.replace("/*__ECHARTS_JS__*/", (ROOT / "archive" / "echarts.min.js").read_text())
+    html = html.replace("/*__ECHARTS_WORDCLOUD_JS__*/", (ROOT / "archive" / "echarts-wordcloud.min.js").read_text())
     html = html.replace("/*__CLOUD_LOGIC_JS__*/", (ROOT / "archive" / "cloud_logic.js").read_text())
     html = html.replace("/*__DATA__*/null", json.dumps({"nodes": nodes, "neighbors": nb}, ensure_ascii=False))
     html = html.replace("/*__FREQ__*/null", json.dumps(freq, ensure_ascii=False))
