@@ -381,16 +381,16 @@
       var(--bg);
   }
   .about-overlay.visible{ display: block; }
-  .about-doc{ max-width: 1040px; margin: 0 auto; padding: clamp(40px, 7vh, 72px) 24px 80px; }
+  .about-doc{ max-width: 1120px; margin: 0 auto; padding: clamp(40px, 7vh, 72px) 24px 80px; }
   .about-doc h2{ margin: 0 0 6px; font-size: clamp(22px, 2.4vw, 30px); letter-spacing: -0.01em; }
   .about-doc .doc-sub{ margin: 0 0 36px; font-size: 13.5px; color: var(--ink-dim); }
   .about-grid{
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin-top: 24px;
   }
-  @media (max-width: 860px) {
+  @media (max-width: 940px) {
     .about-grid{
       grid-template-columns: 1fr;
     }
@@ -428,12 +428,16 @@
   .slot-placeholder code{ font-family: var(--mono); color: var(--ink-dim); }
   .about-section img.slot-img{ width: 100%; border-radius: 10px; margin-top: 12px; display: block; }
   .md-slot{
-    margin: 12px 0 0; max-height: 260px; overflow-y: auto;
+    margin: 12px 0 0; max-height: 120px; overflow-y: auto;
     background: rgba(0,0,0,0.35); border: 1px solid var(--panel-border); border-radius: 10px;
     padding: 14px 16px; font-family: var(--mono); font-size: 12px; line-height: 1.65;
     color: var(--ink-dim); white-space: pre-wrap; overflow-wrap: anywhere;
   }
-  .vec-strip{ width: 100%; height: 36px; display: block; border-radius: 6px; margin-top: 12px; }
+  .vec-strip{
+    width: 100%; height: 28px; display: block; border-radius: 6px; margin-top: 12px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
   .vec-legend{ display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); margin-top: 5px; }
   .cmp-row{ display: grid; grid-template-columns: 92px 1fr 88px; gap: 12px; align-items: center; margin-top: 12px; }
   .cmp-row .cmp-name{ font-size: 12.5px; color: var(--ink); text-align: right; }
@@ -522,40 +526,28 @@
 
     <div class="about-grid">
       <div class="about-section">
-        <h3>📄 1. 원본 — 근원경쟁력 회고 PPT</h3>
-        <p>모든 것의 시작은 분기회 때 각자 작성한 근원경쟁력 회고 슬라이드입니다. 인당 한 장씩, 자유 서술.</p>
+        <h3>📄 1. 원본 & 텍스트 추출</h3>
+        <p>회고 PPT에서 텍스트를 추출해 마크다운(MD) 양식으로 정규화합니다. 이 마크다운이 이후 모든 단계의 입력이 됩니다.</p>
         <!--__ABOUT_PPT__-->
-      </div>
-
-      <div class="about-section">
-        <h3>📝 2. 텍스트 추출 — PPT → 마크다운</h3>
-        <p>PPT에서 인당 텍스트를 뽑아 <b>마크다운 한 편</b>으로 정규화합니다. 제목·불릿 구조는 남기고 서식은 버립니다. 이 md가 이후 모든 단계의 유일한 입력입니다.</p>
         <!--__ABOUT_MD__-->
       </div>
 
       <div class="about-section">
-        <h3>🧬 3. 임베딩 — 텍스트를 3072개의 숫자로</h3>
-        <p>md 전문을 Gemini 임베딩 API에 보내면 <b>3072차원 벡터</b>(숫자 3072개짜리 1차원 배열)가 돌아옵니다. 아래는 그 배열을 값→색으로 칠한 실제 벡터입니다. 픽셀 하나가 숫자 하나.</p>
+        <h3>🧬 2. 임베딩 벡터</h3>
+        <p>Gemini API를 활용해 마크다운 전문을 3072차원 벡터로 변환합니다. 방향이 비슷할수록 닮은 내용입니다.</p>
         <canvas class="vec-strip" id="anchorStrip"></canvas>
         <div class="vec-legend"><span>dim 0</span><span id="vecRange"></span><span>dim 3071</span></div>
-        <p>이 숫자들 자체엔 의미가 없지만, <b>비슷한 이야기를 쓴 사람일수록 벡터가 비슷한 방향을 가리킵니다.</b></p>
       </div>
 
       <div class="about-section">
-        <h3>📐 4. 유사도 계산 & 선별 — 상위 관계 연결</h3>
-        <p>두 벡터가 이루는 각도(코사인 유사도)를 계산하여 방향이 비슷한 사람을 찾고, 그 중 상위 관계(Top-K)만 연결선으로 화면에 시각화합니다.</p>
+        <h3>📐 3. 유사도 계산 & 선별</h3>
+        <p>벡터 간 코사인 유사도를 구한 뒤 상위 관계(Top-K)만 연결선으로 화면에 시각화합니다.</p>
         
         <div class="similarity-sub-section">
           <p class="about-sub-title"><b>실제 세 사람과의 유사도 비교:</b></p>
           <div class="cmp-row"><span class="cmp-name" id="anchorName2"><small>본인</small></span><canvas class="vec-strip" id="cmpAnchor"></canvas><span class="cmp-score"></span></div>
           <div id="cmpRows"></div>
           <span class="formula">cos θ = A·B / (|A||B|) → 1에 가까울수록 유사</span>
-        </div>
-
-        <div class="topk-sub-section">
-          <p class="about-sub-title"><b>이 사람의 유사도 상위 10명:</b></p>
-          <div class="topk-list" id="topkList"></div>
-          <p class="about-note">…30위까지 저장되어 있고, 인물 클릭 시 상위 10명이 궤도 뷰로 펼쳐집니다.</p>
         </div>
       </div>
     </div>
@@ -1266,7 +1258,22 @@
       if (clickTimer) return;
       clickTimer = setTimeout(function(){
         clickTimer = null;
-        if (isolateTeam) return; // 격리 중엔 단일 클릭 dim 토글 비활성화
+        if (isolateTeam) return; // 격리 중엔 단일 클릭 비활성화
+        if (stageEl.classList.contains("cloud-max")){
+          // 최대화: 싱글클릭 = 그 팀 클라우드 + 배경 dim (재배치 없음), 재클릭 = 전체 복귀
+          if (cloudScope === "team" && cloudTeam === team){
+            cloudTeam = null;
+            filterTeams = {};
+            setCloudScope("all");
+          } else {
+            cloudTeam = team;
+            filterTeams = {};
+            filterTeams[team] = true;
+            setCloudScope("team");
+          }
+          refreshChips();
+          return;
+        }
         if (filterTeams[team]) delete filterTeams[team]; else filterTeams[team] = true;
         refreshChips();
       }, 230);
@@ -1282,6 +1289,7 @@
       alpha = 1;
       warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
       refreshChips();
+      cloudTeam = isolateTeam;
       setCloudScope(isolateTeam ? "team" : "all"); // 격리 = 워드클라우드 팀 필터 (필터 일원화)
     });
 
@@ -1306,6 +1314,7 @@
     alpha = 1;
     warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
     refreshChips();
+    cloudTeam = null;
     setCloudScope("all");
   });
 
@@ -1328,6 +1337,7 @@
   var cloudSelect = document.getElementById("cloudSelect");
   var cloudTabs = document.getElementById("cloudTabs");
   var cloudScope = "all";
+  var cloudTeam = null; // team 스코프의 대상 팀 — 격리(더블클릭) 또는 최대화 싱글클릭이 설정
   var RANK_COLORS = ["#f3cc73", "#f2a154", "#e0819f", "#c792ea", "#7c9ce6", "#57c9bd"]; // 골드→틸: 빈도 순위
   var CLOUD_CLS = (function(){
     var s = {};
@@ -1337,8 +1347,8 @@
 
   function renderCloud(){
     var isMax = stageEl.classList.contains("cloud-max");
-    // team 스코프는 탭이 아니라 범례 더블클릭(격리)으로만 진입 — 그래프와 클라우드가 한 필터
-    var scopeValue = cloudScope === "team" ? isolateTeam : cloudSelect.value;
+    // team 스코프는 탭이 아니라 범례 클릭(최대화)·더블클릭(격리)으로만 진입
+    var scopeValue = cloudScope === "team" ? cloudTeam : cloudSelect.value;
     var ids = cloudScopeIds(cloudScope, scopeValue, DATA.nodes, null);
     var state = cloudState(FREQ, ids);
 
@@ -1351,7 +1361,7 @@
       cloudNote.textContent = "표본 " + state.count + "명 — 5명 미만 집합은 표시하지 않습니다";
       return;
     }
-    cloudNote.textContent = cloudScope === "team" && isolateTeam ? "팀 필터: " + isolateTeam + " — 범례 더블클릭으로 해제" : "";
+    cloudNote.textContent = cloudScope === "team" && cloudTeam ? "팀 필터: " + cloudTeam : "";
 
     var option = {
       tooltip: {
@@ -1453,6 +1463,13 @@
       topnRow.style.display = "";
       cloudPanelEl.insertBefore(cloudTabs, cloudCanvas);
       cloudPanelEl.insertBefore(cloudSelect, cloudCanvas);
+      if (cloudScope === "team" && !isolateTeam){
+        // 최대화 싱글클릭으로 건 팀 필터는 max 국소 — 격리(더블클릭)로 건 것만 유지
+        cloudTeam = null;
+        filterTeams = {};
+        refreshChips();
+        setCloudScope("all");
+      }
     }
     if (cloudChart) cloudChart.resize();
     renderCloud();
@@ -1470,23 +1487,35 @@
   // 빌드 타임에 주입되는 실데이터 표본: 앵커 1명의 실제 임베딩 벡터 + 비교 3명 + top-K
   var ABOUT = /*__ABOUT__*/null;
 
-  // 1차원 배열을 1×N 히트맵으로: 픽셀 하나 = 숫자 하나 (양수 골드 ↔ 음수 블루, max|v| 정규화)
+  // 1차원 배열을 개념적인 블록 패턴으로 시각화 (3000차원을 60개 블록으로 샘플링해 바코드 형태로 렌더링)
   function drawVecStrip(cv, vec){
-    var n = vec.length;
-    cv.width = n; cv.height = 1;
+    var numBlocks = 60; // 시각적 구분이 잘 가도록 블록 개수 조절
+    var blockW = 6;     // 블록의 가로 크기
+    cv.width = numBlocks * blockW;
+    cv.height = 36;
     var g = cv.getContext("2d");
-    var img = g.createImageData(n, 1);
-    var maxAbs = 0;
-    for (var i = 0; i < n; i++) maxAbs = Math.max(maxAbs, Math.abs(vec[i]));
-    for (i = 0; i < n; i++){
-      // sqrt 감마: 대부분의 차원이 max 대비 작아서 선형이면 거의 검게 보인다
-      var a = Math.sqrt(Math.abs(vec[i]) / (maxAbs || 1));
-      var o = i * 4;
-      if (vec[i] >= 0){ img.data[o] = 12 + 231 * a; img.data[o+1] = 12 + 192 * a; img.data[o+2] = 16 + 99 * a; }
-      else            { img.data[o] = 12 + 78 * a;  img.data[o+1] = 12 + 128 * a; img.data[o+2] = 16 + 214 * a; }
-      img.data[o+3] = 255;
+    
+    var sampled = [];
+    var step = Math.floor(vec.length / numBlocks) || 1;
+    for (var i = 0; i < numBlocks; i++) {
+      sampled.push(vec[i * step] || 0);
     }
-    g.putImageData(img, 0, 0);
+    
+    var maxAbs = 0;
+    for (var i = 0; i < sampled.length; i++) maxAbs = Math.max(maxAbs, Math.abs(sampled[i]));
+    
+    g.clearRect(0, 0, cv.width, cv.height);
+    for (var i = 0; i < sampled.length; i++) {
+      var val = sampled[i];
+      var a = Math.sqrt(Math.abs(val) / (maxAbs || 1));
+      
+      if (val >= 0) {
+        g.fillStyle = hexToRgba("#f3cc73", a * 0.9 + 0.1); // 양수: 골드 계열
+      } else {
+        g.fillStyle = hexToRgba("#5ab4d6", a * 0.9 + 0.1); // 음수: 블루 계열
+      }
+      g.fillRect(i * blockW, 0, blockW - 1, cv.height); // 1px 갭을 주어 바코드 효과
+    }
     return maxAbs;
   }
 
@@ -1507,14 +1536,16 @@
       drawVecStrip(row.querySelector("canvas"), c.vec);
     });
     var topkList = document.getElementById("topkList");
-    ABOUT.topk.slice(0, 10).forEach(function(t, i){
-      var row = document.createElement("div");
-      row.className = "topk-row";
-      row.innerHTML = '<span class="rank">' + (i + 1) + '</span><span>' + escapeHtml(t.name) + '</span>' +
-        '<span class="bar-track"><span class="bar-fill" style="width:' + Math.round(Math.max(t.sim, 0) * 100) + '%"></span></span>' +
-        '<span class="score">' + t.sim.toFixed(3) + '</span>';
-      topkList.appendChild(row);
-    });
+    if (topkList) {
+      ABOUT.topk.slice(0, 10).forEach(function(t, i){
+        var row = document.createElement("div");
+        row.className = "topk-row";
+        row.innerHTML = '<span class="rank">' + (i + 1) + '</span><span>' + escapeHtml(t.name) + '</span>' +
+          '<span class="bar-track"><span class="bar-fill" style="width:' + Math.round(Math.max(t.sim, 0) * 100) + '%"></span></span>' +
+          '<span class="score">' + t.sim.toFixed(3) + '</span>';
+        topkList.appendChild(row);
+      });
+    }
   }
 
   // ---------------- 시작 ----------------

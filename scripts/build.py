@@ -89,8 +89,12 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
     html = html.replace("/*__CLOUD_LOGIC_JS__*/", (ROOT / "archive" / "cloud_logic.js").read_text())
     html = html.replace("/*__DATA__*/null", json.dumps({"nodes": nodes, "neighbors": nb}, ensure_ascii=False))
     html = html.replace("/*__FREQ__*/null", json.dumps(freq, ensure_ascii=False))
-    embeddings = json.loads((data_dir / "embeddings.json").read_text())
-    html = html.replace("/*__ABOUT__*/null", json.dumps(build_about(persons, neighbors, embeddings), ensure_ascii=False))
+    emb_path = data_dir / "embeddings.json"
+    if emb_path.exists():
+        embeddings = json.loads(emb_path.read_text())
+        html = html.replace("/*__ABOUT__*/null", json.dumps(build_about(persons, neighbors, embeddings), ensure_ascii=False))
+    else:
+        html = html.replace("/*__ABOUT__*/null", "null")
     html = about_slots(html)
     html = html.replace("/*__EGO_DISPLAY_N__*/10", str(EGO_DISPLAY_N))
     html = html.replace('max="__TOPN_MAX__"', f'max="{TOPN_MAX}"')
