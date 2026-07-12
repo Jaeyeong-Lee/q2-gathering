@@ -1176,7 +1176,7 @@
       cloudNote.textContent = "표본 " + state.count + "명 — 5명 미만 집합은 표시하지 않습니다";
       return;
     }
-    cloudNote.textContent = "상대 크기만 표시 · 절대 빈도는 공개하지 않습니다";
+    cloudNote.textContent = "";
 
     var colors = PALETTE;
     if (cloudScope === "team" && TEAM_COLOR[cloudSelect.value]) {
