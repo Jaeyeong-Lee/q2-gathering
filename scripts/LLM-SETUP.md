@@ -1,10 +1,10 @@
 # LLM API 설정 가이드
 
-2개의 LLM 호출:
-1. **임베딩 모델** (`scripts/embed.py`) — 텍스트 → 벡터 (3072차원)
-2. **태그 추출** (`scripts/run_extraction.py`) — 텍스트 → 성향/역량 태그
+**2개의 독립적인 LLM 호출** (각각 다른 API일 수 있음):
+1. **임베딩 모델** (`scripts/embed.py`) — 텍스트 → 벡터 (EMBED_PROVIDER)
+2. **태그 추출** (`scripts/run_extraction.py`) — 텍스트 → 태그 (TEXT_PROVIDER)
 
-`llm.py`는 OpenAI Compatible API를 지원하므로, 어떤 LLM 제공자든 사용 가능합니다.
+각 API는 독립적인 환경변수로 제어합니다. `llm.py`는 OpenAI Compatible API를 지원하므로, 어떤 LLM 제공자든 사용 가능합니다.
 
 ---
 
@@ -67,6 +67,63 @@ OPENAI_MODEL=gpt-4-turbo python3 scripts/run_extraction.py
 
 ---
 
+## 설정 시나리오
+
+### 시나리오 1️⃣: 모두 Gemini (기본값)
+
+```bash
+export GEMINI_API_KEY=your-key
+./scripts/pipeline.sh
+```
+
+내부적으로:
+- TEXT_PROVIDER=gemini, EMBED_PROVIDER=gemini (모두 같은 API 키 사용)
+
+### 시나리오 2️⃣: 텍스트는 내부 LLM, 임베딩은 Gemini
+
+```bash
+export GEMINI_API_KEY=gemini-key
+export TEXT_PROVIDER=internal
+export TEXT_API_KEY=internal-key
+export TEXT_API_BASE=http://internal-llm:8000/v1
+./scripts/pipeline.sh
+```
+
+또는 한 줄로:
+```bash
+GEMINI_API_KEY=gemini-key \
+TEXT_PROVIDER=internal \
+TEXT_API_KEY=internal-key \
+TEXT_API_BASE=http://internal-llm:8000/v1 \
+./scripts/pipeline.sh
+```
+
+### 시나리오 3️⃣: 텍스트는 Gemini, 임베딩은 내부 LLM
+
+```bash
+export GEMINI_API_KEY=gemini-key
+export EMBED_PROVIDER=internal
+export EMBED_API_KEY=internal-embed-key
+export EMBED_API_BASE=http://embedding-server:9000/v1
+./scripts/pipeline.sh
+```
+
+### 시나리오 4️⃣: 모두 내부 LLM (텍스트/임베딩 서로 다른 키)
+
+```bash
+export TEXT_PROVIDER=internal
+export TEXT_API_KEY=llm-key
+export TEXT_API_BASE=http://text-gen:8000/v1
+
+export EMBED_PROVIDER=internal
+export EMBED_API_KEY=embed-key
+export EMBED_API_BASE=http://embeddings:9000/v1
+
+./scripts/pipeline.sh
+```
+
+---
+
 ## 설정 방법
 
 ### 임시 (현재 터미널만)
@@ -81,11 +138,24 @@ export LLM_API_BASE=http://localhost:8000/v1
 ### 영구 (zsh)
 
 ```bash
+# 옵션 1: 둘 다 같은 서버
 cat >> ~/.zshrc <<'EOF'
 export LLM_PROVIDER=internal
 export LLM_API_KEY=your-key-here
 export LLM_API_BASE=http://your-server:8000/v1
 EOF
+
+# 옵션 2: 각각 다른 서버
+cat >> ~/.zshrc <<'EOF'
+export TEXT_PROVIDER=internal
+export TEXT_API_KEY=llm-key
+export TEXT_API_BASE=http://text-gen:8000/v1
+
+export EMBED_PROVIDER=internal
+export EMBED_API_KEY=embed-key
+export EMBED_API_BASE=http://embeddings:9000/v1
+EOF
+
 source ~/.zshrc
 ```
 
@@ -93,10 +163,23 @@ source ~/.zshrc
 
 ```bash
 # .env 파일 생성 (git ignore됨)
+
+# 옵션 1: 둘 다 같은 서버
 cat > .env <<'EOF'
 LLM_PROVIDER=internal
 LLM_API_KEY=test-key
 LLM_API_BASE=http://localhost:8000/v1
+EOF
+
+# 옵션 2: 텍스트/임베딩 분리
+cat > .env <<'EOF'
+TEXT_PROVIDER=internal
+TEXT_API_KEY=llm-key
+TEXT_API_BASE=http://localhost:8000/v1
+
+EMBED_PROVIDER=internal
+EMBED_API_KEY=embed-key
+EMBED_API_BASE=http://localhost:9000/v1
 EOF
 
 # 실행 시 로드
@@ -105,32 +188,42 @@ source .env && ./scripts/pipeline.sh
 
 ---
 
-## 각 API 키 분리 (선택사항)
+## 각 API 키 분리 (기본 지원)
 
-임베딩과 텍스트 생성에 다른 API를 사용하고 싶다면, `llm.py`를 확장:
+`llm.py`는 이미 TEXT_PROVIDER와 EMBED_PROVIDER를 독립적으로 지원합니다.
 
-```python
-# llm.py 추가
-def embed_text(text, model=None, max_retries=5):
-    embed_provider = os.getenv("EMBED_PROVIDER", _provider)
-    # embed_provider별로 다른 클라이언트 사용
-    ...
+**환경변수 우선순위:**
 
-def call_gemini(prompt, model=None, max_retries=5):
-    text_provider = os.getenv("TEXT_PROVIDER", _provider)
-    # text_provider별로 다른 클라이언트 사용
-    ...
+텍스트 생성 (태그 추출):
+1. `TEXT_API_KEY` (지정 시)
+2. `GEMINI_API_KEY` (Gemini 선택 시)
+
+임베딩:
+1. `EMBED_API_KEY` (지정 시)
+2. `GEMINI_API_KEY` (Gemini 선택 시)
+
+**예시: 텍스트와 임베딩에 다른 API 사용**
+
+```bash
+# 태그 추출: Gemini
+export GEMINI_API_KEY=gemini-key
+
+# 임베딩: 내부 LLM 서버 (다른 키)
+export EMBED_PROVIDER=internal
+export EMBED_API_KEY=embed-key
+export EMBED_API_BASE=http://embeddings:9000/v1
+
+./scripts/pipeline.sh
 ```
 
-사용:
+또는 `TEXT_API_KEY`를 명시적으로 지정:
 ```bash
-export LLM_PROVIDER=openai_compat
-export LLM_API_BASE=http://text-generation:8000/v1
-export LLM_API_KEY=key1
+export TEXT_API_KEY=gemini-key
+export TEXT_PROVIDER=gemini
 
-export EMBED_PROVIDER=openai_compat
+export EMBED_API_KEY=embed-key
+export EMBED_PROVIDER=internal
 export EMBED_API_BASE=http://embeddings:9000/v1
-export EMBED_API_KEY=key2
 
 ./scripts/pipeline.sh
 ```
@@ -180,14 +273,3 @@ curl http://localhost:8000/v1/models
 | Gemini | 3072차원 | gemini-2.5-flash | $0.20 | 원격 |
 | 내부 vLLM | 가변 | 내부 모델 | $0 | 로컬 |
 | OpenAI | 1536차원 | gpt-4-turbo | $2+ | 원격 |
-
----
-
-## Makefile 통합
-
-```bash
-# .env 파일이 있으면 자동 로드
-make pipeline  # → source .env && ./scripts/pipeline.sh
-```
-
-(Makefile 수정 필요 시 요청)
