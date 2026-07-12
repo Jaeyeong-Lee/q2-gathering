@@ -334,8 +334,9 @@
   #cloudMaxBtn{ font-size: 14px; line-height: 1; }
 
   /* ---- 워드클라우드 최대화 ---- */
-  /* #graph(네트워크)는 남겨 스크림 뒤로 은은하게 비치고, 나머지 UI만 숨긴다 */
-  .stage.cloud-max > :not(.cloud-panel):not(#graph){ display: none; }
+  /* #graph(네트워크)는 스크림 뒤 배경으로, 팀 범례(.side-panel)는 그대로 두고 나머지 UI만 숨긴다 */
+  .stage.cloud-max > :not(.cloud-panel):not(#graph):not(.side-panel){ display: none; }
+  .stage.cloud-max .side-panel{ z-index: 21; }
   .stage.cloud-max .cloud-panel{
     inset: 0; width: auto; border: none; border-radius: 0;
     padding: 26px clamp(24px, 4vw, 60px);
@@ -344,6 +345,8 @@
     backdrop-filter: none; -webkit-backdrop-filter: none;
   }
   .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; }
+  .stage.cloud-max .cloud-tabs, .stage.cloud-max .cloud-select{ display: block; max-width: 640px; margin-inline: auto; width: 100%; }
+  .stage.cloud-max .cloud-tabs{ display: flex; }
 
   .overlay-close{
     position: absolute; top: 22px; right: 28px; z-index: 30;
@@ -660,12 +663,12 @@
   }
   window.addEventListener("resize", resize);
 
-  // 빅뱅 인트로: 전 노드를 중앙 근처에 아주 좁게 모아 시작 -> 반발력으로 확산
+  // 중앙 원반에 퍼뜨려 시작: 좁게 모으면 반발력이 폭발해 초기 화면이 요동친다
   (function seedPositions(){
     var cx = 0.5, cy = 0.5;
     nodes.forEach(function(n){
       var a = Math.random() * Math.PI * 2;
-      var rad = Math.random() * 0.01;
+      var rad = Math.sqrt(Math.random()) * 0.30; // sqrt: 원반 균일 분포
       n.ux = cx + Math.cos(a) * rad;
       n.uy = cy + Math.sin(a) * rad;
     });
@@ -1290,6 +1293,7 @@
   var cloudTabs = document.getElementById("cloudTabs");
   var cloudEgoTab = document.getElementById("cloudEgoTab");
   var cloudScope = "all";
+  var RANK_COLORS = ["#f3cc73", "#f2a154", "#e0819f", "#c792ea", "#7c9ce6", "#57c9bd"]; // 골드→틸: 빈도 순위
   var CLOUD_TEAMS = Object.keys(TEAM_COLOR).sort();
   var CLOUD_CLS = (function(){
     var s = {};
@@ -1318,19 +1322,6 @@
     }
     cloudNote.textContent = "";
 
-    var colors = PALETTE;
-    if (cloudScope === "team" && TEAM_COLOR[cloudSelect.value]) {
-      var tc = TEAM_COLOR[cloudSelect.value];
-      colors = [tc, tc, GOLD, "#57c9bd", "#c792ea"];
-    } else if (cloudScope === "ego" && selectedId !== null) {
-      var egoNode = byId[selectedId];
-      if (egoNode && TEAM_COLOR[egoNode.team]) {
-        var tc = TEAM_COLOR[egoNode.team];
-        colors = [tc, tc, GOLD, "#57c9bd", "#c792ea"];
-      }
-    }
-    if (isMax) colors = GALAXY; // 갤럭시 모드: 성운 팔레트가 스코프 색을 덮는다
-
     var option = {
       tooltip: {
         show: true,
@@ -1355,7 +1346,7 @@
         height: '100%',
         right: null,
         bottom: null,
-        sizeRange: isMax ? [24, 90] : [12, 38],
+        sizeRange: isMax ? [30, 130] : [12, 38],
         rotationRange: [0, 0],
         rotationStep: 0,
         gridSize: 3,
@@ -1363,12 +1354,9 @@
         layoutAnimation: isMax, // 확대 진입 시에만 단어 퍼지는 연출
         textStyle: {
           fontFamily: '"Pretendard Variable", -apple-system, "Segoe UI", Roboto, sans-serif',
-          fontWeight: 600,
+          fontWeight: isMax ? 800 : 600,
           shadowBlur: isMax ? 14 : 0,
-          shadowColor: isMax ? "rgba(190,205,255,0.55)" : "transparent",
-          color: function() {
-            return colors[Math.floor(Math.random() * colors.length)];
-          }
+          shadowColor: isMax ? "rgba(190,205,255,0.55)" : "transparent"
         },
         emphasis: {
           focus: 'self',
@@ -1377,10 +1365,12 @@
             shadowColor: 'rgba(255, 255, 255, 0.25)'
           }
         },
-        data: state.list.map(function(item) {
+        // 빈도 순위 그라데이션: 상위 단어일수록 따뜻한 색 (list는 빈도 내림차순)
+        data: state.list.map(function(item, i) {
           return {
             name: item[0],
-            value: item[1]
+            value: item[1],
+            textStyle: { color: RANK_COLORS[Math.min(RANK_COLORS.length - 1, Math.floor(i / state.list.length * RANK_COLORS.length))] }
           };
         })
       }]
@@ -1417,7 +1407,6 @@
 
   // ---------------- 워드클라우드 최대화 ----------------
   var stageEl = document.querySelector(".stage");
-  var GALAXY = ["#f3cc73", "#57c9bd", "#c792ea", "#e0819f", "#9fd8ff"]; // 골드·틸·바이올렛·핑크·아이스블루
 
   function setCloudMax(on){
     stageEl.classList.toggle("cloud-max", on);
