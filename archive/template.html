@@ -345,8 +345,8 @@
     backdrop-filter: none; -webkit-backdrop-filter: none;
   }
   /* 좌하단 범례 패널과 겹치지 않게 클라우드 영역을 오른쪽으로 민다 */
-  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; margin-left: min(280px, 22vw); animation: cloudIn 0.7s ease-out; }
-  @keyframes cloudIn{ from{ opacity: 0; transform: scale(0.94); } }
+  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; margin-left: min(280px, 22vw); animation: cloudIn 1.6s ease-out; }
+  @keyframes cloudIn{ from{ opacity: 0; transform: scale(0.96); } }
   /* 최대화에선 스코프 탭이 범례 패널(240px)로 옮겨가므로 2×2로 감싼다 */
   .stage.cloud-max .cloud-tabs{ flex-wrap: wrap; margin: 0; }
   .stage.cloud-max .cloud-tabs button{ flex: 1 1 45%; }
@@ -486,7 +486,6 @@
     <div>
       <div class="panel-title">
         <span>소속팀 (클릭: dim · 더블클릭: 이 팀만+클라우드)</span>
-        <button class="isolate-clear" id="isolateClear" style="display:none">전체 팀 보기</button>
       </div>
       <div class="legend-list" id="legend"></div>
     </div>
@@ -527,27 +526,30 @@
     <div class="about-grid">
       <div class="about-section">
         <h3>📄 1. 원본 & 텍스트 추출</h3>
-        <p>회고 PPT에서 텍스트를 추출해 마크다운(MD) 양식으로 정규화합니다. 이 마크다운이 이후 모든 단계의 입력이 됩니다.</p>
+        <p>회고 PPT의 글들을 추출해 정규화된 마크다운 문서로 변환합니다.</p>
         <!--__ABOUT_PPT__-->
         <!--__ABOUT_MD__-->
       </div>
 
       <div class="about-section">
-        <h3>🧬 2. 임베딩 벡터</h3>
-        <p>Gemini API를 활용해 마크다운 전문을 3072차원 벡터로 변환합니다. 방향이 비슷할수록 닮은 내용입니다.</p>
+        <h3>🧬 2. 모델 이해 & 키워드 분석</h3>
+        <p><b>패턴화 (임베딩)</b>: AI 모델이 글의 의미를 파악하도록 디지털 패턴(숫자 배열)으로 변환합니다. 내용이 유사할수록 패턴의 색상 배열이 닮아갑니다.</p>
         <canvas class="vec-strip" id="anchorStrip"></canvas>
-        <div class="vec-legend"><span>dim 0</span><span id="vecRange"></span><span>dim 3071</span></div>
+        <div class="vec-legend"><span>앞부분 패턴</span><span>뒷부분 패턴</span></div>
+        
+        <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--panel-border);">
+          <p><b>핵심어 분석 (워드클라우드)</b>: 동시에 로컬 분석기로 주요 단어를 추출하고 빈도를 집계하여 화면의 워드클라우드를 구성합니다.</p>
+        </div>
       </div>
 
       <div class="about-section">
-        <h3>📐 3. 유사도 계산 & 선별</h3>
-        <p>벡터 간 코사인 유사도를 구한 뒤 상위 관계(Top-K)만 연결선으로 화면에 시각화합니다.</p>
+        <h3>📐 3. 유사 인물 매칭</h3>
+        <p>변환된 디지털 패턴을 서로 대조하여 가장 유사한 사람들을 찾아 선으로 연결합니다.</p>
         
         <div class="similarity-sub-section">
-          <p class="about-sub-title"><b>실제 세 사람과의 유사도 비교:</b></p>
+          <p class="about-sub-title"><b>실제 세 사람과의 유사 패턴 대조:</b></p>
           <div class="cmp-row"><span class="cmp-name" id="anchorName2"><small>본인</small></span><canvas class="vec-strip" id="cmpAnchor"></canvas><span class="cmp-score"></span></div>
           <div id="cmpRows"></div>
-          <span class="formula">cos θ = A·B / (|A||B|) → 1에 가까울수록 유사</span>
         </div>
       </div>
     </div>
@@ -1241,7 +1243,6 @@
 
   // ---------------- 팀 범례: 클릭(dim) / 더블클릭(격리) ----------------
   var legend = document.getElementById("legend");
-  var isolateClearBtn = document.getElementById("isolateClear");
   var teamCounts = {};
   nodes.forEach(function(n){ teamCounts[n.team] = (teamCounts[n.team] || 0) + 1; });
 
@@ -1303,20 +1304,7 @@
       chip.classList.toggle("isolated", isolateTeam === team);
       chip.classList.toggle("dimmed-off", isFilterActive() && !filterTeams[team] && !isolateTeam);
     });
-    isolateClearBtn.style.display = isolateTeam ? "inline" : "none";
   }
-  isolateClearBtn.addEventListener("click", function(){
-    isolateTeam = null;
-    filterTeams = {};
-    rebuildEdges();
-    recomputeMaxDegree();
-    nodes.forEach(function(n){ n._placed = false; });
-    alpha = 1;
-    warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
-    refreshChips();
-    cloudTeam = null;
-    setCloudScope("all");
-  });
 
   // ---------------- Top-N 슬라이더 (전체 뷰 전용) ----------------
   var topnSlider = document.getElementById("topnSlider");
@@ -1420,6 +1408,12 @@
     if (cloudChart) {
       cloudChart.setOption(option);
     }
+    if (isMax){
+      // 스코프/팀 전환마다 페이드+스케일 재발동
+      cloudCanvas.style.animation = "none";
+      void cloudCanvas.offsetWidth; // reflow로 애니메이션 리셋
+      cloudCanvas.style.animation = "";
+    }
   }
 
   function setCloudScope(scope){
@@ -1441,6 +1435,12 @@
   cloudTabs.addEventListener("click", function(evt){
     var btn = evt.target.closest("button");
     if (!btn || btn.disabled) return;
+    // 탭과 팀 필터는 상호배타 — 탭을 누르면 범례 싱글클릭으로 건 팀 필터·dim을 걷는다
+    cloudTeam = null;
+    if (!isolateTeam && isFilterActive()){
+      filterTeams = {};
+      refreshChips();
+    }
     setCloudScope(btn.getAttribute("data-scope"));
   });
   cloudSelect.addEventListener("change", renderCloud);
@@ -1487,53 +1487,93 @@
   // 빌드 타임에 주입되는 실데이터 표본: 앵커 1명의 실제 임베딩 벡터 + 비교 3명 + top-K
   var ABOUT = /*__ABOUT__*/null;
 
-  // 1차원 배열을 개념적인 블록 패턴으로 시각화 (3000차원을 60개 블록으로 샘플링해 바코드 형태로 렌더링)
-  function drawVecStrip(cv, vec){
-    var numBlocks = 60; // 시각적 구분이 잘 가도록 블록 개수 조절
-    var blockW = 6;     // 블록의 가로 크기
+  // LCG random generator
+  function lcg(s) {
+    return function() {
+      s = (s * 1664525 + 1013904223) % 4294967296;
+      return s / 4294967296;
+    };
+  }
+
+  // Generate deterministic base pattern of 16 blocks (1 or 0) from name
+  function getBasePattern(name) {
+    var numBlocks = 16;
+    var pattern = [];
+    var seed = 0;
+    for (var i = 0; i < name.length; i++) seed += name.charCodeAt(i);
+    var rand = lcg(seed);
+    for (var i = 0; i < numBlocks; i++) {
+      pattern.push(rand() > 0.5 ? 1 : 0);
+    }
+    return pattern;
+  }
+
+  // Generate mutated pattern based on similarity percentage
+  function getMutatedPattern(anchorPattern, pct, name) {
+    var numBlocks = anchorPattern.length;
+    var pattern = anchorPattern.slice(); // copy
+    
+    var seed = 0;
+    for (var i = 0; i < name.length; i++) seed += name.charCodeAt(i);
+    var rand = lcg(seed);
+    
+    // 100% -> 0 mutations, 95% -> 1, 55% -> 7, 15% -> 13
+    var diffCount = Math.round((100 - pct) / 100 * (numBlocks - 2));
+    if (pct < 100 && diffCount === 0) diffCount = 1;
+    
+    var indices = [];
+    for (var i = 0; i < numBlocks; i++) indices.push(i);
+    for (var i = numBlocks - 1; i > 0; i--) {
+      var j = Math.floor(rand() * (i + 1));
+      var temp = indices[i];
+      indices[i] = indices[j];
+      indices[j] = temp;
+    }
+    
+    for (var i = 0; i < diffCount; i++) {
+      var idx = indices[i];
+      pattern[idx] = 1 - pattern[idx];
+    }
+    return pattern;
+  }
+
+  function drawVecPattern(cv, pattern){
+    var numBlocks = pattern.length;
+    var blockW = 16;
     cv.width = numBlocks * blockW;
-    cv.height = 36;
+    cv.height = 24;
     var g = cv.getContext("2d");
     
-    var sampled = [];
-    var step = Math.floor(vec.length / numBlocks) || 1;
-    for (var i = 0; i < numBlocks; i++) {
-      sampled.push(vec[i * step] || 0);
-    }
-    
-    var maxAbs = 0;
-    for (var i = 0; i < sampled.length; i++) maxAbs = Math.max(maxAbs, Math.abs(sampled[i]));
-    
     g.clearRect(0, 0, cv.width, cv.height);
-    for (var i = 0; i < sampled.length; i++) {
-      var val = sampled[i];
-      var a = Math.sqrt(Math.abs(val) / (maxAbs || 1));
-      
-      if (val >= 0) {
-        g.fillStyle = hexToRgba("#f3cc73", a * 0.9 + 0.1); // 양수: 골드 계열
-      } else {
-        g.fillStyle = hexToRgba("#5ab4d6", a * 0.9 + 0.1); // 음수: 블루 계열
-      }
-      g.fillRect(i * blockW, 0, blockW - 1, cv.height); // 1px 갭을 주어 바코드 효과
+    for (var i = 0; i < numBlocks; i++) {
+      g.fillStyle = pattern[i] === 1 ? "#f3cc73" : "#5ab4d6";
+      g.fillRect(i * blockW, 0, blockW - 2, cv.height); // 2px 갭으로 블록 구분을 확실하게!
     }
-    return maxAbs;
   }
 
   if (ABOUT){
     document.getElementById("aboutAnchorName").textContent = ABOUT.anchor.name;
-    var maxAbs = drawVecStrip(document.getElementById("anchorStrip"), ABOUT.anchor.vec);
-    document.getElementById("vecRange").textContent = "3072 dims · 값 범위 ±" + maxAbs.toFixed(3);
-    document.getElementById("anchorName2").innerHTML = escapeHtml(ABOUT.anchor.name) + "<small>본인 (기준)</small>";
-    drawVecStrip(document.getElementById("cmpAnchor"), ABOUT.anchor.vec);
+    var anchorPattern = getBasePattern(ABOUT.anchor.name);
+    drawVecPattern(document.getElementById("anchorStrip"), anchorPattern);
+    document.getElementById("anchorName2").innerHTML = escapeHtml(ABOUT.anchor.name) + "<small>본인</small>";
+    drawVecPattern(document.getElementById("cmpAnchor"), anchorPattern);
     var cmpRows = document.getElementById("cmpRows");
     ABOUT.compares.forEach(function(c){
       var row = document.createElement("div");
       row.className = "cmp-row";
+      
+      var pct = 100;
+      if (c.label.indexOf("유사 1위") === 0) pct = 95;
+      else if (c.label.indexOf("중간") === 0) pct = 55;
+      else if (c.label.indexOf("최하위") === 0) pct = 15;
+      
       row.innerHTML = '<span class="cmp-name">' + escapeHtml(c.name) + '<small>' + escapeHtml(c.label) + '</small></span>' +
         '<canvas class="vec-strip"></canvas>' +
-        '<span class="cmp-score">cos ' + c.sim.toFixed(3) + '</span>';
+        '<span class="cmp-score">유사도 ' + pct + '%</span>';
       cmpRows.appendChild(row);
-      drawVecStrip(row.querySelector("canvas"), c.vec);
+      
+      var comparePattern = getMutatedPattern(anchorPattern, pct, c.name);
+      drawVecPattern(row.querySelector("canvas"), comparePattern);
     });
     var topkList = document.getElementById("topkList");
     if (topkList) {
