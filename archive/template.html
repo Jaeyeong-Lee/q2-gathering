@@ -179,7 +179,6 @@
   }
   .team-chip:hover{ background: rgba(255,255,255,0.05); }
   .team-chip:focus-visible{ outline: 2px solid var(--gold); }
-  .team-chip.dimmed-off{ opacity: 0.4; }
   .team-chip.isolated{ color: var(--ink); background: rgba(255,255,255,0.07); }
   .team-chip .dot{ width: 9px; height: 9px; }
   .team-chip .count{ margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
@@ -344,9 +343,20 @@
     background: rgba(4,5,13,0.80);
     backdrop-filter: none; -webkit-backdrop-filter: none;
   }
-  /* 좌하단 범례 패널과 겹치지 않게 클라우드 영역을 오른쪽으로 민다 */
-  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; margin-left: min(280px, 22vw); animation: cloudIn 1.6s ease-out; }
-  @keyframes cloudIn{ from{ opacity: 0; transform: scale(0.96); } }
+  /* 좌하단 범례 패널과 겹치지 않게 클라우드 영역을 오른쪽으로 민다.
+     등장: 중앙→바깥 원형 리빌 — 큰 단어(골드)가 중앙이라 자연스럽게 중요도 순으로 드러난다 */
+  .stage.cloud-max #cloudCanvas{
+    flex: 1; height: auto; margin-left: min(280px, 22vw);
+    -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%);
+    mask-image: radial-gradient(circle, #000 99%, transparent 100%);
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center; mask-position: center;
+    animation: cloudReveal 1.8s ease-out;
+  }
+  @keyframes cloudReveal{
+    from{ opacity: 0.3; -webkit-mask-size: 6% 6%; mask-size: 6% 6%; }
+    to{ opacity: 1; -webkit-mask-size: 250% 250%; mask-size: 250% 250%; }
+  }
   /* 최대화에선 스코프 탭이 범례 패널(240px)로 옮겨가므로 2×2로 감싼다 */
   .stage.cloud-max .cloud-tabs{ flex-wrap: wrap; margin: 0; }
   .stage.cloud-max .cloud-tabs button{ flex: 1 1 45%; }
@@ -485,7 +495,7 @@
   <div class="panel side-panel">
     <div>
       <div class="panel-title">
-        <span>소속팀 (클릭: dim · 더블클릭: 이 팀만+클라우드)</span>
+        <span>소속팀 (팀 클릭: 그 팀만 보기 · 다시 클릭: 전체)</span>
       </div>
       <div class="legend-list" id="legend"></div>
     </div>
@@ -551,10 +561,11 @@
           <div class="cmp-row"><span class="cmp-name" id="anchorName2"><small>본인</small></span><canvas class="vec-strip" id="cmpAnchor"></canvas><span class="cmp-score"></span></div>
           <div id="cmpRows"></div>
         </div>
+        <p class="about-note" style="margin-top: 14px; border-top: 1px dashed var(--panel-border); padding-top: 10px;">
+          * 서로를 Top-K 이웃으로 지목하는 관계(상호 유사)일수록 연결선이 굵어집니다.
+        </p>
       </div>
     </div>
-
-    <p class="about-note">* 워드클라우드는 형태소 분석(명사 추출) 빈도 기반 — LLM이 아닌 로컬 처리입니다.</p>
   </div>
 </div>
 
@@ -604,11 +615,8 @@
     neighborsFull[idStr] = DATA.neighbors[idStr].map(function(e){ return { node: byId[e.id], w: e.w }; });
   });
 
-  // ---------------- 팀 필터 / 격리 상태 ----------------
-  var filterTeams = {};   // team -> true (dim 처리 대상 아님, 강조 표시)
+  // ---------------- 팀 필터 (격리) 상태 ----------------
   var isolateTeam = null; // 특정 팀만 남기고 나머지 완전히 숨김 + 재배치
-
-  function isFilterActive(){ return Object.keys(filterTeams).length > 0; }
 
   function activeNodeList(){
     return isolateTeam ? nodes.filter(function(n){ return n.team === isolateTeam; }) : nodes;
@@ -962,8 +970,7 @@
     // 노드
     pool.forEach(function(n){
       if (!n.visible) return;
-      var inTeamFilter = !isFilterActive() || filterTeams[n.team];
-      var dim = active ? !active[n.id] : !(inTeamFilter && passesTagFilter(n, filterTag));
+      var dim = active ? !active[n.id] : !passesTagFilter(n, filterTag);
       var isSelected = n.id === selectedId;
       var isHover = n.id === hoverId;
       var showLabel = active ? (isSelected || (revealedIds && revealedIds[n.id])) : isHover;
@@ -1255,23 +1262,12 @@
       '<span>' + escapeHtml(team) + '</span>' +
       '<span class="count">' + (teamCounts[team] || 0) + '</span>';
 
-    var clickTimer = null;
+    // 원클릭 단일 모델: 팀 클릭 = 그 팀만 보기, 다시 클릭 = 전체 (어느 화면에서나 동일)
+    var lastClickAt = 0;
     chip.addEventListener("click", function(){
-      if (clickTimer) return;
-      clickTimer = setTimeout(function(){
-        clickTimer = null;
-        if (stageEl.classList.contains("cloud-max")){
-          // 최대화: 싱글클릭 한 번으로 그 팀 격리+클라우드, 재클릭 = 전체 복귀
-          setIsolate(isolateTeam === team ? null : team);
-          return;
-        }
-        if (isolateTeam) return; // 격리 중엔 dim 토글 비활성화 (해제: 빈 공간 클릭/더블클릭)
-        if (filterTeams[team]) delete filterTeams[team]; else filterTeams[team] = true;
-        refreshChips();
-      }, 230);
-    });
-    chip.addEventListener("dblclick", function(){
-      if (clickTimer){ clearTimeout(clickTimer); clickTimer = null; }
+      var now = Date.now();
+      if (now - lastClickAt < 350) return; // 습관성 더블클릭이 토글을 두 번 밟지 않게
+      lastClickAt = now;
       setIsolate(isolateTeam === team ? null : team);
     });
 
@@ -1281,17 +1277,14 @@
 
   function refreshChips(){
     Object.keys(chipEls).forEach(function(team){
-      var chip = chipEls[team];
-      chip.classList.toggle("isolated", isolateTeam === team);
-      chip.classList.toggle("dimmed-off", isFilterActive() && !filterTeams[team] && !isolateTeam);
+      chipEls[team].classList.toggle("isolated", isolateTeam === team);
     });
   }
 
   // 팀 격리 + 워드클라우드 팀 필터를 한 번에 (team=null이면 전체 복귀)
-  // 진입 경로: 범례 더블클릭(그래프 뷰) · 싱글클릭(최대화) · 빈 공간 클릭(해제)
+  // 진입 경로: 범례 팀 클릭(토글) · 빈 공간 클릭(해제)
   function setIsolate(team){
     isolateTeam = team;
-    filterTeams = {};
     if (viewMode === "ego") exitEgo();
     rebuildEdges();
     recomputeMaxDegree();
@@ -1322,8 +1315,7 @@
   var cloudSelect = document.getElementById("cloudSelect");
   var cloudTabs = document.getElementById("cloudTabs");
   var cloudScope = "all";
-  var cloudTeam = null; // team 스코프의 대상 팀 — 격리(더블클릭) 또는 최대화 싱글클릭이 설정
-  var cloudWaveTimer = null; // 최대화 색상 웨이브 등장용
+  var cloudTeam = null; // team 스코프의 대상 팀 — 범례 팀 클릭이 설정
   var RANK_COLORS = ["#f3cc73", "#f2a154", "#e0819f", "#c792ea", "#7c9ce6", "#57c9bd"]; // 골드→틸: 빈도 순위
   var CLOUD_CLS = (function(){
     var s = {};
@@ -1403,25 +1395,11 @@
       }]
     };
 
-    clearTimeout(cloudWaveTimer);
     if (cloudChart) {
-      // 최대화: 색상(빈도 순위) 버킷별로 320ms 간격 웨이브 등장 — 골드부터 틸까지
-      var fullData = option.series[0].data;
-      var waves = (isMax && !matchMedia("(prefers-reduced-motion: reduce)").matches) ? RANK_COLORS.length : 1;
-      var wave = 1;
-      option.series[0].data = fullData.slice(0, Math.ceil(fullData.length * wave / waves));
       cloudChart.setOption(option);
-      (function nextWave(){
-        if (wave >= waves) return;
-        cloudWaveTimer = setTimeout(function(){
-          wave++;
-          cloudChart.setOption({ series: [{ data: fullData.slice(0, Math.ceil(fullData.length * wave / waves)) }] });
-          nextWave();
-        }, 320);
-      })();
     }
     if (isMax){
-      // 스코프/팀 전환마다 페이드+스케일 재발동
+      // 스코프/팀 전환마다 원형 리빌 재발동
       cloudCanvas.style.animation = "none";
       void cloudCanvas.offsetWidth; // reflow로 애니메이션 리셋
       cloudCanvas.style.animation = "";
@@ -1447,12 +1425,6 @@
   cloudTabs.addEventListener("click", function(evt){
     var btn = evt.target.closest("button");
     if (!btn || btn.disabled) return;
-    // 탭과 팀 필터는 상호배타 — 탭을 누르면 범례 싱글클릭으로 건 팀 필터·dim을 걷는다
-    cloudTeam = null;
-    if (!isolateTeam && isFilterActive()){
-      filterTeams = {};
-      refreshChips();
-    }
     setCloudScope(btn.getAttribute("data-scope"));
   });
   cloudSelect.addEventListener("change", renderCloud);
