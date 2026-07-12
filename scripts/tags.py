@@ -35,23 +35,28 @@ PROMPT = """다음은 한 구성원의 근원경쟁력 회고 텍스트다.
 {text}"""
 
 
-def extract_all(persons, call, retries=1, synonyms=None):
+def extract_all(persons, call, retries=1, synonyms=None, delay=0.5):
     """1인 1호출 배치. 실패한 인물만 retries회까지 개별 재시도.
 
     반환: ({id: [태그]}, [최종 실패 id])
     """
+    import time
     if synonyms is None:
         synonyms = load_synonyms()
     by_id, failed = {}, []
-    for p in persons:
+    for i, p in enumerate(persons):
         prompt = PROMPT.format(text=p["text"])
         for attempt in range(1 + retries):
             try:
                 by_id[p["id"]] = normalize(parse_tags(call(prompt)), synonyms)
+                if i % 10 == 9:
+                    print(f"처리: {i + 1}/{len(persons)}", file=sys.stderr)
                 break
             except Exception:
                 if attempt == retries:
                     failed.append(p["id"])
+        if delay > 0:
+            time.sleep(delay)
     return by_id, failed
 
 
@@ -89,13 +94,13 @@ def parse_tags(response):
     return out
 
 
-def main(persons_path=ROOT / "data" / "persons.json", call=None, retries=1):
+def main(persons_path=ROOT / "data" / "persons.json", call=None, retries=1, delay=0.5):
     """persons.json의 tags 필드를 LLM 추출 태그로 갱신. 실패 인물은 기존 태그 유지, id 목록 반환."""
     if call is None:
         raise SystemExit("LLM 호출 함수 미연결 — 실데이터 때 call 파라미터에 실제 호출부를 꽂아 실행")
     persons_path = Path(persons_path)
     persons = json.loads(persons_path.read_text())
-    by_id, failed = extract_all(persons, call, retries=retries)
+    by_id, failed = extract_all(persons, call, retries=retries, delay=delay)
     by_id = consolidate_pool(by_id, call)
     for p in persons:
         if p["id"] in by_id:

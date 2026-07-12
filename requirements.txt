@@ -1,2 +1,3 @@
 pytest
 kiwipiepy  # todos/003 한국어 형태소 분석 (freq.py)
+google-generativeai
