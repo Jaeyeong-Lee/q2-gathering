@@ -316,15 +316,8 @@
     width: 360px;
     padding: 12px 14px;
   }
-  .cloud-tabs{ display: flex; gap: 6px; margin: 9px 0 10px; }
-  .cloud-tabs button{
-    flex: 1; background: none; border: 1px solid var(--panel-border); border-radius: 7px;
-    color: var(--ink-dim); font-family: var(--sans); font-size: 12px; padding: 5px 0; cursor: pointer;
-  }
-  .cloud-tabs button.active{ color: var(--ink); background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.25); }
-  .cloud-tabs button:disabled{ opacity: 0.35; cursor: default; }
   .cloud-select{
-    width: 100%; margin-bottom: 8px; background: rgba(255,255,255,0.06); color: var(--ink);
+    width: 100%; margin: 9px 0 8px; background: rgba(255,255,255,0.06); color: var(--ink);
     border: 1px solid var(--panel-border); border-radius: 7px; padding: 5px 8px;
     font-family: var(--sans); font-size: 12.5px;
   }
@@ -357,9 +350,6 @@
     from{ opacity: 0.3; -webkit-mask-size: 6% 6%; mask-size: 6% 6%; }
     to{ opacity: 1; -webkit-mask-size: 250% 250%; mask-size: 250% 250%; }
   }
-  /* 최대화에선 스코프 탭이 범례 패널(240px)로 옮겨가므로 2×2로 감싼다 */
-  .stage.cloud-max .cloud-tabs{ flex-wrap: wrap; margin: 0; }
-  .stage.cloud-max .cloud-tabs button{ flex: 1 1 45%; }
 
   .overlay-close{
     position: absolute; top: 22px; right: 28px; z-index: 30;
@@ -511,11 +501,7 @@
   <div class="panel cloud-panel">
     <button class="overlay-close" id="cloudMaxClose" aria-label="최대화 닫기">×</button>
     <div class="panel-title"><span>근원경쟁력 워드클라우드</span><button class="isolate-clear" id="cloudMaxBtn" title="최대화 (갤럭시 뷰)" aria-label="워드클라우드 최대화">⛶</button></div>
-    <div class="cloud-tabs" id="cloudTabs">
-      <button data-scope="all" class="active">전체</button>
-      <button data-scope="cl">CL별</button>
-    </div>
-    <select class="cloud-select" id="cloudSelect" style="display:none" aria-label="워드클라우드 대상 선택"></select>
+    <select class="cloud-select" id="cloudSelect" aria-label="CL 필터"></select>
     <div id="cloudCanvas"></div>
     <div class="cloud-note" id="cloudNote"></div>
   </div>
@@ -524,13 +510,13 @@
 
   <aside class="panel detail-panel" id="detailPanel"></aside>
 
-  <button class="about-btn" id="aboutBtn">이렇게 만들었어요</button>
+  <button class="about-btn" id="aboutBtn">💡 How it Works</button>
 </div>
 
 <div class="about-overlay" id="aboutOverlay">
   <button class="overlay-close" id="aboutClose" aria-label="설명 닫기">×</button>
   <div class="about-doc">
-    <h2>이렇게 만들었어요</h2>
+    <h2>💡 How it Works</h2>
     <p class="doc-sub">한 사람(<b id="aboutAnchorName"></b>)의 데이터가 화면의 연결선이 되기까지 — 아래 수치와 벡터는 전부 이 화면에 실제로 쓰인 데이터입니다.</p>
 
     <div class="about-grid">
@@ -543,27 +529,69 @@
 
       <div class="about-section">
         <h3>🧬 2. 모델 이해 & 키워드 분석</h3>
-        <p><b>패턴화 (임베딩)</b>: AI 모델이 글의 의미를 파악하도록 디지털 패턴(숫자 배열)으로 변환합니다. 내용이 유사할수록 패턴의 색상 배열이 닮아갑니다.</p>
+        <p><b>생각의 지문 (임베딩)</b>: AI 모델이 글의 의미를 파악하여 '생각 패턴(숫자 배열)'으로 변환합니다. 내용이 유사할수록 패턴의 색상 배열이 닮아갑니다.</p>
         <canvas class="vec-strip" id="anchorStrip"></canvas>
-        <div class="vec-legend"><span>앞부분 패턴</span><span>뒷부분 패턴</span></div>
+        <div class="vec-legend" style="margin-bottom: 12px;"><span>앞부분 패턴</span><span>뒷부분 패턴</span></div>
         
-        <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--panel-border);">
-          <p><b>핵심어 분석 (워드클라우드)</b>: 동시에 로컬 분석기로 주요 단어를 추출하고 빈도를 집계하여 화면의 워드클라우드를 구성합니다.</p>
+        <div style="margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--panel-border);">
+          <p><b>핵심어 분석 (워드클라우드)</b>: 로컬 분석기로 주요 명사만 추출해 빈도를 집계합니다.</p>
+          <div style="margin-top: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px; font-size: 12px;">
+            <div style="font-family: var(--mono); color: var(--ink-faint); margin-bottom: 4px; font-size: 10px;">형태소 분석 (명사 추출)</div>
+            <div style="line-height: 1.5; color: var(--ink-dim);">
+              "적극적으로 <span style="background: rgba(243,204,115,0.18); color: #f3cc73; border-radius: 4px; padding: 1px 3px;">협업</span>하여 <span style="background: rgba(243,204,115,0.18); color: #f3cc73; border-radius: 4px; padding: 1px 3px;">성과</span>를 냅니다."
+            </div>
+            <div style="margin-top: 6px; display: flex; gap: 6px; align-items: center; color: var(--ink-faint); font-size: 11px;">
+              <span>추출 결과:</span>
+              <span style="background: #f3cc73; color: #1a1b20; border-radius: 10px; padding: 1px 6px; font-weight: bold; font-size: 10.5px;">협업</span>
+              <span style="background: #f3cc73; color: #1a1b20; border-radius: 10px; padding: 1px 6px; font-weight: bold; font-size: 10.5px;">성과</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="about-section">
         <h3>📐 3. 유사 인물 매칭</h3>
-        <p>변환된 디지털 패턴을 서로 대조하여 가장 유사한 사람들을 찾아 선으로 연결합니다.</p>
+        <p>변환된 생각 패턴을 서로 대조하여 가장 유사한 사람들을 찾아 선으로 연결합니다.</p>
         
-        <div class="similarity-sub-section">
+        <div class="similarity-sub-section" style="margin-bottom: 12px;">
           <p class="about-sub-title"><b>실제 세 사람과의 유사 패턴 대조:</b></p>
           <div class="cmp-row"><span class="cmp-name" id="anchorName2"><small>본인</small></span><canvas class="vec-strip" id="cmpAnchor"></canvas><span class="cmp-score"></span></div>
           <div id="cmpRows"></div>
         </div>
-        <p class="about-note" style="margin-top: 14px; border-top: 1px dashed var(--panel-border); padding-top: 10px;">
-          * 서로를 Top-K 이웃으로 지목하는 관계(상호 유사)일수록 연결선이 굵어집니다.
-        </p>
+        
+        <div style="margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--panel-border); display: flex; flex-direction: column; align-items: center;">
+          <svg width="240" height="144" style="background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px; box-sizing: border-box;">
+            <!-- Top: Hub Cluster (Center at x=120, y=36) -->
+            <circle cx="120" cy="36" r="12" fill="#f3cc73" opacity="0.95"></circle>
+            <circle cx="120" cy="36" r="18" stroke="#f3cc73" stroke-width="1.5" fill="none" opacity="0.35"></circle>
+            
+            <!-- In-arrows from surrounding nodes -->
+            <circle cx="85" cy="20" r="3.5" fill="#f3cc73" opacity="0.6"></circle>
+            <line x1="88" y1="22" x2="108" y2="30" stroke="var(--ink-faint)" stroke-width="1" opacity="0.5"></line>
+            
+            <circle cx="85" cy="52" r="3.5" fill="#f3cc73" opacity="0.6"></circle>
+            <line x1="88" y1="50" x2="108" y2="42" stroke="var(--ink-faint)" stroke-width="1" opacity="0.5"></line>
+            
+            <circle cx="155" cy="20" r="3.5" fill="#f3cc73" opacity="0.6"></circle>
+            <line x1="152" y1="22" x2="132" y2="30" stroke="var(--ink-faint)" stroke-width="1" opacity="0.5"></line>
+            
+            <circle cx="155" cy="52" r="3.5" fill="#f3cc73" opacity="0.6"></circle>
+            <line x1="152" y1="50" x2="132" y2="42" stroke="var(--ink-faint)" stroke-width="1" opacity="0.5"></line>
+            
+            <text x="120" y="68" font-size="9.5" fill="#f3cc73" text-anchor="middle" font-weight="600">허브 노드 (지목 많음 → 크게 표시)</text>
+
+            <!-- Separator (Horizontal) -->
+            <line x1="20" y1="80" x2="220" y2="80" stroke="var(--panel-border)" stroke-width="1" stroke-dasharray="3,3"></line>
+
+            <!-- Bottom: Isolated Node (Center at x=120, y=108) -->
+            <circle cx="120" cy="108" r="4.5" fill="#f3cc73" opacity="0.95"></circle>
+            <circle cx="85" cy="108" r="3.5" fill="#f3cc73" opacity="0.6"></circle>
+            <line x1="88" y1="108" x2="112" y2="108" stroke="var(--ink-faint)" stroke-width="1" opacity="0.5"></line>
+            <polygon points="112,108 107,105 107,111" fill="var(--ink-faint)" opacity="0.5"></polygon>
+            
+            <text x="120" y="128" font-size="9.5" fill="var(--ink-dim)" text-anchor="middle">일반 노드 (지목 적음 → 작게 표시)</text>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -617,6 +645,7 @@
 
   // ---------------- 팀 필터 (격리) 상태 ----------------
   var isolateTeam = null; // 특정 팀만 남기고 나머지 완전히 숨김 + 재배치
+  var hoverTeam = null;   // 범례 hover 순간 강조 (클릭 상태 아님)
 
   function activeNodeList(){
     return isolateTeam ? nodes.filter(function(n){ return n.team === isolateTeam; }) : nodes;
@@ -970,7 +999,7 @@
     // 노드
     pool.forEach(function(n){
       if (!n.visible) return;
-      var dim = active ? !active[n.id] : !passesTagFilter(n, filterTag);
+      var dim = active ? !active[n.id] : !(passesTagFilter(n, filterTag) && (!hoverTeam || n.team === hoverTeam));
       var isSelected = n.id === selectedId;
       var isHover = n.id === hoverId;
       var showLabel = active ? (isSelected || (revealedIds && revealedIds[n.id])) : isHover;
@@ -1270,6 +1299,9 @@
       lastClickAt = now;
       setIsolate(isolateTeam === team ? null : team);
     });
+    // hover = 그 팀만 순간 강조 (떼면 즉시 복귀, 외울 것 없는 훑어보기)
+    chip.addEventListener("mouseenter", function(){ hoverTeam = team; });
+    chip.addEventListener("mouseleave", function(){ hoverTeam = null; });
 
     legend.appendChild(chip);
     chipEls[team] = chip;
@@ -1292,8 +1324,7 @@
     alpha = 1;
     warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
     refreshChips();
-    cloudTeam = team;
-    setCloudScope(team ? "team" : "all");
+    renderCloud(); // 클라우드 = 팀 필터 × CL 필터 교집합
   }
 
   // ---------------- Top-N 슬라이더 (전체 뷰 전용) ----------------
@@ -1313,21 +1344,27 @@
   var cloudCanvas = document.getElementById("cloudCanvas");
   var cloudNote = document.getElementById("cloudNote");
   var cloudSelect = document.getElementById("cloudSelect");
-  var cloudTabs = document.getElementById("cloudTabs");
-  var cloudScope = "all";
-  var cloudTeam = null; // team 스코프의 대상 팀 — 범례 팀 클릭이 설정
+  var cloudCL = ""; // CL 필터 ("" = 전체) — 팀 필터(isolateTeam)와 독립인 두 번째 축
   var RANK_COLORS = ["#f3cc73", "#f2a154", "#e0819f", "#c792ea", "#7c9ce6", "#57c9bd"]; // 골드→틸: 빈도 순위
   var CLOUD_CLS = (function(){
     var s = {};
     DATA.nodes.forEach(function(n){ s[n.cl_level] = true; });
     return Object.keys(s).sort();
   })();
+  cloudSelect.innerHTML = '<option value="">CL 전체</option>' + CLOUD_CLS.map(function(v){
+    return '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + "</option>";
+  }).join("");
+  cloudSelect.addEventListener("change", function(){
+    cloudCL = cloudSelect.value;
+    renderCloud();
+  });
 
   function renderCloud(){
     var isMax = stageEl.classList.contains("cloud-max");
-    // team 스코프는 탭이 아니라 범례 클릭(최대화)·더블클릭(격리)으로만 진입
-    var scopeValue = cloudScope === "team" ? cloudTeam : cloudSelect.value;
-    var ids = cloudScopeIds(cloudScope, scopeValue, DATA.nodes, null);
+    // 클라우드 대상 = 팀 필터(범례) × CL 필터(드롭다운) 교집합
+    var ids = DATA.nodes.filter(function(p){
+      return (!isolateTeam || p.team === isolateTeam) && (!cloudCL || p.cl_level === cloudCL);
+    }).map(function(p){ return p.id; });
     var state = cloudState(FREQ, ids);
 
     if (!cloudChart && window.echarts) {
@@ -1339,7 +1376,10 @@
       cloudNote.textContent = "표본 " + state.count + "명 — 5명 미만 집합은 표시하지 않습니다";
       return;
     }
-    cloudNote.textContent = cloudScope === "team" && cloudTeam ? "팀 필터: " + cloudTeam : "";
+    var filterParts = [];
+    if (isolateTeam) filterParts.push(isolateTeam);
+    if (cloudCL) filterParts.push(cloudCL);
+    cloudNote.textContent = filterParts.length ? "필터: " + filterParts.join(" · ") + " (" + ids.length + "명)" : "";
 
     var option = {
       tooltip: {
@@ -1406,29 +1446,6 @@
     }
   }
 
-  function setCloudScope(scope){
-    cloudScope = scope;
-    Array.prototype.forEach.call(cloudTabs.querySelectorAll("button"), function(b){
-      b.classList.toggle("active", b.getAttribute("data-scope") === scope);
-    });
-    if (scope === "cl"){
-      cloudSelect.innerHTML = CLOUD_CLS.map(function(v){
-        return '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + "</option>";
-      }).join("");
-      cloudSelect.style.display = "block";
-    } else {
-      cloudSelect.style.display = "none";
-    }
-    renderCloud();
-  }
-
-  cloudTabs.addEventListener("click", function(evt){
-    var btn = evt.target.closest("button");
-    if (!btn || btn.disabled) return;
-    setCloudScope(btn.getAttribute("data-scope"));
-  });
-  cloudSelect.addEventListener("change", renderCloud);
-
   // ---------------- 워드클라우드 최대화 ----------------
   var stageEl = document.querySelector(".stage");
 
@@ -1439,13 +1456,11 @@
   function setCloudMax(on){
     stageEl.classList.toggle("cloud-max", on);
     if (on){
-      // Top-N은 최대화에서 무의미 → 그 자리에 스코프 탭을 옮겨 범례 패널을 클라우드 컨트롤러로
+      // Top-N은 최대화에서 무의미 → 그 자리에 CL 드롭다운을 옮겨 범례 패널을 필터 컨트롤러로
       topnRow.style.display = "none";
-      sidePanelEl.appendChild(cloudTabs);
       sidePanelEl.appendChild(cloudSelect);
     } else {
       topnRow.style.display = "";
-      cloudPanelEl.insertBefore(cloudTabs, cloudCanvas);
       cloudPanelEl.insertBefore(cloudSelect, cloudCanvas);
     }
     if (cloudChart) cloudChart.resize();
@@ -1591,7 +1606,7 @@
   resize();
   warmUp(300); // 첫 프레임 전에 초기 요동(빅뱅)을 화면 밖에서 소화
   loop();
-  setCloudScope("all");
+  renderCloud();
   // #ego=<id> 딥링크: 데모 중 특정 인물 에고 뷰로 바로 진입 (헤드리스 검증 겸용)
   var egoHash = location.hash.match(/^#ego=(\d+)$/);
   if (egoHash && byId[parseInt(egoHash[1], 10)]) enterEgo(parseInt(egoHash[1], 10));
