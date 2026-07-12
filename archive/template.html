@@ -381,17 +381,40 @@
       var(--bg);
   }
   .about-overlay.visible{ display: block; }
-  .about-doc{ max-width: 860px; margin: 0 auto; padding: clamp(40px, 7vh, 72px) 24px 80px; }
+  .about-doc{ max-width: 1040px; margin: 0 auto; padding: clamp(40px, 7vh, 72px) 24px 80px; }
   .about-doc h2{ margin: 0 0 6px; font-size: clamp(22px, 2.4vw, 30px); letter-spacing: -0.01em; }
   .about-doc .doc-sub{ margin: 0 0 36px; font-size: 13.5px; color: var(--ink-dim); }
+  .about-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+  }
+  @media (max-width: 860px) {
+    .about-grid{
+      grid-template-columns: 1fr;
+    }
+  }
   .about-section{
     background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px;
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    padding: 24px 26px; margin-bottom: 18px;
+    padding: 24px 26px; margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
   }
   .about-section h3{ margin: 0 0 10px; font-size: 16px; color: var(--gold); }
   .about-section p{ margin: 8px 0 0; font-size: 13.5px; line-height: 1.7; color: var(--ink-dim); }
   .about-section p b{ color: var(--ink); }
+  .similarity-sub-section, .topk-sub-section {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--panel-border);
+  }
+  .about-sub-title {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    margin: 0 0 10px 0;
+  }
   .about-section .formula{
     font-family: var(--mono); font-size: 13px; color: var(--ink);
     background: rgba(255,255,255,0.05); border-radius: 8px; padding: 8px 12px;
@@ -499,39 +522,44 @@
     <h2>이렇게 만들었어요</h2>
     <p class="doc-sub">한 사람(<b id="aboutAnchorName"></b>)의 데이터가 화면의 연결선이 되기까지 — 아래 수치와 벡터는 전부 이 화면에 실제로 쓰인 데이터입니다.</p>
 
-    <div class="about-section">
-      <h3>📄 1. 원본 — 근원경쟁력 회고 PPT</h3>
-      <p>모든 것의 시작은 분기회 때 각자 작성한 근원경쟁력 회고 슬라이드입니다. 인당 한 장씩, 자유 서술.</p>
-      <!--__ABOUT_PPT__-->
-    </div>
+    <div class="about-grid">
+      <div class="about-section">
+        <h3>📄 1. 원본 — 근원경쟁력 회고 PPT</h3>
+        <p>모든 것의 시작은 분기회 때 각자 작성한 근원경쟁력 회고 슬라이드입니다. 인당 한 장씩, 자유 서술.</p>
+        <!--__ABOUT_PPT__-->
+      </div>
 
-    <div class="about-section">
-      <h3>📝 2. 텍스트 추출 — PPT → 마크다운</h3>
-      <p>PPT에서 인당 텍스트를 뽑아 <b>마크다운 한 편</b>으로 정규화합니다. 제목·불릿 구조는 남기고 서식은 버립니다. 이 md가 이후 모든 단계의 유일한 입력입니다.</p>
-      <!--__ABOUT_MD__-->
-    </div>
+      <div class="about-section">
+        <h3>📝 2. 텍스트 추출 — PPT → 마크다운</h3>
+        <p>PPT에서 인당 텍스트를 뽑아 <b>마크다운 한 편</b>으로 정규화합니다. 제목·불릿 구조는 남기고 서식은 버립니다. 이 md가 이후 모든 단계의 유일한 입력입니다.</p>
+        <!--__ABOUT_MD__-->
+      </div>
 
-    <div class="about-section">
-      <h3>🧬 3. 임베딩 — 텍스트를 3072개의 숫자로</h3>
-      <p>md 전문을 Gemini 임베딩 API에 보내면 <b>3072차원 벡터</b>(숫자 3072개짜리 1차원 배열)가 돌아옵니다. 아래는 그 배열을 값→색으로 칠한 실제 벡터입니다. 픽셀 하나가 숫자 하나.</p>
-      <canvas class="vec-strip" id="anchorStrip"></canvas>
-      <div class="vec-legend"><span>dim 0</span><span id="vecRange"></span><span>dim 3071</span></div>
-      <p>이 숫자들 자체엔 의미가 없지만, <b>비슷한 이야기를 쓴 사람일수록 벡터가 비슷한 방향을 가리킵니다.</b></p>
-    </div>
+      <div class="about-section">
+        <h3>🧬 3. 임베딩 — 텍스트를 3072개의 숫자로</h3>
+        <p>md 전문을 Gemini 임베딩 API에 보내면 <b>3072차원 벡터</b>(숫자 3072개짜리 1차원 배열)가 돌아옵니다. 아래는 그 배열을 값→색으로 칠한 실제 벡터입니다. 픽셀 하나가 숫자 하나.</p>
+        <canvas class="vec-strip" id="anchorStrip"></canvas>
+        <div class="vec-legend"><span>dim 0</span><span id="vecRange"></span><span>dim 3071</span></div>
+        <p>이 숫자들 자체엔 의미가 없지만, <b>비슷한 이야기를 쓴 사람일수록 벡터가 비슷한 방향을 가리킵니다.</b></p>
+      </div>
 
-    <div class="about-section">
-      <h3>📐 4. 코사인 유사도 — 벡터끼리 방향 비교</h3>
-      <p>두 벡터가 이루는 각도로 유사도를 잽니다. 무늬가 닮았으면 점수가 높습니다 — 실제 세 사람과 비교한 결과:</p>
-      <div class="cmp-row"><span class="cmp-name" id="anchorName2"><small>본인</small></span><canvas class="vec-strip" id="cmpAnchor"></canvas><span class="cmp-score"></span></div>
-      <div id="cmpRows"></div>
-      <span class="formula">cos θ = A·B / (|A||B|) → 1에 가까울수록 유사</span>
-    </div>
+      <div class="about-section">
+        <h3>📐 4. 유사도 계산 & 선별 — 상위 관계 연결</h3>
+        <p>두 벡터가 이루는 각도(코사인 유사도)를 계산하여 방향이 비슷한 사람을 찾고, 그 중 상위 관계(Top-K)만 연결선으로 화면에 시각화합니다.</p>
+        
+        <div class="similarity-sub-section">
+          <p class="about-sub-title"><b>실제 세 사람과의 유사도 비교:</b></p>
+          <div class="cmp-row"><span class="cmp-name" id="anchorName2"><small>본인</small></span><canvas class="vec-strip" id="cmpAnchor"></canvas><span class="cmp-score"></span></div>
+          <div id="cmpRows"></div>
+          <span class="formula">cos θ = A·B / (|A||B|) → 1에 가까울수록 유사</span>
+        </div>
 
-    <div class="about-section">
-      <h3>🕸️ 5. Top-K 선별 — 점수 상위만 연결선으로</h3>
-      <p>150명 전원 쌍을 다 이으면 11,175개 선이 됩니다. 그래서 인당 <b>유사도 상위 K=30명</b>만 저장하고, 화면에서는 Top-N 슬라이더로 그중 몇 개를 보여줄지 조절합니다. 이 사람의 실제 상위 10명:</p>
-      <div class="topk-list" id="topkList"></div>
-      <p class="about-note">…30위까지 저장되어 있고, 인물 클릭 시 상위 10명이 궤도 뷰로 펼쳐집니다.</p>
+        <div class="topk-sub-section">
+          <p class="about-sub-title"><b>이 사람의 유사도 상위 10명:</b></p>
+          <div class="topk-list" id="topkList"></div>
+          <p class="about-note">…30위까지 저장되어 있고, 인물 클릭 시 상위 10명이 궤도 뷰로 펼쳐집니다.</p>
+        </div>
+      </div>
     </div>
 
     <p class="about-note">* 워드클라우드는 형태소 분석(명사 추출) 빈도 기반 — LLM이 아닌 로컬 처리입니다.</p>
@@ -729,7 +757,8 @@
       edges.forEach(function(e){
         var dx = e.b.x - e.a.x, dy = e.b.y - e.a.y;
         var dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
-        var restLen = (1 - Math.max(e.w, 0)) * 180 + 34;
+        // 더미 유사도가 0.85~0.97에 몰려 있어 상수항이 실질 간격을 정한다 — 작으면 전부 엉겨붙음
+        var restLen = (1 - Math.max(e.w, 0)) * 200 + 95;
         var k = 0.02 + Math.max(e.w, 0) * 0.03;
         var f = (dist - restLen) * k;
         var fx = (dx / dist) * f, fy = (dy / dist) * f;
@@ -767,6 +796,11 @@
     }
 
     updateEgoTransition();
+  }
+
+  // 물리를 화면 밖에서 미리 돌려 배치 요동을 숨긴다 (시작·격리 토글 공용)
+  function warmUp(ticks){
+    for (var i = 0; i < ticks; i++) tick();
   }
 
   // ---------------- 에고 뷰 (선택 인물 중앙 배치 + 상위 10명 궤도) ----------------
@@ -1267,6 +1301,7 @@
       recomputeMaxDegree();
       nodes.forEach(function(n){ n._placed = false; });
       alpha = 1;
+      warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
       refreshChips();
     });
 
@@ -1289,6 +1324,7 @@
     recomputeMaxDegree();
     nodes.forEach(function(n){ n._placed = false; });
     alpha = 1;
+    warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
     refreshChips();
   });
 
@@ -1508,8 +1544,7 @@
 
   // ---------------- 시작 ----------------
   resize();
-  // 워밍업: 첫 프레임 전에 물리를 미리 돌려 초기 요동(빅뱅)을 화면 밖에서 소화한다
-  for (var wu = 0; wu < 300; wu++) tick();
+  warmUp(300); // 첫 프레임 전에 초기 요동(빅뱅)을 화면 밖에서 소화
   loop();
   setCloudScope("all");
   // #ego=<id> 딥링크: 데모 중 특정 인물 에고 뷰로 바로 진입 (헤드리스 검증 겸용)
