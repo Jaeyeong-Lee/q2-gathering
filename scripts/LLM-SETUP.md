@@ -1,275 +1,210 @@
-# LLM API 설정 가이드
+# LLM API 상세 설정
 
-**2개의 독립적인 LLM 호출** (각각 다른 API일 수 있음):
-1. **임베딩 모델** (`scripts/embed.py`) — 텍스트 → 벡터 (EMBED_PROVIDER)
-2. **태그 추출** (`scripts/run_extraction.py`) — 텍스트 → 태그 (TEXT_PROVIDER)
+## 개요
 
-각 API는 독립적인 환경변수로 제어합니다. `llm.py`는 OpenAI Compatible API를 지원하므로, 어떤 LLM 제공자든 사용 가능합니다.
+2개의 독립적인 API:
+1. **TEXT** (태그 추출): LLM 텍스트 생성 모델 — `scripts/run_extraction.py`
+2. **EMBED** (임베딩): 임베딩 모델 — `scripts/embed.py`
 
----
-
-## 1️⃣ Gemini (기본값)
-
-```bash
-export LLM_PROVIDER=gemini
-export GEMINI_API_KEY=your-api-key-here
-```
-
-- 임베딩: `models/gemini-embedding-2` (3072차원)
-- 텍스트 생성: `models/gemini-2.5-flash`
-- 비용: ~$0.20/배치 (150명)
-- 제한: 15 RPM (자동 리트라이 + 백오프)
+각각 다른 서버/키 가능. OpenAI Compatible API 지원.
 
 ---
 
-## 2️⃣ 내부 LLM 서버 (OpenAI Compatible)
+## 환경변수
+
+### 텍스트 생성 (태그 추출)
 
 ```bash
-export LLM_PROVIDER=internal
-export LLM_API_KEY=your-api-key
-export LLM_API_BASE=http://your-internal-server:8000/v1
+TEXT_PROVIDER=openai_compat      # 고정
+TEXT_API_KEY=your-api-key        # API 키
+TEXT_API_BASE=http://server:8000/v1  # 서버 주소
 ```
 
-예시 환경:
-- vLLM 서버: `http://llm-server.internal:8000/v1`
-- Ollama: `http://localhost:11434/v1`
-- LM Studio: `http://localhost:1234/v1`
-
-### 모델 이름 (scripts/embed.py, scripts/run_extraction.py 수정 필요)
-
-임베딩 모델 선택 예시:
-- `text-embedding-3-small` (OpenAI)
-- `sentence-transformers/all-MiniLM-L6-v2` (오픈소스)
-- 내부 모델 이름
-
-텍스트 생성 모델:
-- 내부 모델명 (예: `llama2`, `mistral`, `qwen`)
-
----
-
-## 3️⃣ OpenAI API
+### 임베딩
 
 ```bash
-export LLM_PROVIDER=openai_compat
-export LLM_API_KEY=sk-...
-export LLM_API_BASE=https://api.openai.com/v1
-```
-
-### 모델 이름 수정 (scripts/embed.py, scripts/run_extraction.py)
-
-```python
-# embed.py 7번 라인
-python3 scripts/embed.py data/persons.json data/embeddings.json "text-embedding-3-small" "sk-..."
-
-# run_extraction.py
-OPENAI_MODEL=gpt-4-turbo python3 scripts/run_extraction.py
+EMBED_PROVIDER=openai_compat     # 고정
+EMBED_API_KEY=your-api-key
+EMBED_API_BASE=http://server:9000/v1  # 다른 서버 가능
 ```
 
 ---
 
 ## 설정 시나리오
 
-### 시나리오 1️⃣: 모두 Gemini (기본값)
+### A. 같은 서버, 같은 키
 
 ```bash
-export GEMINI_API_KEY=your-key
+export TEXT_PROVIDER=openai_compat
+export TEXT_API_KEY=mykey
+export TEXT_API_BASE=http://llm.internal:8000/v1
+
+export EMBED_PROVIDER=openai_compat
+export EMBED_API_KEY=mykey
+export EMBED_API_BASE=http://llm.internal:8000/v1
+
 ./scripts/pipeline.sh
 ```
 
-내부적으로:
-- TEXT_PROVIDER=gemini, EMBED_PROVIDER=gemini (모두 같은 API 키 사용)
-
-### 시나리오 2️⃣: 텍스트는 내부 LLM, 임베딩은 Gemini
+### B. 다른 서버
 
 ```bash
-export GEMINI_API_KEY=gemini-key
-export TEXT_PROVIDER=internal
-export TEXT_API_KEY=internal-key
-export TEXT_API_BASE=http://internal-llm:8000/v1
-./scripts/pipeline.sh
-```
+# 태그: 내부 LLM
+export TEXT_PROVIDER=openai_compat
+export TEXT_API_KEY=text-key
+export TEXT_API_BASE=http://llm-server:8000/v1
 
-또는 한 줄로:
-```bash
-GEMINI_API_KEY=gemini-key \
-TEXT_PROVIDER=internal \
-TEXT_API_KEY=internal-key \
-TEXT_API_BASE=http://internal-llm:8000/v1 \
-./scripts/pipeline.sh
-```
-
-### 시나리오 3️⃣: 텍스트는 Gemini, 임베딩은 내부 LLM
-
-```bash
-export GEMINI_API_KEY=gemini-key
-export EMBED_PROVIDER=internal
-export EMBED_API_KEY=internal-embed-key
-export EMBED_API_BASE=http://embedding-server:9000/v1
-./scripts/pipeline.sh
-```
-
-### 시나리오 4️⃣: 모두 내부 LLM (텍스트/임베딩 서로 다른 키)
-
-```bash
-export TEXT_PROVIDER=internal
-export TEXT_API_KEY=llm-key
-export TEXT_API_BASE=http://text-gen:8000/v1
-
-export EMBED_PROVIDER=internal
+# 임베딩: 별도 서버 (아직 미확정)
+export EMBED_PROVIDER=openai_compat
 export EMBED_API_KEY=embed-key
-export EMBED_API_BASE=http://embeddings:9000/v1
+export EMBED_API_BASE=http://embed-server:9000/v1
 
 ./scripts/pipeline.sh
 ```
 
----
+### C. .env 파일로 저장
 
-## 설정 방법
-
-### 임시 (현재 터미널만)
+루트에 `.env` 생성 (git ignore됨):
 
 ```bash
-export LLM_PROVIDER=internal
-export LLM_API_KEY=test-key
-export LLM_API_BASE=http://localhost:8000/v1
-./scripts/pipeline.sh
-```
-
-### 영구 (zsh)
-
-```bash
-# 옵션 1: 둘 다 같은 서버
-cat >> ~/.zshrc <<'EOF'
-export LLM_PROVIDER=internal
-export LLM_API_KEY=your-key-here
-export LLM_API_BASE=http://your-server:8000/v1
-EOF
-
-# 옵션 2: 각각 다른 서버
-cat >> ~/.zshrc <<'EOF'
-export TEXT_PROVIDER=internal
-export TEXT_API_KEY=llm-key
-export TEXT_API_BASE=http://text-gen:8000/v1
-
-export EMBED_PROVIDER=internal
-export EMBED_API_KEY=embed-key
-export EMBED_API_BASE=http://embeddings:9000/v1
-EOF
-
-source ~/.zshrc
-```
-
-### 프로젝트 로컬 (.env)
-
-```bash
-# .env 파일 생성 (git ignore됨)
-
-# 옵션 1: 둘 다 같은 서버
 cat > .env <<'EOF'
-LLM_PROVIDER=internal
-LLM_API_KEY=test-key
-LLM_API_BASE=http://localhost:8000/v1
-EOF
+TEXT_PROVIDER=openai_compat
+TEXT_API_KEY=text-key
+TEXT_API_BASE=http://llm-server:8000/v1
 
-# 옵션 2: 텍스트/임베딩 분리
-cat > .env <<'EOF'
-TEXT_PROVIDER=internal
-TEXT_API_KEY=llm-key
-TEXT_API_BASE=http://localhost:8000/v1
-
-EMBED_PROVIDER=internal
+EMBED_PROVIDER=openai_compat
 EMBED_API_KEY=embed-key
-EMBED_API_BASE=http://localhost:9000/v1
+EMBED_API_BASE=http://embed-server:9000/v1
 EOF
 
-# 실행 시 로드
 source .env && ./scripts/pipeline.sh
 ```
 
 ---
 
-## 각 API 키 분리 (기본 지원)
+## 서버별 설정
 
-`llm.py`는 이미 TEXT_PROVIDER와 EMBED_PROVIDER를 독립적으로 지원합니다.
-
-**환경변수 우선순위:**
-
-텍스트 생성 (태그 추출):
-1. `TEXT_API_KEY` (지정 시)
-2. `GEMINI_API_KEY` (Gemini 선택 시)
-
-임베딩:
-1. `EMBED_API_KEY` (지정 시)
-2. `GEMINI_API_KEY` (Gemini 선택 시)
-
-**예시: 텍스트와 임베딩에 다른 API 사용**
+### vLLM
 
 ```bash
-# 태그 추출: Gemini
-export GEMINI_API_KEY=gemini-key
+export TEXT_API_BASE=http://vllm-server:8000/v1
+export TEXT_API_KEY=dummy  # 보안 비활성화 시 아무 값
+```
 
-# 임베딩: 내부 LLM 서버 (다른 키)
-export EMBED_PROVIDER=internal
-export EMBED_API_KEY=embed-key
-export EMBED_API_BASE=http://embeddings:9000/v1
+사용 가능한 모델 확인:
+```bash
+curl http://vllm-server:8000/v1/models | jq .data[].id
+```
+
+### Ollama
+
+```bash
+export TEXT_API_BASE=http://localhost:11434/v1
+export TEXT_API_KEY=ollama
+```
+
+### LM Studio
+
+```bash
+export TEXT_API_BASE=http://localhost:1234/v1
+export TEXT_API_KEY=not-needed
+```
+
+---
+
+## 임베딩 모델 미확정 시
+
+아직 임베딩 서버/모델이 정해지지 않은 경우:
+
+**임시방편:** 텍스트와 임베딩을 같은 LLM 서버에서 처리
+
+```bash
+export TEXT_PROVIDER=openai_compat
+export TEXT_API_KEY=key
+export TEXT_API_BASE=http://llm:8000/v1
+
+export EMBED_PROVIDER=openai_compat
+export EMBED_API_KEY=key
+export EMBED_API_BASE=http://llm:8000/v1
 
 ./scripts/pipeline.sh
 ```
 
-또는 `TEXT_API_KEY`를 명시적으로 지정:
+**향후:** 임베딩 모델 정해진 후 `EMBED_API_BASE` 변경
+
+---
+
+## llm.py 코드
+
+`llm.py`는 provider별로 다른 클라이언트 사용:
+
+```python
+# TEXT 초기화 (태그 추출용)
+if TEXT_PROVIDER == "openai_compat":
+    _text_openai_client = OpenAI(api_key=TEXT_API_KEY, base_url=TEXT_API_BASE)
+
+# EMBED 초기화 (임베딩용)
+if EMBED_PROVIDER == "openai_compat":
+    _embed_openai_client = OpenAI(api_key=EMBED_API_KEY, base_url=EMBED_API_BASE)
+```
+
+추가 provider (예: 특수한 인증방식) 필요 시 `llm.py`에 추가.
+
+---
+
+## 모델명 확인
+
+현재 가능한 모델:
+
 ```bash
-export TEXT_API_KEY=gemini-key
-export TEXT_PROVIDER=gemini
+curl $TEXT_API_BASE/models | jq .
+```
 
-export EMBED_API_KEY=embed-key
-export EMBED_PROVIDER=internal
-export EMBED_API_BASE=http://embeddings:9000/v1
-
-./scripts/pipeline.sh
+예시 응답:
+```json
+{
+  "data": [
+    {"id": "gpt-3.5-turbo", "owned_by": "openai"},
+    {"id": "text-embedding-3-small", "owned_by": "openai"}
+  ]
+}
 ```
 
 ---
 
-## 테스트
+## 에러 해결
 
-```bash
-# Gemini (기본값)
-export GEMINI_API_KEY=your-key
-python3 -c "import llm; llm.init(); print(llm.call_gemini('Hi'))"
-
-# 내부 서버
-export LLM_PROVIDER=internal
-export LLM_API_KEY=test
-export LLM_API_BASE=http://localhost:8000/v1
-python3 -c "import llm; llm.init(); print(llm.call_gemini('Hi'))"
-```
+| 에러 | 해결책 |
+|------|--------|
+| "API_KEY 필수" | `echo $TEXT_API_KEY` / `echo $EMBED_API_KEY` 확인 |
+| "연결 거부" (refused) | 서버 실행 확인: `curl $TEXT_API_BASE/health` |
+| "모델을 찾을 수 없음" | 모델명 확인: `curl $TEXT_API_BASE/models` |
+| "인증 실패" | API 키 및 base URL 재확인 |
 
 ---
 
-## 트러블슈팅
+## 성능 참고
 
-**"LLM_API_KEY 환경변수 필수" 에러**
-```bash
-echo $LLM_API_KEY  # 확인
-```
-
-**"연결 거부" 에러**
-```bash
-curl http://localhost:8000/v1/models  # API 서버 실행 확인
-```
-
-**모델명 오류 ("Model not found")**
-```bash
-# 사용 가능한 모델 확인
-curl http://localhost:8000/v1/models
-```
+150명 기준:
+- 태그 추출: ~10분 (RPM 제한에 따라 가변)
+- 임베딩: ~8분
+- 형태소 분석: ~30초
+- 유사도 계산: ~2초
+- 빌드: ~5초
 
 ---
 
-## 성능 비교
+## 향후 임베딩 모델 추가
 
-| Provider | 임베딩 | 텍스트생성 | 비용 | 지연 |
-|----------|--------|-----------|------|------|
-| Gemini | 3072차원 | gemini-2.5-flash | $0.20 | 원격 |
-| 내부 vLLM | 가변 | 내부 모델 | $0 | 로컬 |
-| OpenAI | 1536차원 | gpt-4-turbo | $2+ | 원격 |
+임베딩 모델 정해진 후:
+```bash
+export EMBED_PROVIDER=openai_compat
+export EMBED_API_KEY=embed-service-key
+export EMBED_API_BASE=http://embedding-service:9000/v1
+```
+
+기존 설정과 분리되므로 재배포 불필요.
+
+---
+
+빠른 시작은 `scripts/LLM-QUICK.md` 참고.
