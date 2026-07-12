@@ -333,30 +333,17 @@
   .cloud-note{ font-size: 11px; color: var(--ink-faint); margin-top: 7px; }
   #cloudMaxBtn{ font-size: 14px; line-height: 1; }
 
-  /* ---- 워드클라우드 최대화 (갤럭시 모드) ---- */
-  .stage.cloud-max > :not(.cloud-panel){ display: none; }
+  /* ---- 워드클라우드 최대화 ---- */
+  /* #graph(네트워크)는 남겨 스크림 뒤로 은은하게 비치고, 나머지 UI만 숨긴다 */
+  .stage.cloud-max > :not(.cloud-panel):not(#graph){ display: none; }
   .stage.cloud-max .cloud-panel{
     inset: 0; width: auto; border: none; border-radius: 0;
     padding: 26px clamp(24px, 4vw, 60px);
     display: flex; flex-direction: column; z-index: 20;
-    background:
-      radial-gradient(ellipse at 18% 25%, rgba(93,63,211,0.26), transparent 55%),
-      radial-gradient(ellipse at 80% 72%, rgba(38,64,168,0.30), transparent 55%),
-      radial-gradient(ellipse at 68% 12%, rgba(199,146,234,0.13), transparent 45%),
-      radial-gradient(ellipse at 30% 88%, rgba(87,201,189,0.10), transparent 50%),
-      #04050d;
+    background: rgba(4,5,13,0.80);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
   }
-  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; animation: drift 46s ease-in-out infinite alternate; }
-  @keyframes drift{
-    from{ transform: translate(-0.6%, 0.4%); }
-    to{ transform: translate(0.6%, -0.4%); }
-  }
-  .star-layer{ position: absolute; inset: 0; width: 100%; height: 100%; display: none; pointer-events: none; }
-  .stage.cloud-max .star-layer{ display: block; }
-  .stage.cloud-max canvas.star-layer:nth-of-type(1){ animation: twinkle 2.8s ease-in-out infinite alternate; }
-  .stage.cloud-max canvas.star-layer:nth-of-type(2){ animation: twinkle 4.1s ease-in-out -1.4s infinite alternate; }
-  .stage.cloud-max canvas.star-layer:nth-of-type(3){ animation: twinkle 5.6s ease-in-out -2.8s infinite alternate; }
-  @keyframes twinkle{ from{ opacity: 1; } to{ opacity: 0.3; } }
+  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; }
 
   .overlay-close{
     position: absolute; top: 22px; right: 28px; z-index: 30;
@@ -366,6 +353,7 @@
   .overlay-close:hover{ color: var(--ink); }
   .overlay-close:focus-visible{ outline: 2px solid var(--gold); border-radius: 6px; }
   .stage.cloud-max .overlay-close, .about-overlay .overlay-close{ display: block; }
+  .about-overlay .overlay-close{ position: fixed; } /* 스크롤해도 우상단 고정 */
 
   /* ---- "이렇게 만들었어요" 오버레이 ---- */
   .about-btn{
@@ -380,25 +368,56 @@
 
   .about-overlay{
     position: fixed; inset: 0; z-index: 40; display: none;
-    flex-direction: column; align-items: center; justify-content: center; gap: 34px;
+    overflow-y: auto;
     background:
       radial-gradient(ellipse at 30% 20%, rgba(87,201,189,0.07), transparent 55%),
       radial-gradient(ellipse at 75% 80%, rgba(242,161,84,0.05), transparent 55%),
       var(--bg);
   }
-  .about-overlay.visible{ display: flex; }
-  .about-overlay h2{ margin: 0; font-size: clamp(20px, 2.4vw, 30px); letter-spacing: -0.01em; }
-  .about-steps{ display: flex; align-items: stretch; gap: 14px; padding: 0 clamp(20px, 4vw, 60px); }
-  .about-card{
-    width: min(240px, 20vw); padding: 22px 20px;
+  .about-overlay.visible{ display: block; }
+  .about-doc{ max-width: 860px; margin: 0 auto; padding: clamp(40px, 7vh, 72px) 24px 80px; }
+  .about-doc h2{ margin: 0 0 6px; font-size: clamp(22px, 2.4vw, 30px); letter-spacing: -0.01em; }
+  .about-doc .doc-sub{ margin: 0 0 36px; font-size: 13.5px; color: var(--ink-dim); }
+  .about-section{
     background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px;
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    padding: 24px 26px; margin-bottom: 18px;
   }
-  .about-card .emoji{ font-size: 30px; }
-  .about-card h3{ margin: 12px 0 8px; font-size: 15.5px; color: var(--gold); }
-  .about-card p{ margin: 0; font-size: 13px; line-height: 1.65; color: var(--ink-dim); }
-  .about-arrow{ align-self: center; color: var(--gold); font-size: 24px; flex: none; }
-  .about-note{ margin: 0; font-size: 12.5px; color: var(--ink-faint); }
+  .about-section h3{ margin: 0 0 10px; font-size: 16px; color: var(--gold); }
+  .about-section p{ margin: 8px 0 0; font-size: 13.5px; line-height: 1.7; color: var(--ink-dim); }
+  .about-section p b{ color: var(--ink); }
+  .about-section .formula{
+    font-family: var(--mono); font-size: 13px; color: var(--ink);
+    background: rgba(255,255,255,0.05); border-radius: 8px; padding: 8px 12px;
+    display: inline-block; margin-top: 10px;
+  }
+  .slot-placeholder{
+    border: 1.5px dashed rgba(255,255,255,0.18); border-radius: 10px;
+    padding: 36px 20px; margin-top: 12px; text-align: center;
+    color: var(--ink-faint); font-size: 12.5px; line-height: 1.7;
+  }
+  .slot-placeholder code{ font-family: var(--mono); color: var(--ink-dim); }
+  .about-section img.slot-img{ width: 100%; border-radius: 10px; margin-top: 12px; display: block; }
+  .md-slot{
+    margin: 12px 0 0; max-height: 260px; overflow-y: auto;
+    background: rgba(0,0,0,0.35); border: 1px solid var(--panel-border); border-radius: 10px;
+    padding: 14px 16px; font-family: var(--mono); font-size: 12px; line-height: 1.65;
+    color: var(--ink-dim); white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .vec-strip{ width: 100%; height: 36px; display: block; border-radius: 6px; margin-top: 12px; }
+  .vec-legend{ display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); margin-top: 5px; }
+  .cmp-row{ display: grid; grid-template-columns: 92px 1fr 88px; gap: 12px; align-items: center; margin-top: 12px; }
+  .cmp-row .cmp-name{ font-size: 12.5px; color: var(--ink); text-align: right; }
+  .cmp-row .cmp-name small{ display: block; color: var(--ink-faint); font-size: 10.5px; }
+  .cmp-row .vec-strip{ height: 26px; margin-top: 0; }
+  .cmp-row .cmp-score{ font-family: var(--mono); font-size: 13px; color: var(--gold); }
+  .topk-list{ margin-top: 12px; display: flex; flex-direction: column; gap: 5px; }
+  .topk-row{ display: grid; grid-template-columns: 24px 110px 1fr 56px; gap: 10px; align-items: center; font-size: 12.5px; }
+  .topk-row .rank{ font-family: var(--mono); color: var(--ink-faint); font-size: 11px; }
+  .topk-row .bar-track{ height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
+  .topk-row .bar-fill{ height: 100%; border-radius: 3px; background: var(--gold); }
+  .topk-row .score{ font-family: var(--mono); font-size: 11.5px; color: var(--ink-dim); text-align: right; }
+  .about-note{ margin: 6px 0 0; font-size: 12.5px; color: var(--ink-faint); }
 
   ::-webkit-scrollbar{ width: 8px; }
   ::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.12); border-radius: 4px; }
@@ -447,10 +466,7 @@
   <button class="tag-filter-pill" id="tagPill" title="클릭하면 태그 필터 해제"></button>
 
   <div class="panel cloud-panel">
-    <canvas class="star-layer"></canvas>
-    <canvas class="star-layer"></canvas>
-    <canvas class="star-layer"></canvas>
-    <button class="overlay-close" id="cloudMaxClose" aria-label="갤럭시 뷰 닫기">×</button>
+    <button class="overlay-close" id="cloudMaxClose" aria-label="최대화 닫기">×</button>
     <div class="panel-title"><span>근원경쟁력 워드클라우드</span><button class="isolate-clear" id="cloudMaxBtn" title="최대화 (갤럭시 뷰)" aria-label="워드클라우드 최대화">⛶</button></div>
     <div class="cloud-tabs" id="cloudTabs">
       <button data-scope="all" class="active">전체</button>
@@ -472,33 +488,47 @@
 
 <div class="about-overlay" id="aboutOverlay">
   <button class="overlay-close" id="aboutClose" aria-label="설명 닫기">×</button>
-  <h2>이렇게 만들었어요</h2>
-  <div class="about-steps">
-    <div class="about-card">
-      <div class="emoji">📄</div>
-      <h3>1. 텍스트 추출</h3>
-      <p>PPT(근원경쟁력 회고)에서 인당 텍스트를 추출합니다.</p>
+  <div class="about-doc">
+    <h2>이렇게 만들었어요</h2>
+    <p class="doc-sub">한 사람(<b id="aboutAnchorName"></b>)의 데이터가 화면의 연결선이 되기까지 — 아래 수치와 벡터는 전부 이 화면에 실제로 쓰인 데이터입니다.</p>
+
+    <div class="about-section">
+      <h3>📄 1. 원본 — 근원경쟁력 회고 PPT</h3>
+      <p>모든 것의 시작은 분기회 때 각자 작성한 근원경쟁력 회고 슬라이드입니다. 인당 한 장씩, 자유 서술.</p>
+      <!--__ABOUT_PPT__-->
     </div>
-    <div class="about-arrow">→</div>
-    <div class="about-card">
-      <div class="emoji">🧬</div>
-      <h3>2. 임베딩</h3>
-      <p>텍스트를 임베딩 모델에 보내 고차원 벡터(3072차원)로 바꿉니다. 비슷한 의미 = 가까운 벡터.</p>
+
+    <div class="about-section">
+      <h3>📝 2. 텍스트 추출 — PPT → 마크다운</h3>
+      <p>PPT에서 인당 텍스트를 뽑아 <b>마크다운 한 편</b>으로 정규화합니다. 제목·불릿 구조는 남기고 서식은 버립니다. 이 md가 이후 모든 단계의 유일한 입력입니다.</p>
+      <!--__ABOUT_MD__-->
     </div>
-    <div class="about-arrow">→</div>
-    <div class="about-card">
-      <div class="emoji">📐</div>
-      <h3>3. 코사인 유사도</h3>
-      <p>모든 인물 쌍의 벡터 방향을 비교해 0~1 점수를 냅니다.</p>
+
+    <div class="about-section">
+      <h3>🧬 3. 임베딩 — 텍스트를 3072개의 숫자로</h3>
+      <p>md 전문을 Gemini 임베딩 API에 보내면 <b>3072차원 벡터</b>(숫자 3072개짜리 1차원 배열)가 돌아옵니다. 아래는 그 배열을 값→색으로 칠한 실제 벡터입니다. 픽셀 하나가 숫자 하나.</p>
+      <canvas class="vec-strip" id="anchorStrip"></canvas>
+      <div class="vec-legend"><span>dim 0</span><span id="vecRange"></span><span>dim 3071</span></div>
+      <p>이 숫자들 자체엔 의미가 없지만, <b>비슷한 이야기를 쓴 사람일수록 벡터가 비슷한 방향을 가리킵니다.</b></p>
     </div>
-    <div class="about-arrow">→</div>
-    <div class="about-card">
-      <div class="emoji">🕸️</div>
-      <h3>4. Top-K 연결</h3>
-      <p>인당 상위 K명(30)만 엣지로 연결하고, 화면의 Top-N 슬라이더로 표시 개수를 조절합니다.</p>
+
+    <div class="about-section">
+      <h3>📐 4. 코사인 유사도 — 벡터끼리 방향 비교</h3>
+      <p>두 벡터가 이루는 각도로 유사도를 잽니다. 무늬가 닮았으면 점수가 높습니다 — 실제 세 사람과 비교한 결과:</p>
+      <div class="cmp-row"><span class="cmp-name" id="anchorName2"><small>본인</small></span><canvas class="vec-strip" id="cmpAnchor"></canvas><span class="cmp-score"></span></div>
+      <div id="cmpRows"></div>
+      <span class="formula">cos θ = A·B / (|A||B|) → 1에 가까울수록 유사</span>
     </div>
+
+    <div class="about-section">
+      <h3>🕸️ 5. Top-K 선별 — 점수 상위만 연결선으로</h3>
+      <p>150명 전원 쌍을 다 이으면 11,175개 선이 됩니다. 그래서 인당 <b>유사도 상위 K=30명</b>만 저장하고, 화면에서는 Top-N 슬라이더로 그중 몇 개를 보여줄지 조절합니다. 이 사람의 실제 상위 10명:</p>
+      <div class="topk-list" id="topkList"></div>
+      <p class="about-note">…30위까지 저장되어 있고, 인물 클릭 시 상위 10명이 궤도 뷰로 펼쳐집니다.</p>
+    </div>
+
+    <p class="about-note">* 워드클라우드는 형태소 분석(명사 추출) 빈도 기반 — LLM이 아닌 로컬 처리입니다.</p>
   </div>
-  <p class="about-note">* 워드클라우드는 형태소 분석(명사 추출) 빈도 기반 — LLM이 아닌 로컬 처리입니다.</p>
 </div>
 
 <script>/*__ECHARTS_JS__*/</script>
@@ -621,13 +651,11 @@
   var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
 
   function resize(){
-    if (canvas.clientWidth){ // 갤럭시 모드에서 #graph가 display:none이면 W/H를 망치지 않게 스킵
-      W = canvas.clientWidth;
-      H = canvas.clientHeight;
-      canvas.width = W * DPR;
-      canvas.height = H * DPR;
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    }
+    W = canvas.clientWidth;
+    H = canvas.clientHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (cloudChart) cloudChart.resize();
   }
   window.addEventListener("resize", resize);
@@ -1387,29 +1415,12 @@
   });
   cloudSelect.addEventListener("change", renderCloud);
 
-  // ---------------- 워드클라우드 최대화 (갤럭시 모드) ----------------
+  // ---------------- 워드클라우드 최대화 ----------------
   var stageEl = document.querySelector(".stage");
   var GALAXY = ["#f3cc73", "#57c9bd", "#c792ea", "#e0819f", "#9fd8ff"]; // 골드·틸·바이올렛·핑크·아이스블루
 
-  function drawStars(){
-    Array.prototype.forEach.call(document.querySelectorAll(".star-layer"), function(c){
-      c.width = c.clientWidth; // 리셋 겸 사이징 (재진입 시 다시 뿌린다)
-      c.height = c.clientHeight;
-      var g = c.getContext("2d");
-      for (var i = 0; i < 85; i++){
-        g.globalAlpha = 0.25 + Math.random() * 0.75;
-        g.fillStyle = i % 9 ? "#ffffff" : "#cfe0ff";
-        g.beginPath();
-        g.arc(Math.random() * c.width, Math.random() * c.height, 0.4 + Math.random() * 1.2, 0, Math.PI * 2);
-        g.fill();
-      }
-    });
-  }
-
   function setCloudMax(on){
     stageEl.classList.toggle("cloud-max", on);
-    if (on) drawStars();
-    else resize(); // 복귀: 최대화 중 창 크기가 바뀌었을 수 있으니 그래프 캔버스 재측정
     if (cloudChart) cloudChart.resize();
     renderCloud();
   }
@@ -1422,6 +1433,56 @@
   var aboutOverlay = document.getElementById("aboutOverlay");
   document.getElementById("aboutBtn").addEventListener("click", function(){ aboutOverlay.classList.add("visible"); });
   document.getElementById("aboutClose").addEventListener("click", function(){ aboutOverlay.classList.remove("visible"); });
+
+  // 빌드 타임에 주입되는 실데이터 표본: 앵커 1명의 실제 임베딩 벡터 + 비교 3명 + top-K
+  var ABOUT = /*__ABOUT__*/null;
+
+  // 1차원 배열을 1×N 히트맵으로: 픽셀 하나 = 숫자 하나 (양수 골드 ↔ 음수 블루, max|v| 정규화)
+  function drawVecStrip(cv, vec){
+    var n = vec.length;
+    cv.width = n; cv.height = 1;
+    var g = cv.getContext("2d");
+    var img = g.createImageData(n, 1);
+    var maxAbs = 0;
+    for (var i = 0; i < n; i++) maxAbs = Math.max(maxAbs, Math.abs(vec[i]));
+    for (i = 0; i < n; i++){
+      // sqrt 감마: 대부분의 차원이 max 대비 작아서 선형이면 거의 검게 보인다
+      var a = Math.sqrt(Math.abs(vec[i]) / (maxAbs || 1));
+      var o = i * 4;
+      if (vec[i] >= 0){ img.data[o] = 12 + 231 * a; img.data[o+1] = 12 + 192 * a; img.data[o+2] = 16 + 99 * a; }
+      else            { img.data[o] = 12 + 78 * a;  img.data[o+1] = 12 + 128 * a; img.data[o+2] = 16 + 214 * a; }
+      img.data[o+3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    return maxAbs;
+  }
+
+  if (ABOUT){
+    document.getElementById("aboutAnchorName").textContent = ABOUT.anchor.name;
+    var maxAbs = drawVecStrip(document.getElementById("anchorStrip"), ABOUT.anchor.vec);
+    document.getElementById("vecRange").textContent = "3072 dims · 값 범위 ±" + maxAbs.toFixed(3);
+    document.getElementById("anchorName2").innerHTML = escapeHtml(ABOUT.anchor.name) + "<small>본인 (기준)</small>";
+    drawVecStrip(document.getElementById("cmpAnchor"), ABOUT.anchor.vec);
+    var cmpRows = document.getElementById("cmpRows");
+    ABOUT.compares.forEach(function(c){
+      var row = document.createElement("div");
+      row.className = "cmp-row";
+      row.innerHTML = '<span class="cmp-name">' + escapeHtml(c.name) + '<small>' + escapeHtml(c.label) + '</small></span>' +
+        '<canvas class="vec-strip"></canvas>' +
+        '<span class="cmp-score">cos ' + c.sim.toFixed(3) + '</span>';
+      cmpRows.appendChild(row);
+      drawVecStrip(row.querySelector("canvas"), c.vec);
+    });
+    var topkList = document.getElementById("topkList");
+    ABOUT.topk.slice(0, 10).forEach(function(t, i){
+      var row = document.createElement("div");
+      row.className = "topk-row";
+      row.innerHTML = '<span class="rank">' + (i + 1) + '</span><span>' + escapeHtml(t.name) + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + Math.round(Math.max(t.sim, 0) * 100) + '%"></span></span>' +
+        '<span class="score">' + t.sim.toFixed(3) + '</span>';
+      topkList.appendChild(row);
+    });
+  }
 
   // ---------------- 시작 ----------------
   resize();
