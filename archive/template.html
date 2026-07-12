@@ -1108,7 +1108,8 @@
       if (hit){
         if (viewMode === "overview" || hit.id !== selectedId) enterEgo(hit.id);
       } else if (inCanvas){
-        exitEgo();
+        if (viewMode === "ego") exitEgo();
+        else if (isolateTeam) setIsolate(null); // 격리 중 빈 공간 클릭 = 전체 복귀
       }
     }
     downPos = null;
@@ -1259,39 +1260,19 @@
       if (clickTimer) return;
       clickTimer = setTimeout(function(){
         clickTimer = null;
-        if (isolateTeam) return; // 격리 중엔 단일 클릭 비활성화
         if (stageEl.classList.contains("cloud-max")){
-          // 최대화: 싱글클릭 = 그 팀 클라우드 + 배경 dim (재배치 없음), 재클릭 = 전체 복귀
-          if (cloudScope === "team" && cloudTeam === team){
-            cloudTeam = null;
-            filterTeams = {};
-            setCloudScope("all");
-          } else {
-            cloudTeam = team;
-            filterTeams = {};
-            filterTeams[team] = true;
-            setCloudScope("team");
-          }
-          refreshChips();
+          // 최대화: 싱글클릭 한 번으로 그 팀 격리+클라우드, 재클릭 = 전체 복귀
+          setIsolate(isolateTeam === team ? null : team);
           return;
         }
+        if (isolateTeam) return; // 격리 중엔 dim 토글 비활성화 (해제: 빈 공간 클릭/더블클릭)
         if (filterTeams[team]) delete filterTeams[team]; else filterTeams[team] = true;
         refreshChips();
       }, 230);
     });
     chip.addEventListener("dblclick", function(){
       if (clickTimer){ clearTimeout(clickTimer); clickTimer = null; }
-      isolateTeam = (isolateTeam === team) ? null : team;
-      filterTeams = {};
-      if (viewMode === "ego") exitEgo();
-      rebuildEdges();
-      recomputeMaxDegree();
-      nodes.forEach(function(n){ n._placed = false; });
-      alpha = 1;
-      warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
-      refreshChips();
-      cloudTeam = isolateTeam;
-      setCloudScope(isolateTeam ? "team" : "all"); // 격리 = 워드클라우드 팀 필터 (필터 일원화)
+      setIsolate(isolateTeam === team ? null : team);
     });
 
     legend.appendChild(chip);
@@ -1304,6 +1285,22 @@
       chip.classList.toggle("isolated", isolateTeam === team);
       chip.classList.toggle("dimmed-off", isFilterActive() && !filterTeams[team] && !isolateTeam);
     });
+  }
+
+  // 팀 격리 + 워드클라우드 팀 필터를 한 번에 (team=null이면 전체 복귀)
+  // 진입 경로: 범례 더블클릭(그래프 뷰) · 싱글클릭(최대화) · 빈 공간 클릭(해제)
+  function setIsolate(team){
+    isolateTeam = team;
+    filterTeams = {};
+    if (viewMode === "ego") exitEgo();
+    rebuildEdges();
+    recomputeMaxDegree();
+    nodes.forEach(function(n){ n._placed = false; });
+    alpha = 1;
+    warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
+    refreshChips();
+    cloudTeam = team;
+    setCloudScope(team ? "team" : "all");
   }
 
   // ---------------- Top-N 슬라이더 (전체 뷰 전용) ----------------
@@ -1326,6 +1323,7 @@
   var cloudTabs = document.getElementById("cloudTabs");
   var cloudScope = "all";
   var cloudTeam = null; // team 스코프의 대상 팀 — 격리(더블클릭) 또는 최대화 싱글클릭이 설정
+  var cloudWaveTimer = null; // 최대화 색상 웨이브 등장용
   var RANK_COLORS = ["#f3cc73", "#f2a154", "#e0819f", "#c792ea", "#7c9ce6", "#57c9bd"]; // 골드→틸: 빈도 순위
   var CLOUD_CLS = (function(){
     var s = {};
@@ -1405,8 +1403,22 @@
       }]
     };
 
+    clearTimeout(cloudWaveTimer);
     if (cloudChart) {
+      // 최대화: 색상(빈도 순위) 버킷별로 320ms 간격 웨이브 등장 — 골드부터 틸까지
+      var fullData = option.series[0].data;
+      var waves = (isMax && !matchMedia("(prefers-reduced-motion: reduce)").matches) ? RANK_COLORS.length : 1;
+      var wave = 1;
+      option.series[0].data = fullData.slice(0, Math.ceil(fullData.length * wave / waves));
       cloudChart.setOption(option);
+      (function nextWave(){
+        if (wave >= waves) return;
+        cloudWaveTimer = setTimeout(function(){
+          wave++;
+          cloudChart.setOption({ series: [{ data: fullData.slice(0, Math.ceil(fullData.length * wave / waves)) }] });
+          nextWave();
+        }, 320);
+      })();
     }
     if (isMax){
       // 스코프/팀 전환마다 페이드+스케일 재발동
@@ -1463,13 +1475,6 @@
       topnRow.style.display = "";
       cloudPanelEl.insertBefore(cloudTabs, cloudCanvas);
       cloudPanelEl.insertBefore(cloudSelect, cloudCanvas);
-      if (cloudScope === "team" && !isolateTeam){
-        // 최대화 싱글클릭으로 건 팀 필터는 max 국소 — 격리(더블클릭)로 건 것만 유지
-        cloudTeam = null;
-        filterTeams = {};
-        refreshChips();
-        setCloudScope("all");
-      }
     }
     if (cloudChart) cloudChart.resize();
     renderCloud();
@@ -1495,7 +1500,7 @@
     };
   }
 
-  // Generate deterministic base pattern of 16 blocks (1 or 0) from name
+  // Generate deterministic base pattern of 16 floats (between -1.0 and 1.0) from name
   function getBasePattern(name) {
     var numBlocks = 16;
     var pattern = [];
@@ -1503,7 +1508,7 @@
     for (var i = 0; i < name.length; i++) seed += name.charCodeAt(i);
     var rand = lcg(seed);
     for (var i = 0; i < numBlocks; i++) {
-      pattern.push(rand() > 0.5 ? 1 : 0);
+      pattern.push(rand() * 2 - 1); // -1.0 to 1.0
     }
     return pattern;
   }
@@ -1517,7 +1522,8 @@
     for (var i = 0; i < name.length; i++) seed += name.charCodeAt(i);
     var rand = lcg(seed);
     
-    // 100% -> 0 mutations, 95% -> 1, 55% -> 7, 15% -> 13
+    // Calculate how many blocks to mutate
+    // 95% -> 1 block change, 55% -> 7, 15% -> 13
     var diffCount = Math.round((100 - pct) / 100 * (numBlocks - 2));
     if (pct < 100 && diffCount === 0) diffCount = 1;
     
@@ -1532,11 +1538,14 @@
     
     for (var i = 0; i < diffCount; i++) {
       var idx = indices[i];
-      pattern[idx] = 1 - pattern[idx];
+      // Invert sign and scale slightly to show distinct color change (positive <-> negative transition)
+      pattern[idx] = -pattern[idx] * (0.8 + rand() * 0.4);
+      pattern[idx] = Math.max(-1, Math.min(1, pattern[idx]));
     }
     return pattern;
   }
 
+  // Draw 16 blocks using 4 premium colors (Gold, Orange, Purple, Cyan/Teal) based on float values
   function drawVecPattern(cv, pattern){
     var numBlocks = pattern.length;
     var blockW = 16;
@@ -1546,8 +1555,26 @@
     
     g.clearRect(0, 0, cv.width, cv.height);
     for (var i = 0; i < numBlocks; i++) {
-      g.fillStyle = pattern[i] === 1 ? "#f3cc73" : "#5ab4d6";
-      g.fillRect(i * blockW, 0, blockW - 2, cv.height); // 2px 갭으로 블록 구분을 확실하게!
+      var val = pattern[i];
+      var color = "#f3cc73"; // default gold
+      var a = Math.abs(val);
+      
+      if (val >= 0) {
+        if (val > 0.5) {
+          color = "#f3cc73"; // Gold
+        } else {
+          color = "#f2a154"; // Orange
+        }
+      } else {
+        if (val < -0.5) {
+          color = "#c792ea"; // Purple
+        } else {
+          color = "#57c9bd"; // Cyan/Teal
+        }
+      }
+      
+      g.fillStyle = hexToRgba(color, a * 0.85 + 0.15); // Opacity ranges from 0.15 to 1.0
+      g.fillRect(i * blockW, 0, blockW - 2, cv.height); // 2px gap
     }
   }
 
