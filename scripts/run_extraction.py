@@ -8,8 +8,8 @@ import tags
 ROOT = Path(__file__).parent.parent
 
 
-def main(persons_path=None, retries=1, delay=1.0):
-    """Gemini 호출 함수를 tags.main에 주입. delay=1초 권장 (레이트 리밋 대응)."""
+def main(persons_path=None, retries=1, delay=5.0):
+    """Gemini 호출 함수를 tags.main에 주입. delay=5.0초 권장 (15 RPM 제한 대응)."""
     if persons_path is None:
         persons_path = ROOT / "data" / "persons.json"
 

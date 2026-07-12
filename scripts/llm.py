@@ -26,10 +26,20 @@ def call_gemini(prompt, model="models/gemini-2.5-flash", max_retries=5):
                 raise
     raise RuntimeError(f"Max retries ({max_retries}) exceeded")
 
-def embed_text(text, model="models/gemini-embedding-2"):
-    """텍스트를 벡터로 임베딩."""
-    result = genai.embed_content(model=model, content=text)
-    return result['embedding']
+def embed_text(text, model="models/gemini-embedding-2", max_retries=5):
+    """텍스트를 벡터로 임베딩 (리트라이 + 백오프)."""
+    for attempt in range(max_retries):
+        try:
+            result = genai.embed_content(model=model, content=text)
+            return result['embedding']
+        except Exception as e:
+            if "429" in str(e) or "quota" in str(e).lower():
+                wait = 2 ** attempt  # 1, 2, 4, 8, 16초
+                print(f"⏳ Embedding Rate limit, {wait}초 대기... ({attempt + 1}/{max_retries})", flush=True)
+                time.sleep(wait)
+            else:
+                raise
+    raise RuntimeError(f"Max retries ({max_retries}) exceeded for embedding")
 
 if __name__ == "__main__":
     init()

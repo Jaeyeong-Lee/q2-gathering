@@ -12,11 +12,12 @@ from config import K
 ROOT = Path(__file__).parent.parent
 
 
-def embed_persons(persons_path=ROOT / "data" / "persons.json", out_path=None):
+def embed_persons(persons_path=ROOT / "data" / "persons.json", out_path=None, delay=0.0):
     """persons.json의 회고 텍스트를 임베딩.
 
     반환: {id: [768차원 임베딩]}
     """
+    import time
     llm.init()
     persons_path = Path(persons_path)
     persons = json.loads(persons_path.read_text())
@@ -31,6 +32,8 @@ def embed_persons(persons_path=ROOT / "data" / "persons.json", out_path=None):
                 print(f"임베딩: {i + 1}/{len(persons)}", file=sys.stderr)
         except Exception as e:
             print(f"임베딩 실패 {p['id']}: {e}", file=sys.stderr)
+        if delay > 0:
+            time.sleep(delay)
 
     if out_path:
         out_path = Path(out_path)
@@ -41,9 +44,9 @@ def embed_persons(persons_path=ROOT / "data" / "persons.json", out_path=None):
     return embeddings
 
 
-def main(persons_path=ROOT / "data" / "persons.json"):
+def main(persons_path=ROOT / "data" / "persons.json", delay=1.0):
     out_path = Path(persons_path).parent / "embeddings.json"
-    embed_persons(persons_path, out_path)
+    embed_persons(persons_path, out_path, delay=delay)
     return out_path
 
 
