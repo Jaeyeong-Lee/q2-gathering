@@ -17,7 +17,11 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
     # 템플릿 JS는 프로토타입 필드명(team/w)을 쓰므로 스키마 필드에 별칭을 얹는다
     # ponytail: 별칭 대신 템플릿 JS 전체 개명은 화면 확장이 끝나는 시점에 정리
     nodes = [dict(p, team=p["pjt"]) for p in persons]
-    nb = {k: [{"id": e["id"], "w": e["similarity"]} for e in v] for k, v in neighbors.items()}
+    # 임베딩 실패 등으로 neighbors에 빠진 인물은 빈 이웃으로 채워 JS가 죽지 않게 한다
+    nb = {
+        str(p["id"]): [{"id": e["id"], "w": e["similarity"]} for e in neighbors.get(str(p["id"]), [])]
+        for p in persons
+    }
 
     html = TEMPLATE.read_text()
     html = html.replace("/*__ECHARTS_JS__*/", (ROOT / "archive" / "echarts.min.js").read_text())
