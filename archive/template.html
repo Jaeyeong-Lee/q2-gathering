@@ -331,6 +331,74 @@
   }
   #cloudCanvas{ width: 100%; height: 210px; display: block; }
   .cloud-note{ font-size: 11px; color: var(--ink-faint); margin-top: 7px; }
+  #cloudMaxBtn{ font-size: 14px; line-height: 1; }
+
+  /* ---- 워드클라우드 최대화 (갤럭시 모드) ---- */
+  .stage.cloud-max > :not(.cloud-panel){ display: none; }
+  .stage.cloud-max .cloud-panel{
+    inset: 0; width: auto; border: none; border-radius: 0;
+    padding: 26px clamp(24px, 4vw, 60px);
+    display: flex; flex-direction: column; z-index: 20;
+    background:
+      radial-gradient(ellipse at 18% 25%, rgba(93,63,211,0.26), transparent 55%),
+      radial-gradient(ellipse at 80% 72%, rgba(38,64,168,0.30), transparent 55%),
+      radial-gradient(ellipse at 68% 12%, rgba(199,146,234,0.13), transparent 45%),
+      radial-gradient(ellipse at 30% 88%, rgba(87,201,189,0.10), transparent 50%),
+      #04050d;
+  }
+  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; animation: drift 46s ease-in-out infinite alternate; }
+  @keyframes drift{
+    from{ transform: translate(-0.6%, 0.4%); }
+    to{ transform: translate(0.6%, -0.4%); }
+  }
+  .star-layer{ position: absolute; inset: 0; width: 100%; height: 100%; display: none; pointer-events: none; }
+  .stage.cloud-max .star-layer{ display: block; }
+  .stage.cloud-max canvas.star-layer:nth-of-type(1){ animation: twinkle 2.8s ease-in-out infinite alternate; }
+  .stage.cloud-max canvas.star-layer:nth-of-type(2){ animation: twinkle 4.1s ease-in-out -1.4s infinite alternate; }
+  .stage.cloud-max canvas.star-layer:nth-of-type(3){ animation: twinkle 5.6s ease-in-out -2.8s infinite alternate; }
+  @keyframes twinkle{ from{ opacity: 1; } to{ opacity: 0.3; } }
+
+  .overlay-close{
+    position: absolute; top: 22px; right: 28px; z-index: 30;
+    background: none; border: none; color: var(--ink-dim); font-size: 34px; line-height: 1;
+    cursor: pointer; display: none; padding: 4px 8px; font-family: var(--sans);
+  }
+  .overlay-close:hover{ color: var(--ink); }
+  .overlay-close:focus-visible{ outline: 2px solid var(--gold); border-radius: 6px; }
+  .stage.cloud-max .overlay-close, .about-overlay .overlay-close{ display: block; }
+
+  /* ---- "이렇게 만들었어요" 오버레이 ---- */
+  .about-btn{
+    position: absolute; top: clamp(18px, 3vh, 32px); right: clamp(18px, 3vw, 32px); z-index: 5;
+    padding: 9px 16px; border-radius: 100px;
+    border: 1px solid var(--panel-border); background: var(--panel);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: var(--ink-dim);
+    font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .about-btn:hover{ color: var(--ink); border-color: rgba(255,255,255,0.2); }
+  .about-btn:focus-visible{ outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .about-overlay{
+    position: fixed; inset: 0; z-index: 40; display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 34px;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(87,201,189,0.07), transparent 55%),
+      radial-gradient(ellipse at 75% 80%, rgba(242,161,84,0.05), transparent 55%),
+      var(--bg);
+  }
+  .about-overlay.visible{ display: flex; }
+  .about-overlay h2{ margin: 0; font-size: clamp(20px, 2.4vw, 30px); letter-spacing: -0.01em; }
+  .about-steps{ display: flex; align-items: stretch; gap: 14px; padding: 0 clamp(20px, 4vw, 60px); }
+  .about-card{
+    width: min(240px, 20vw); padding: 22px 20px;
+    background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .about-card .emoji{ font-size: 30px; }
+  .about-card h3{ margin: 12px 0 8px; font-size: 15.5px; color: var(--gold); }
+  .about-card p{ margin: 0; font-size: 13px; line-height: 1.65; color: var(--ink-dim); }
+  .about-arrow{ align-self: center; color: var(--gold); font-size: 24px; flex: none; }
+  .about-note{ margin: 0; font-size: 12.5px; color: var(--ink-faint); }
 
   ::-webkit-scrollbar{ width: 8px; }
   ::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.12); border-radius: 4px; }
@@ -379,7 +447,11 @@
   <button class="tag-filter-pill" id="tagPill" title="클릭하면 태그 필터 해제"></button>
 
   <div class="panel cloud-panel">
-    <div class="panel-title"><span>근원경쟁력 워드클라우드</span></div>
+    <canvas class="star-layer"></canvas>
+    <canvas class="star-layer"></canvas>
+    <canvas class="star-layer"></canvas>
+    <button class="overlay-close" id="cloudMaxClose" aria-label="갤럭시 뷰 닫기">×</button>
+    <div class="panel-title"><span>근원경쟁력 워드클라우드</span><button class="isolate-clear" id="cloudMaxBtn" title="최대화 (갤럭시 뷰)" aria-label="워드클라우드 최대화">⛶</button></div>
     <div class="cloud-tabs" id="cloudTabs">
       <button data-scope="all" class="active">전체</button>
       <button data-scope="team">팀별</button>
@@ -394,6 +466,39 @@
   <button class="reset-btn" id="resetBtn">전체 뷰로 돌아가기</button>
 
   <aside class="panel detail-panel" id="detailPanel"></aside>
+
+  <button class="about-btn" id="aboutBtn">이렇게 만들었어요</button>
+</div>
+
+<div class="about-overlay" id="aboutOverlay">
+  <button class="overlay-close" id="aboutClose" aria-label="설명 닫기">×</button>
+  <h2>이렇게 만들었어요</h2>
+  <div class="about-steps">
+    <div class="about-card">
+      <div class="emoji">📄</div>
+      <h3>1. 텍스트 추출</h3>
+      <p>PPT(근원경쟁력 회고)에서 인당 텍스트를 추출합니다.</p>
+    </div>
+    <div class="about-arrow">→</div>
+    <div class="about-card">
+      <div class="emoji">🧬</div>
+      <h3>2. 임베딩</h3>
+      <p>텍스트를 임베딩 모델에 보내 고차원 벡터(3072차원)로 바꿉니다. 비슷한 의미 = 가까운 벡터.</p>
+    </div>
+    <div class="about-arrow">→</div>
+    <div class="about-card">
+      <div class="emoji">📐</div>
+      <h3>3. 코사인 유사도</h3>
+      <p>모든 인물 쌍의 벡터 방향을 비교해 0~1 점수를 냅니다.</p>
+    </div>
+    <div class="about-arrow">→</div>
+    <div class="about-card">
+      <div class="emoji">🕸️</div>
+      <h3>4. Top-K 연결</h3>
+      <p>인당 상위 K명(30)만 엣지로 연결하고, 화면의 Top-N 슬라이더로 표시 개수를 조절합니다.</p>
+    </div>
+  </div>
+  <p class="about-note">* 워드클라우드는 형태소 분석(명사 추출) 빈도 기반 — LLM이 아닌 로컬 처리입니다.</p>
 </div>
 
 <script>/*__ECHARTS_JS__*/</script>
@@ -516,11 +621,13 @@
   var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
 
   function resize(){
-    W = canvas.clientWidth;
-    H = canvas.clientHeight;
-    canvas.width = W * DPR;
-    canvas.height = H * DPR;
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (canvas.clientWidth){ // 갤럭시 모드에서 #graph가 display:none이면 W/H를 망치지 않게 스킵
+      W = canvas.clientWidth;
+      H = canvas.clientHeight;
+      canvas.width = W * DPR;
+      canvas.height = H * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
     if (cloudChart) cloudChart.resize();
   }
   window.addEventListener("resize", resize);
@@ -951,7 +1058,10 @@
   });
 
   window.addEventListener("keydown", function(evt){
-    if (evt.key === "Escape") exitEgo();
+    if (evt.key !== "Escape") return;
+    if (aboutOverlay.classList.contains("visible")) aboutOverlay.classList.remove("visible");
+    else if (stageEl.classList.contains("cloud-max")) setCloudMax(false);
+    else exitEgo();
   });
 
   // ---------------- 사이드 패널 (선택 인물 상세) ----------------
@@ -1165,6 +1275,7 @@
   }
 
   function renderCloud(){
+    var isMax = stageEl.classList.contains("cloud-max");
     var ids = cloudScopeIds(cloudScope, cloudSelect.value, DATA.nodes, egoIdList());
     var state = cloudState(FREQ, ids);
 
@@ -1190,6 +1301,7 @@
         colors = [tc, tc, GOLD, "#57c9bd", "#c792ea"];
       }
     }
+    if (isMax) colors = GALAXY; // 갤럭시 모드: 성운 팔레트가 스코프 색을 덮는다
 
     var option = {
       tooltip: {
@@ -1215,15 +1327,17 @@
         height: '100%',
         right: null,
         bottom: null,
-        sizeRange: [12, 38],
+        sizeRange: isMax ? [24, 90] : [12, 38],
         rotationRange: [0, 0],
         rotationStep: 0,
         gridSize: 3,
         drawOutOfBound: false,
-        layoutAnimation: false,
+        layoutAnimation: isMax, // 확대 진입 시에만 단어 퍼지는 연출
         textStyle: {
           fontFamily: '"Pretendard Variable", -apple-system, "Segoe UI", Roboto, sans-serif',
           fontWeight: 600,
+          shadowBlur: isMax ? 14 : 0,
+          shadowColor: isMax ? "rgba(190,205,255,0.55)" : "transparent",
           color: function() {
             return colors[Math.floor(Math.random() * colors.length)];
           }
@@ -1273,6 +1387,42 @@
   });
   cloudSelect.addEventListener("change", renderCloud);
 
+  // ---------------- 워드클라우드 최대화 (갤럭시 모드) ----------------
+  var stageEl = document.querySelector(".stage");
+  var GALAXY = ["#f3cc73", "#57c9bd", "#c792ea", "#e0819f", "#9fd8ff"]; // 골드·틸·바이올렛·핑크·아이스블루
+
+  function drawStars(){
+    Array.prototype.forEach.call(document.querySelectorAll(".star-layer"), function(c){
+      c.width = c.clientWidth; // 리셋 겸 사이징 (재진입 시 다시 뿌린다)
+      c.height = c.clientHeight;
+      var g = c.getContext("2d");
+      for (var i = 0; i < 85; i++){
+        g.globalAlpha = 0.25 + Math.random() * 0.75;
+        g.fillStyle = i % 9 ? "#ffffff" : "#cfe0ff";
+        g.beginPath();
+        g.arc(Math.random() * c.width, Math.random() * c.height, 0.4 + Math.random() * 1.2, 0, Math.PI * 2);
+        g.fill();
+      }
+    });
+  }
+
+  function setCloudMax(on){
+    stageEl.classList.toggle("cloud-max", on);
+    if (on) drawStars();
+    else resize(); // 복귀: 최대화 중 창 크기가 바뀌었을 수 있으니 그래프 캔버스 재측정
+    if (cloudChart) cloudChart.resize();
+    renderCloud();
+  }
+  document.getElementById("cloudMaxBtn").addEventListener("click", function(){
+    setCloudMax(!stageEl.classList.contains("cloud-max"));
+  });
+  document.getElementById("cloudMaxClose").addEventListener("click", function(){ setCloudMax(false); });
+
+  // ---------------- "이렇게 만들었어요" 오버레이 ----------------
+  var aboutOverlay = document.getElementById("aboutOverlay");
+  document.getElementById("aboutBtn").addEventListener("click", function(){ aboutOverlay.classList.add("visible"); });
+  document.getElementById("aboutClose").addEventListener("click", function(){ aboutOverlay.classList.remove("visible"); });
+
   // ---------------- 시작 ----------------
   resize();
   loop();
@@ -1280,5 +1430,8 @@
   // #ego=<id> 딥링크: 데모 중 특정 인물 에고 뷰로 바로 진입 (헤드리스 검증 겸용)
   var egoHash = location.hash.match(/^#ego=(\d+)$/);
   if (egoHash && byId[parseInt(egoHash[1], 10)]) enterEgo(parseInt(egoHash[1], 10));
+  // #view= 딥링크: 데모 점프 겸 헤드리스 검증용
+  if (location.hash === "#view=cloudmax") setCloudMax(true);
+  if (location.hash === "#view=about") aboutOverlay.classList.add("visible");
 })();
 </script>
