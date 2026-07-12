@@ -481,7 +481,7 @@
   <div class="panel side-panel">
     <div>
       <div class="panel-title">
-        <span>소속팀 (클릭: dim · 더블클릭: 이 팀만)</span>
+        <span>소속팀 (클릭: dim · 더블클릭: 이 팀만+클라우드)</span>
         <button class="isolate-clear" id="isolateClear" style="display:none">전체 팀 보기</button>
       </div>
       <div class="legend-list" id="legend"></div>
@@ -500,9 +500,7 @@
     <div class="panel-title"><span>근원경쟁력 워드클라우드</span><button class="isolate-clear" id="cloudMaxBtn" title="최대화 (갤럭시 뷰)" aria-label="워드클라우드 최대화">⛶</button></div>
     <div class="cloud-tabs" id="cloudTabs">
       <button data-scope="all" class="active">전체</button>
-      <button data-scope="team">팀별</button>
       <button data-scope="cl">CL별</button>
-      <button data-scope="ego" id="cloudEgoTab" disabled>유사군</button>
     </div>
     <select class="cloud-select" id="cloudSelect" style="display:none" aria-label="워드클라우드 대상 선택"></select>
     <div id="cloudCanvas"></div>
@@ -851,8 +849,6 @@
     alpha = Math.max(alpha, 0.05);
     renderDetail();
     resetBtn.classList.add("visible");
-    cloudEgoTab.disabled = false;
-    setCloudScope("ego"); // 유사군 클라우드 자동 연동
   }
 
   function exitEgo(){
@@ -870,8 +866,6 @@
     detailPanel.classList.remove("visible");
     resetBtn.classList.remove("visible");
     alpha = Math.max(alpha, 0.35);
-    cloudEgoTab.disabled = true;
-    if (cloudScope === "ego") setCloudScope("all");
   }
 
   function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
@@ -1272,21 +1266,6 @@
       if (clickTimer) return;
       clickTimer = setTimeout(function(){
         clickTimer = null;
-        if (stageEl.classList.contains("cloud-max")){
-          // 최대화: 범례 클릭 = 그 팀 워드클라우드 필터 토글 (배경 그래프도 함께 dim)
-          if (cloudScope === "team" && cloudSelect.value === team){
-            filterTeams = {};
-            setCloudScope("all");
-          } else {
-            filterTeams = {};
-            filterTeams[team] = true;
-            setCloudScope("team");
-            cloudSelect.value = team;
-            renderCloud();
-          }
-          refreshChips();
-          return;
-        }
         if (isolateTeam) return; // 격리 중엔 단일 클릭 dim 토글 비활성화
         if (filterTeams[team]) delete filterTeams[team]; else filterTeams[team] = true;
         refreshChips();
@@ -1303,6 +1282,7 @@
       alpha = 1;
       warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
       refreshChips();
+      setCloudScope(isolateTeam ? "team" : "all"); // 격리 = 워드클라우드 팀 필터 (필터 일원화)
     });
 
     legend.appendChild(chip);
@@ -1326,6 +1306,7 @@
     alpha = 1;
     warmUp(300); // 재시드 빅뱅을 화면 밖에서 소화
     refreshChips();
+    setCloudScope("all");
   });
 
   // ---------------- Top-N 슬라이더 (전체 뷰 전용) ----------------
@@ -1346,24 +1327,19 @@
   var cloudNote = document.getElementById("cloudNote");
   var cloudSelect = document.getElementById("cloudSelect");
   var cloudTabs = document.getElementById("cloudTabs");
-  var cloudEgoTab = document.getElementById("cloudEgoTab");
   var cloudScope = "all";
   var RANK_COLORS = ["#f3cc73", "#f2a154", "#e0819f", "#c792ea", "#7c9ce6", "#57c9bd"]; // 골드→틸: 빈도 순위
-  var CLOUD_TEAMS = Object.keys(TEAM_COLOR).sort();
   var CLOUD_CLS = (function(){
     var s = {};
     DATA.nodes.forEach(function(n){ s[n.cl_level] = true; });
     return Object.keys(s).sort();
   })();
 
-  function egoIdList(){
-    if (viewMode !== "ego") return null;
-    return [selectedId].concat(egoNeighbors.map(function(nb){ return nb.node.id; }));
-  }
-
   function renderCloud(){
     var isMax = stageEl.classList.contains("cloud-max");
-    var ids = cloudScopeIds(cloudScope, cloudSelect.value, DATA.nodes, egoIdList());
+    // team 스코프는 탭이 아니라 범례 더블클릭(격리)으로만 진입 — 그래프와 클라우드가 한 필터
+    var scopeValue = cloudScope === "team" ? isolateTeam : cloudSelect.value;
+    var ids = cloudScopeIds(cloudScope, scopeValue, DATA.nodes, null);
     var state = cloudState(FREQ, ids);
 
     if (!cloudChart && window.echarts) {
@@ -1375,7 +1351,7 @@
       cloudNote.textContent = "표본 " + state.count + "명 — 5명 미만 집합은 표시하지 않습니다";
       return;
     }
-    cloudNote.textContent = "";
+    cloudNote.textContent = cloudScope === "team" && isolateTeam ? "팀 필터: " + isolateTeam + " — 범례 더블클릭으로 해제" : "";
 
     var option = {
       tooltip: {
@@ -1441,9 +1417,8 @@
     Array.prototype.forEach.call(cloudTabs.querySelectorAll("button"), function(b){
       b.classList.toggle("active", b.getAttribute("data-scope") === scope);
     });
-    if (scope === "team" || scope === "cl"){
-      var opts = scope === "team" ? CLOUD_TEAMS : CLOUD_CLS;
-      cloudSelect.innerHTML = opts.map(function(v){
+    if (scope === "cl"){
+      cloudSelect.innerHTML = CLOUD_CLS.map(function(v){
         return '<option value="' + escapeHtml(v) + '">' + escapeHtml(v) + "</option>";
       }).join("");
       cloudSelect.style.display = "block";
