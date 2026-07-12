@@ -344,9 +344,12 @@
     background: rgba(4,5,13,0.80);
     backdrop-filter: none; -webkit-backdrop-filter: none;
   }
-  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; }
-  .stage.cloud-max .cloud-tabs, .stage.cloud-max .cloud-select{ display: block; max-width: 640px; margin-inline: auto; width: 100%; }
-  .stage.cloud-max .cloud-tabs{ display: flex; }
+  /* 좌하단 범례 패널과 겹치지 않게 클라우드 영역을 오른쪽으로 민다 */
+  .stage.cloud-max #cloudCanvas{ flex: 1; height: auto; margin-left: min(280px, 22vw); animation: cloudIn 0.7s ease-out; }
+  @keyframes cloudIn{ from{ opacity: 0; transform: scale(0.94); } }
+  /* 최대화에선 스코프 탭이 범례 패널(240px)로 옮겨가므로 2×2로 감싼다 */
+  .stage.cloud-max .cloud-tabs{ flex-wrap: wrap; margin: 0; }
+  .stage.cloud-max .cloud-tabs button{ flex: 1 1 45%; }
 
   .overlay-close{
     position: absolute; top: 22px; right: 28px; z-index: 30;
@@ -427,6 +430,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .reset-btn, .detail-panel, .hover-tip{ transition: none; }
+    .stage.cloud-max #cloudCanvas{ animation: none; }
   }
 </style>
 
@@ -747,8 +751,8 @@
           n.vx = 0; n.vy = 0;
           return;
         }
-        n.vx += (cx - n.x) * 0.0012;
-        n.vy += (cy - n.y) * 0.0012;
+        n.vx += (cx - n.x) * 0.0003; // 중심 인력: 크면 평형이 빽빽한 원반으로 붕괴한다
+        n.vy += (cy - n.y) * 0.0003;
         n.vx *= 0.8;
         n.vy *= 0.8;
         n.x += n.vx * alpha;
@@ -1234,6 +1238,21 @@
       if (clickTimer) return;
       clickTimer = setTimeout(function(){
         clickTimer = null;
+        if (stageEl.classList.contains("cloud-max")){
+          // 최대화: 범례 클릭 = 그 팀 워드클라우드 필터 토글 (배경 그래프도 함께 dim)
+          if (cloudScope === "team" && cloudSelect.value === team){
+            filterTeams = {};
+            setCloudScope("all");
+          } else {
+            filterTeams = {};
+            filterTeams[team] = true;
+            setCloudScope("team");
+            cloudSelect.value = team;
+            renderCloud();
+          }
+          refreshChips();
+          return;
+        }
         if (isolateTeam) return; // 격리 중엔 단일 클릭 dim 토글 비활성화
         if (filterTeams[team]) delete filterTeams[team]; else filterTeams[team] = true;
         refreshChips();
@@ -1408,8 +1427,22 @@
   // ---------------- 워드클라우드 최대화 ----------------
   var stageEl = document.querySelector(".stage");
 
+  var sidePanelEl = document.querySelector(".side-panel");
+  var cloudPanelEl = document.querySelector(".cloud-panel");
+  var topnRow = document.querySelector(".topn-row");
+
   function setCloudMax(on){
     stageEl.classList.toggle("cloud-max", on);
+    if (on){
+      // Top-N은 최대화에서 무의미 → 그 자리에 스코프 탭을 옮겨 범례 패널을 클라우드 컨트롤러로
+      topnRow.style.display = "none";
+      sidePanelEl.appendChild(cloudTabs);
+      sidePanelEl.appendChild(cloudSelect);
+    } else {
+      topnRow.style.display = "";
+      cloudPanelEl.insertBefore(cloudTabs, cloudCanvas);
+      cloudPanelEl.insertBefore(cloudSelect, cloudCanvas);
+    }
     if (cloudChart) cloudChart.resize();
     renderCloud();
   }
@@ -1475,6 +1508,8 @@
 
   // ---------------- 시작 ----------------
   resize();
+  // 워밍업: 첫 프레임 전에 물리를 미리 돌려 초기 요동(빅뱅)을 화면 밖에서 소화한다
+  for (var wu = 0; wu < 300; wu++) tick();
   loop();
   setCloudScope("all");
   // #ego=<id> 딥링크: 데모 중 특정 인물 에고 뷰로 바로 진입 (헤드리스 검증 겸용)
