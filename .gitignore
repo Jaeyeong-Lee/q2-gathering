@@ -17,4 +17,3 @@ env/
 # Env / secrets
 .env
 data/
-dist/
