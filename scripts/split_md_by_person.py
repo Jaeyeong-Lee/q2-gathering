@@ -1,12 +1,11 @@
 """PPT→MD 원본을 사람 단위로 결정론적 분할 (LLM 없음).
 
-마스터 메타 JSON(name,pjt,part,cl_level,source_file,source_file_seq,... 객체 배열)을 source of truth로 삼아,
+sqlite roster 테이블(scripts/import_roster.py 산출물)을 source of truth로 삼아,
 source_file로 해당 파일 인원을 필터링, source_file_seq 순서로 페이지를 사람에게 배정한다.
-사용자가 주는 필드는 전부 매니페스트에 보존하고, 코드가 채우는 컬럼만 뒤에 붙인다.
+결과는 같은 roster 테이블의 상태 컬럼(page_start/page_end/status/split_filename)에 UPDATE된다.
 """
-import csv
-import json
 import re
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -14,19 +13,17 @@ ROOT = Path(__file__).parent.parent
 
 PAGE_DELIMITER = r"<!--\s*Page\s+\d+\s*-->"  # 원본 md의 페이지 구분자: <!-- Page 63 -->
 
-CODE_FIELDS = ["page_start", "page_end", "status", "split_filename", "normalized_filename"]
-
 MIN_PAGES, MAX_PAGES = 1, 8  # 정상 판정 여유 범위 (예상 3~6)
 
 
-def load_roster(meta_path, source_file):
-    """마스터 JSON(객체 배열)에서 source_file 해당분만 필터링, source_file_seq 순 정렬."""
-    all_rows = json.loads(Path(meta_path).read_text(encoding="utf-8"))
-    rows = [r for r in all_rows if r["source_file"] == source_file]
+def load_roster(conn, source_file):
+    """roster 테이블에서 source_file 해당분만 필터링, source_file_seq 순 정렬."""
+    rows = conn.execute(
+        "SELECT * FROM roster WHERE source_file = ? ORDER BY source_file_seq", (source_file,)
+    ).fetchall()
     if not rows:
-        raise ValueError(f"메타 JSON에 source_file={source_file!r} 항목이 없음 — 파일명 표기 확인")
-    rows.sort(key=lambda r: int(r["source_file_seq"]))
-    return rows
+        raise ValueError(f"roster 테이블에 source_file={source_file!r} 항목이 없음 — 파일명 표기 확인")
+    return [dict(r) for r in rows]
 
 
 def split_pages(md_text, delimiter=None):
@@ -37,6 +34,10 @@ def split_pages(md_text, delimiter=None):
             "PAGE_DELIMITER 미설정 — scripts/split_md_by_person.py 상단에 실제 구분자 정규식을 채워주세요"
         )
     parts = re.split(delimiter, md_text)
+    # 노이즈 제거 지점: 사람별 원문에서 지우고 싶은 패턴은 여기서 re.sub로 걸러낸다.
+    # 여기서 지우면 다운스트림 전체(LLM 정제 입력 → 임베딩 → 워드클라우드 → 상세패널 원문)가 같이 깨끗해짐.
+    # 현재: HTML 주석(<!-- Image --> 등) 제거. 추가로 지울 게 생기면 아래에 re.sub 한 줄씩 더하면 됨.
+    parts = [re.sub(r"<!--.*?-->", "", p, flags=re.DOTALL) for p in parts]
     return [p.strip() for p in parts if p.strip()]
 
 
@@ -61,21 +62,22 @@ def safe_filename(*parts):
     return "__".join(cleaned)
 
 
-def main(md_path, meta_path, out_dir=ROOT / "data" / "raw_sections",
-         manifest_path=ROOT / "data" / "split_manifest.csv"):
+def main(md_path, db_path=ROOT / "data" / "roster.db", out_dir=ROOT / "data" / "raw_sections"):
     md_path = Path(md_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    roster = load_roster(meta_path, md_path.name)
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    roster = load_roster(conn, md_path.name)
     roster_names = [r["name"] for r in roster]
 
     md_text = md_path.read_text(encoding="utf-8")
     pages = split_pages(md_text)
     assigned = assign_pages(pages, roster_names)
 
-    meta_fields = list(roster[0].keys())
-    rows = []
+    updates = []
+    bad = []
     for r in roster:
         name = r["name"]
         page_idxs = assigned[name]
@@ -85,31 +87,31 @@ def main(md_path, meta_path, out_dir=ROOT / "data" / "raw_sections",
         )
         n = len(page_idxs)
         status = "정상" if (n and MIN_PAGES <= n <= MAX_PAGES) else "이상"
-        rows.append(dict(r, **{
-            "page_start": (page_idxs[0] + 1) if page_idxs else "",
-            "page_end": (page_idxs[-1] + 1) if page_idxs else "",
-            "status": status,
-            "split_filename": split_filename,
-            "normalized_filename": "",
-        }))
+        if status == "이상":
+            bad.append(name)
+        updates.append((
+            (page_idxs[0] + 1) if page_idxs else None,
+            (page_idxs[-1] + 1) if page_idxs else None,
+            status,
+            split_filename,
+            r["seq"],
+        ))
+
+    conn.executemany(
+        "UPDATE roster SET page_start=?, page_end=?, status=?, split_filename=? WHERE seq=?",
+        updates,
+    )
+    conn.commit()
 
     total_assigned = sum(len(v) for v in assigned.values())
     if total_assigned != len(pages):
         print(f"경고: {md_path.name} — 전체 페이지 {len(pages)}장 중 {total_assigned}장만 배정됨", file=sys.stderr)
 
-    manifest_path = Path(manifest_path)
-    write_header = not manifest_path.exists()
-    with open(manifest_path, "a", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=meta_fields + CODE_FIELDS)
-        if write_header:
-            writer.writeheader()
-        writer.writerows(rows)
-
-    bad = [r["name"] for r in rows if r["status"] == "이상"]
     if bad:
         print(f"이상 {len(bad)}명 (페이지 배정 확인 필요): {bad}", file=sys.stderr)
 
-    return manifest_path
+    conn.close()
+    return db_path
 
 
 if __name__ == "__main__":

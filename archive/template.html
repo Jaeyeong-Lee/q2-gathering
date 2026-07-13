@@ -256,6 +256,14 @@
   .md-body h1:first-child, .md-body h2:first-child{ margin-top: 0; }
   .md-body p{ margin: 3px 0; }
   .md-body ul{ margin: 3px 0; padding-left: 16px; }
+  .raw-toggle{
+    margin-top: 8px; padding: 3px 10px; font-size: 11px; cursor: pointer;
+    background: none; border: 1px solid var(--panel-border); border-radius: 10px;
+    color: var(--ink-faint);
+  }
+  .raw-toggle:hover{ color: var(--ink); }
+  .raw-body{ display: none; }
+  .raw-body.visible{ display: block; }
 
   .neighbor-label{
     margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--panel-border);
@@ -636,6 +644,7 @@
   var nodes = DATA.nodes.map(function(n){
     return {
       id: n.id, name: n.name, team: n.team, cl: n.cl_level, tags: n.tags || [], text: n.text || "",
+      normalized_text: n.normalized_text || "",
       x: 0, y: 0, vx: 0, vy: 0, r: 5, _placed: false,
       visible: true
     };
@@ -1192,8 +1201,10 @@
     html += '<div class="tag-chips">' + (n.tags || []).map(function(t){
       return '<button class="tag-chip" data-tag="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';
     }).join("") + '</div>';
-    html += '<div class="detail-flavor"><span class="label">근원경쟁력 회고 원문 (더미)</span>';
-    html += '<div class="md-body">' + mdToHtml(n.text || "") + '</div></div>';
+    html += '<div class="detail-flavor"><span class="label">근원경쟁력 정리본</span>';
+    html += '<div class="md-body">' + mdToHtml(n.normalized_text || "") + '</div>';
+    html += '<button class="raw-toggle">원문 보기</button>';
+    html += '<div class="md-body raw-body">' + mdToHtml(n.text || "") + '</div></div>';
     html += '<div class="neighbor-label">유사도 상위 ' + neighbors.length + '명</div>';
     html += '<div class="neighbor-list">';
     neighbors.forEach(function(nb){
@@ -1214,6 +1225,13 @@
     detailPanel.querySelectorAll(".neighbor-item").forEach(function(btn){
       btn.addEventListener("click", function(){
         enterEgo(parseInt(btn.getAttribute("data-id"), 10));
+      });
+    });
+
+    detailPanel.querySelectorAll(".raw-toggle").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var visible = btn.nextElementSibling.classList.toggle("visible");
+        btn.textContent = visible ? "원문 접기" : "원문 보기";
       });
     });
 

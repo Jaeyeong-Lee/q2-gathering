@@ -12,7 +12,7 @@ def test_persons_schema():
     assert len({p["id"] for p in persons}) == 150
     assert len({p["name"] for p in persons}) == 150
     for p in persons:
-        assert set(p) == {"id", "name", "pjt", "cl_level", "text", "tags"}
+        assert set(p) == {"id", "name", "pjt", "cl_level", "text", "normalized_text", "tags"}
         assert p["cl_level"] in {"CL2", "CL3", "CL4"}
         assert isinstance(p["tags"], list) and p["tags"]
         assert p["text"].strip()

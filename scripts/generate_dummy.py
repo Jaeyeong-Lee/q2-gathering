@@ -37,7 +37,9 @@ def _make_freq(persons, rng):
 
 def _make_person(i, name, rng):
     kws = rng.sample(KEYWORDS, 6)
-    text = (
+    # text=정제 전 원문(흩어진 키워드 나열), normalized_text=LLM 정제본 형태
+    raw_text = f"{kws[0]} {kws[1]} {kws[2]} {kws[3]} {kws[4]} {kws[5]} 관련 업무 다수 수행"
+    normalized_text = (
         f"# 근원경쟁력\n\n"
         f"## 핵심 역량\n{kws[0]}, {kws[1]} 중심으로 현장 경험을 쌓아왔습니다.\n\n"
         f"## 주요 경력\n{kws[2]} 및 {kws[3]} 업무를 담당하며 {kws[4]} 프로젝트를 수행했습니다.\n\n"
@@ -48,7 +50,8 @@ def _make_person(i, name, rng):
         "name": name,
         "pjt": rng.choice(PJTS),
         "cl_level": rng.choices(CL_LEVELS, weights=[0.3, 0.45, 0.25])[0],
-        "text": text,
+        "text": raw_text,
+        "normalized_text": normalized_text,
         "tags": rng.sample(TAGS, rng.randint(3, 5)),
     }
 
