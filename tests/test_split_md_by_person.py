@@ -4,18 +4,15 @@ import json
 import split_md_by_person as split_md
 
 
-DELIM = r"<---\s*\d+\s*--->"
+def test_split_pages_with_real_delimiter():
+    md = "<!-- Page 1 --> 첫 페이지\n<!--Page 63--> 둘째 페이지\n<!--  Page  100  -->   "
+    assert split_md.split_pages(md) == ["첫 페이지", "둘째 페이지"]
 
 
-def test_split_pages_strips_and_drops_empty():
-    md = "<--- 1 ---> 첫 페이지\n<--- 2 ---> 둘째 페이지\n<--- 3 --->   "
-    assert split_md.split_pages(md, delimiter=DELIM) == ["첫 페이지", "둘째 페이지"]
-
-
-def test_split_pages_requires_delimiter():
+def test_split_pages_rejects_empty_delimiter():
     try:
-        split_md.split_pages("아무 텍스트")
-        assert False, "delimiter 없이 호출하면 에러가 나야 함"
+        split_md.split_pages("아무 텍스트", delimiter="")
+        assert False, "빈 delimiter로 호출하면 에러가 나야 함"
     except ValueError:
         pass
 
@@ -36,9 +33,9 @@ def test_assign_pages_handles_missing_name_without_crashing():
 def test_main_writes_per_person_files_and_manifest(tmp_path):
     md_path = tmp_path / "team1.md"
     md_path.write_text(
-        "<--- 1 ---> 안지유 핵심역량\n"
-        "<--- 2 ---> 안지유 주요경력\n"
-        "<--- 3 ---> 김민수 핵심역량\n",
+        "<!-- Page 1 --> 안지유 핵심역량\n"
+        "<!-- Page 2 --> 안지유 주요경력\n"
+        "<!-- Page 3 --> 김민수 핵심역량\n",
         encoding="utf-8",
     )
     meta_path = tmp_path / "master.json"
@@ -54,11 +51,7 @@ def test_main_writes_per_person_files_and_manifest(tmp_path):
 
     out_dir = tmp_path / "out"
     manifest_path = tmp_path / "manifest.csv"
-    split_md.PAGE_DELIMITER = DELIM
-    try:
-        split_md.main(md_path, meta_path, out_dir=out_dir, manifest_path=manifest_path)
-    finally:
-        split_md.PAGE_DELIMITER = None
+    split_md.main(md_path, meta_path, out_dir=out_dir, manifest_path=manifest_path)
 
     rows = list(csv.DictReader(open(manifest_path, encoding="utf-8")))
     assert len(rows) == 2  # team1.md 인원만 (박영희 제외)

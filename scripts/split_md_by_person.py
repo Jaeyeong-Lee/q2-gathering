@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 
-PAGE_DELIMITER = None  # TODO(사용자): 실제 구분자 정규식 채우기 (예: r"<---\s*\d+\s*--->")
+PAGE_DELIMITER = r"<!--\s*Page\s+\d+\s*-->"  # 원본 md의 페이지 구분자: <!-- Page 63 -->
 
 CODE_FIELDS = ["page_start", "page_end", "status", "split_filename", "normalized_filename"]
 
