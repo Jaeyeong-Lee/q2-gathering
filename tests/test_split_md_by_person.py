@@ -1,4 +1,5 @@
 import csv
+import json
 
 import split_md_by_person as split_md
 
@@ -40,20 +41,16 @@ def test_main_writes_per_person_files_and_manifest(tmp_path):
         "<--- 3 ---> 김민수 핵심역량\n",
         encoding="utf-8",
     )
-    meta_path = tmp_path / "meta.csv"
-    fields = ["seq", "name", "pjt", "part", "cl_level", "source_file", "source_file_seq"]
-    with open(meta_path, "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
-        w.writeheader()
-        w.writerows([
-            # 마스터 CSV: 다른 파일 인원(박영희)은 필터링되고, seq 역순 입력도 source_file_seq로 정렬돼야 함
-            {"seq": "3", "name": "박영희", "pjt": "AI", "part": "설비", "cl_level": "CL2",
-             "source_file": "team2.md", "source_file_seq": "1"},
-            {"seq": "2", "name": "김민수", "pjt": "디지털트윈", "part": "품질", "cl_level": "CL3",
-             "source_file": "team1.md", "source_file_seq": "2"},
-            {"seq": "1", "name": "안지유", "pjt": "디지털트윈", "part": "품질", "cl_level": "CL4",
-             "source_file": "team1.md", "source_file_seq": "1"},
-        ])
+    meta_path = tmp_path / "master.json"
+    meta_path.write_text(json.dumps([
+        # 마스터 JSON: 다른 파일 인원(박영희)은 필터링되고, seq 역순 입력도 source_file_seq로 정렬돼야 함
+        {"seq": 3, "name": "박영희", "pjt": "AI", "part": "설비", "cl_level": "CL2",
+         "source_file": "team2.md", "source_file_seq": 1},
+        {"seq": 2, "name": "김민수", "pjt": "디지털트윈", "part": "품질", "cl_level": "CL3",
+         "source_file": "team1.md", "source_file_seq": 2},
+        {"seq": 1, "name": "안지유", "pjt": "디지털트윈", "part": "품질", "cl_level": "CL4",
+         "source_file": "team1.md", "source_file_seq": 1},
+    ], ensure_ascii=False), encoding="utf-8")
 
     out_dir = tmp_path / "out"
     manifest_path = tmp_path / "manifest.csv"

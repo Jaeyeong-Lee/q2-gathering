@@ -1,10 +1,11 @@
 """PPT→MD 원본을 사람 단위로 결정론적 분할 (LLM 없음).
 
-마스터 메타 CSV(name,pjt,part,cl_level,source_file,source_file_seq,...)를 source of truth로 삼아,
+마스터 메타 JSON(name,pjt,part,cl_level,source_file,source_file_seq,... 객체 배열)을 source of truth로 삼아,
 source_file로 해당 파일 인원을 필터링, source_file_seq 순서로 페이지를 사람에게 배정한다.
-사용자가 주는 컬럼은 전부 매니페스트에 보존하고, 코드가 채우는 컬럼만 뒤에 붙인다.
+사용자가 주는 필드는 전부 매니페스트에 보존하고, 코드가 채우는 컬럼만 뒤에 붙인다.
 """
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -18,12 +19,12 @@ CODE_FIELDS = ["page_start", "page_end", "status", "split_filename", "normalized
 MIN_PAGES, MAX_PAGES = 1, 8  # 정상 판정 여유 범위 (예상 3~6)
 
 
-def load_roster(meta_csv_path, source_file):
-    """마스터 CSV에서 source_file 해당분만 필터링, source_file_seq 순 정렬."""
-    with open(meta_csv_path, encoding="utf-8", newline="") as f:
-        rows = [r for r in csv.DictReader(f) if r["source_file"] == source_file]
+def load_roster(meta_path, source_file):
+    """마스터 JSON(객체 배열)에서 source_file 해당분만 필터링, source_file_seq 순 정렬."""
+    all_rows = json.loads(Path(meta_path).read_text(encoding="utf-8"))
+    rows = [r for r in all_rows if r["source_file"] == source_file]
     if not rows:
-        raise ValueError(f"메타 CSV에 source_file={source_file!r} 행이 없음 — 파일명 표기 확인")
+        raise ValueError(f"메타 JSON에 source_file={source_file!r} 항목이 없음 — 파일명 표기 확인")
     rows.sort(key=lambda r: int(r["source_file_seq"]))
     return rows
 
@@ -60,13 +61,13 @@ def safe_filename(*parts):
     return "__".join(cleaned)
 
 
-def main(md_path, meta_csv_path, out_dir=ROOT / "data" / "raw_sections",
+def main(md_path, meta_path, out_dir=ROOT / "data" / "raw_sections",
          manifest_path=ROOT / "data" / "split_manifest.csv"):
     md_path = Path(md_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    roster = load_roster(meta_csv_path, md_path.name)
+    roster = load_roster(meta_path, md_path.name)
     roster_names = [r["name"] for r in roster]
 
     md_text = md_path.read_text(encoding="utf-8")
