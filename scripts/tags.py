@@ -4,10 +4,13 @@ Phase 1: LLM 호출부는 주입식(call 파라미터) — 실데이터 때 Jay�
 동의어 정규화는 scripts/tag_synonyms.json 편집.
 """
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
+
+from pipeline_log import get_logger
 
 ROOT = Path(__file__).parent.parent
+log = get_logger("tags")
 SYNONYMS_PATH = Path(__file__).parent / "tag_synonyms.json"
 
 
@@ -50,9 +53,12 @@ def extract_all(persons, call, retries=1, synonyms=None, delay=0.5):
             try:
                 by_id[p["id"]] = normalize(parse_tags(call(prompt)), synonyms)
                 if i % 10 == 9:
-                    print(f"처리: {i + 1}/{len(persons)}", file=sys.stderr)
+                    log.info(f"처리: {i + 1}/{len(persons)}")
                 break
             except Exception:
+                log.exception(
+                    f"태그 추출 실패 [{p.get('name', '?')}] (id={p['id']}) 시도 {attempt + 1}/{1 + retries}"
+                )
                 if attempt == retries:
                     failed.append(p["id"])
         if delay > 0:
@@ -101,13 +107,17 @@ def main(persons_path=ROOT / "data" / "persons.json", call=None, retries=1, dela
     persons_path = Path(persons_path)
     persons = json.loads(persons_path.read_text())
     by_id, failed = extract_all(persons, call, retries=retries, delay=delay)
-    by_id = consolidate_pool(by_id, call)
+    try:
+        by_id = consolidate_pool(by_id, call)
+    except Exception:
+        # 풀 정리 1콜 실패로 사람별 추출 결과(N콜)까지 버리지 않는다 — 병합 없이 그대로 저장
+        log.exception("태그 풀 정리 실패 — 개별 태그는 병합 없이 저장")
     for p in persons:
         if p["id"] in by_id:
             p["tags"] = by_id[p["id"]]
     persons_path.write_text(json.dumps(persons, ensure_ascii=False, indent=1))
     if failed:
-        print(f"추출 실패 {len(failed)}명 (기존 태그 유지): {failed}", file=sys.stderr)
+        log.warning(f"추출 실패 {len(failed)}명 (기존 태그 유지): {failed}")
     return failed
 
 

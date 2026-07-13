@@ -121,6 +121,35 @@ def test_normalize_all_unknown_cl_level_raises(tmp_path, monkeypatch):
         pass
 
 
+def test_main_commits_progress_even_if_crashed_midway(tmp_path, monkeypatch):
+    # 2번째 사람에서 미등록 cl_level(KeyError)로 죽어도, 1번째 사람의 정제 기록은 DB에 남아야 함
+    raw_dir = tmp_path / "raw"
+    raw_dir.mkdir()
+    (raw_dir / "a.md").write_text("A 원문", encoding="utf-8")
+    (raw_dir / "b.md").write_text("B 원문", encoding="utf-8")
+    monkeypatch.setattr(norm, "PROMPTS", {"CL2": "{raw}"})
+    db_path = tmp_path / "roster.db"
+    _seed_roster(db_path, [
+        {"seq": 1, "name": "A", "cl_level": "CL2", "status": "정상",
+         "split_filename": "a.md", "normalized_filename": ""},
+        {"seq": 2, "name": "B", "cl_level": "CL9", "status": "정상",
+         "split_filename": "b.md", "normalized_filename": ""},
+    ])
+
+    try:
+        norm.main(db_path=db_path, raw_dir=raw_dir, call=lambda p: "정리된 결과", retries=0, delay=0)
+        assert False, "미등록 cl_level이면 KeyError가 전파되어야 함"
+    except KeyError:
+        pass
+
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    rows = {r["name"]: dict(r) for r in conn.execute("SELECT * FROM roster")}
+    conn.close()
+    assert rows["A"]["normalized_filename"] == "a.normalized.md"  # 죽기 전 진행분 보존
+    assert not rows["B"]["normalized_filename"]  # 재실행 시 B만 다시 대상
+
+
 def test_main_updates_manifest_in_place(tmp_path):
     raw_dir = tmp_path / "raw"
     raw_dir.mkdir()

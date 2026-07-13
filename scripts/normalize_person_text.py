@@ -4,11 +4,13 @@ scripts/llm.py의 openai_compat/internal provider(사내망 로컬 모델)를 �
 roster 테이블(split_md_by_person.py 산출물)에서 status=정상인 사람만 대상으로 한다.
 """
 import sqlite3
-import sys
 import time
 from pathlib import Path
 
+from pipeline_log import get_logger
+
 ROOT = Path(__file__).parent.parent
+log = get_logger("normalize")
 
 # CL별 정제 프롬프트 — 문구는 사용자가 직접 채운다 (TODO: 현재 셋 다 동일한 기본 문구)
 _BASE_PROMPT = """다음은 한 구성원의 근원경쟁력 회고 원문(PPT 발췌, 정리 안 됨)이다.
@@ -44,6 +46,7 @@ def normalize_all(rows, raw_dir, call, retries=1, delay=0.5):
     raw_dir = Path(raw_dir)
     failed = []
     targets = [r for r in rows if r["status"] == "정상" and not r.get("normalized_filename")]
+    log.info(f"정제 대상 {len(targets)}명 (전체 {len(rows)}행 중 정상·미정제만)")
     for i, r in enumerate(targets):
         raw_path = raw_dir / r["split_filename"]
         raw_text = raw_path.read_text(encoding="utf-8")
@@ -54,10 +57,11 @@ def normalize_all(rows, raw_dir, call, retries=1, delay=0.5):
                 out_name = raw_path.stem + ".normalized.md"
                 (raw_dir / out_name).write_text(result, encoding="utf-8")
                 r["normalized_filename"] = out_name
-                if i % 10 == 9:
-                    print(f"정제: {i + 1}/{len(targets)}", file=sys.stderr)
+                log.info(f"정제 완료 [{r['name']}] ({i + 1}/{len(targets)}) → {out_name}")
                 break
             except Exception:
+                # 스택트레이스 포함 → data/pipeline.log에서 원인(URL 오타·모델명·타임아웃 등) 확인
+                log.exception(f"정제 실패 [{r['name']}] 시도 {attempt + 1}/{1 + retries}")
                 if attempt == retries:
                     failed.append(r["name"])
         if delay > 0:
@@ -74,17 +78,19 @@ def main(db_path=ROOT / "data" / "roster.db", raw_dir=ROOT / "data" / "raw_secti
     conn.row_factory = sqlite3.Row
     rows = [dict(r) for r in conn.execute("SELECT * FROM roster")]
 
-    failed = normalize_all(rows, raw_dir, call, retries=retries, delay=delay)
-
-    conn.executemany(
-        "UPDATE roster SET normalized_filename = ? WHERE seq = ?",
-        [(r["normalized_filename"], r["seq"]) for r in rows],
-    )
-    conn.commit()
-    conn.close()
+    try:
+        failed = normalize_all(rows, raw_dir, call, retries=retries, delay=delay)
+    finally:
+        # 도중에 죽어도(KeyError·Ctrl+C·네트워크 단절) 그때까지 채운 normalized_filename은 DB에 남긴다
+        # → 재실행 시 이미 정제된 사람은 스킵되어 LLM 재호출 없음
+        done = [(r["normalized_filename"], r["seq"]) for r in rows if r.get("normalized_filename")]
+        conn.executemany("UPDATE roster SET normalized_filename = ? WHERE seq = ?", done)
+        conn.commit()
+        conn.close()
+        log.info(f"DB 반영: normalized_filename {len(done)}명 기록됨 ({db_path})")
 
     if failed:
-        print(f"정제 실패 {len(failed)}명 (다음 실행에서 재시도 대상): {failed}", file=sys.stderr)
+        log.warning(f"정제 실패 {len(failed)}명 (다음 실행에서 재시도 대상): {failed}")
     return failed
 
 

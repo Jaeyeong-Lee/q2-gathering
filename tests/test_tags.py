@@ -65,6 +65,23 @@ def test_consolidate_pool_unifies_spelling_across_persons():
     assert "협업리더" in seen[0] and "Data-driven" in seen[0]  # 프롬프트에 전체 풀 포함
 
 
+def test_consolidate_failure_keeps_extracted_tags(tmp_path):
+    # 풀 정리 1콜이 실패해도 사람별 추출 결과(N콜)는 병합 없이 저장되어야 함
+    data_dir = tmp_path / "data"
+    generate_dummy.main(out_dir=data_dir)
+    persons_path = data_dir / "persons.json"
+
+    def call(prompt):
+        if "회고:" in prompt:  # 인당 추출 호출
+            return '["신기술탐구"]'
+        raise RuntimeError("풀 정리 실패")
+
+    failed = tags.main(persons_path=persons_path, call=call, retries=0)
+    assert failed == []
+    after = json.loads(persons_path.read_text())
+    assert all(p["tags"] == ["신기술탐구"] for p in after)
+
+
 def test_main_fills_tags_field_in_persons_json(tmp_path):
     data_dir = tmp_path / "data"
     generate_dummy.main(out_dir=data_dir)
