@@ -357,8 +357,10 @@
     mask-image: radial-gradient(circle, #000 99%, transparent 100%);
     -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
     -webkit-mask-position: center; mask-position: center;
-    animation: cloudReveal 2.4s ease-out;
+    animation: cloudReveal 1.5s ease-out;
   }
+  /* 필터 안내문이 좌하단 범례 패널에 가려지지 않게 클라우드와 같은 오프셋으로 민다 */
+  .stage.cloud-max .cloud-note{ margin-left: min(280px, 22vw); }
   @keyframes cloudReveal{
     from{ opacity: 0.25; filter: blur(10px); -webkit-mask-size: 6% 6%; mask-size: 6% 6%; }
     60%{ filter: blur(2px); }
@@ -492,8 +494,7 @@
   <header class="topbar">
     <h1>근원경쟁력 유사도 네트워크</h1>
     <div class="sub">
-      <span>2026 Q2 분기회 라이브 데모</span>
-      <span class="badge">프로토타입 · 더미 데이터</span>
+      <span class="badge">2026 Q3 T-Talk</span>
     </div>
   </header>
 
@@ -1057,13 +1058,14 @@
 
     var pool = activeNodeList();
 
-    // hover 이웃 하이라이트 대상: 올린 노드(또는 검색 선택 노드) + 그 이웃 (전체 뷰에서만)
+    // hover 이웃 하이라이트 대상: 올린 노드(또는 검색 선택 노드) + 본인 기준 상위 Top-N (에고 뷰와 동일 기준.
+    // adjacency를 쓰면 '남들이 나를 꼽은' 역방향 엣지까지 포함돼 허브는 수십 명이 점등된다)
     var focusId = hoverId != null ? hoverId : searchGlowId;
     var hoverSet = null;
     if (!active && focusId != null){
       hoverSet = {};
       hoverSet[focusId] = true;
-      (adjacency[focusId] || []).forEach(function(e){ hoverSet[e.node.id] = true; });
+      (neighborsFull[focusId] || []).slice(0, topN).forEach(function(e){ hoverSet[e.node.id] = true; });
     }
 
     // PJT 군집 라벨: 실시간 팀 중심(centroid) 기준, 군집 가장자리 바로 바깥 — 범례 왕복 없이 군집이 읽히게
@@ -1082,7 +1084,7 @@
         if (d < 200 && d > c.r) c.r = d; // 군집 이탈 노드는 반경 계산에서 제외
       });
       ctx.save();
-      ctx.font = "700 16px " + getComputedStyle(document.body).fontFamily;
+      ctx.font = "700 20px " + getComputedStyle(document.body).fontFamily;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       teamLabelHits = [];
@@ -1134,7 +1136,7 @@
     } else {
       edges.forEach(function(e){
         if (!e.a.visible || !e.b.visible) return;
-        var lit = hoverSet && (e.a.id === focusId || e.b.id === focusId);
+        var lit = hoverSet && ((e.a.id === focusId && hoverSet[e.b.id]) || (e.b.id === focusId && hoverSet[e.a.id]));
         ctx.beginPath();
         ctx.moveTo(e.a.x, e.a.y);
         ctx.lineTo(e.b.x, e.b.y);
@@ -1323,7 +1325,7 @@
       canvas.classList.remove("dragging");
       if (!dragMoved) enterEgo(n.id);
       alpha = Math.max(alpha, 0.15);
-    } else if (!dragMoved){ // 팬 후 놓는 건 클릭이 아니다
+    } else if (downPos && !dragMoved){ // 캔버스에서 시작된 클릭만 — 패널(CL 버튼 등)이 캔버스 위에 떠 있어 좌표만으론 구분 불가
       var p = getPos(evt);
       var rect = canvas.getBoundingClientRect();
       var inCanvas = evt.clientX >= rect.left && evt.clientX <= rect.right && evt.clientY >= rect.top && evt.clientY <= rect.bottom;
@@ -1336,7 +1338,11 @@
       } else if (inCanvas){
         searchGlowId = null; // 빈 공간 클릭 = 검색 점등 해제
         if (viewMode === "ego") exitEgo();
-        else if (isolateTeam) setIsolate(null); // 격리 중 빈 공간 클릭 = 전체 복귀
+        else if (isolateTeam || clActive()){ // 필터 중 빈 공간 클릭 = 팀·CL 모두 해제하고 전체 복귀
+          clFilters = {};
+          refreshClBtns();
+          setIsolate(null);
+        }
       }
     }
     downPos = null;
