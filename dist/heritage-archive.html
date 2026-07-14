@@ -256,6 +256,14 @@
   .md-body h1:first-child, .md-body h2:first-child{ margin-top: 0; }
   .md-body p{ margin: 3px 0; }
   .md-body ul{ margin: 3px 0; padding-left: 16px; }
+  .raw-toggle{
+    margin-top: 8px; padding: 3px 10px; font-size: 11px; cursor: pointer;
+    background: none; border: 1px solid var(--panel-border); border-radius: 10px;
+    color: var(--ink-faint);
+  }
+  .raw-toggle:hover{ color: var(--ink); }
+  .raw-body{ display: none; }
+  .raw-body.visible{ display: block; }
 
   .neighbor-label{
     margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--panel-border);
@@ -731,6 +739,15 @@ function cloudState(freq, ids){
   DATA.nodes.forEach(function(n){
     if (!(n.team in TEAM_COLOR)) TEAM_COLOR[n.team] = PALETTE[Object.keys(TEAM_COLOR).length % PALETTE.length];
   });
+  // PJT 군집 앵커: 팀별로 화면 중앙 기준 원둘레에 균등 배치 (단위좌표라 resize에 안전)
+  var TEAM_ANCHOR = {};
+  (function(){
+    var teams = Object.keys(TEAM_COLOR);
+    teams.forEach(function(t, i){
+      var a = (i / teams.length) * Math.PI * 2 - Math.PI / 2;
+      TEAM_ANCHOR[t] = { ux: 0.5 + Math.cos(a) * 0.30, uy: 0.5 + Math.sin(a) * 0.30 };
+    });
+  })();
   var GOLD = "#f3cc73";
   var DEFAULT_COLOR = "#9aa4b2";
   var cloudChart = null;
@@ -742,6 +759,7 @@ function cloudState(freq, ids){
   var nodes = DATA.nodes.map(function(n){
     return {
       id: n.id, name: n.name, team: n.team, cl: n.cl_level, tags: n.tags || [], text: n.text || "",
+      normalized_text: n.normalized_text || "",
       x: 0, y: 0, vx: 0, vy: 0, r: 5, _placed: false,
       visible: true
     };
@@ -829,6 +847,10 @@ function cloudState(freq, ids){
   var ctx = canvas.getContext("2d");
   var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
 
+  // 카메라: screen = world * k + (x, y). 휠 줌 + 빈 공간 드래그 팬 전용
+  var cam = { x: 0, y: 0, k: 1 };
+  function resetCam(){ cam.x = 0; cam.y = 0; cam.k = 1; }
+
   function resize(){
     W = canvas.clientWidth;
     H = canvas.clientHeight;
@@ -839,14 +861,14 @@ function cloudState(freq, ids){
   }
   window.addEventListener("resize", resize);
 
-  // 중앙 원반에 퍼뜨려 시작: 좁게 모으면 반발력이 폭발해 초기 화면이 요동친다
+  // 자기 PJT 앵커 주변 작은 원반에서 시작: 초기 로드부터 군집 형태로 정착
   (function seedPositions(){
-    var cx = 0.5, cy = 0.5;
     nodes.forEach(function(n){
+      var anchor = TEAM_ANCHOR[n.team] || { ux: 0.5, uy: 0.5 };
       var a = Math.random() * Math.PI * 2;
-      var rad = Math.sqrt(Math.random()) * 0.30; // sqrt: 원반 균일 분포
-      n.ux = cx + Math.cos(a) * rad;
-      n.uy = cy + Math.sin(a) * rad;
+      var rad = Math.sqrt(Math.random()) * 0.08; // sqrt: 원반 균일 분포
+      n.ux = anchor.ux + Math.cos(a) * rad;
+      n.uy = anchor.uy + Math.sin(a) * rad;
     });
   })();
 
@@ -904,6 +926,10 @@ function cloudState(freq, ids){
         // 더미 유사도가 0.85~0.97에 몰려 있어 상수항이 실질 간격을 정한다 — 작으면 전부 엉겨붙음
         var restLen = (1 - Math.max(e.w, 0)) * 200 + 95;
         var k = 0.02 + Math.max(e.w, 0) * 0.03;
+        // 타 PJT 엣지는 스프링만 약화(표시는 그대로): 더미 유사도가 팀 무관하게 높아
+        // 원래 강성으론 전 팀이 한 덩어리로 붕괴한다. 그래도 결이 비슷한 노드는
+        // 군집 사이로 끌려나온다 (튜닝 노브 — 낮출수록 군집이 또렷)
+        if (e.a.team !== e.b.team) k *= 0.05;
         var f = (dist - restLen) * k;
         var fx = (dx / dist) * f, fy = (dy / dist) * f;
         e.a.vx += fx; e.a.vy += fy;
@@ -924,8 +950,15 @@ function cloudState(freq, ids){
           n.vx = 0; n.vy = 0;
           return;
         }
-        n.vx += (cx - n.x) * 0.0003; // 중심 인력: 크면 평형이 빽빽한 원반으로 붕괴한다
-        n.vy += (cy - n.y) * 0.0003;
+        var anchor = !isolateTeam && TEAM_ANCHOR[n.team];
+        if (anchor){
+          // PJT 앵커 인력: 약한 스프링 — 유사도 엣지·반발력과 경쟁해 느슨한 군집을 만든다 (튜닝 노브)
+          n.vx += (anchor.ux * W - n.x) * 0.008 + (cx - n.x) * 0.0001;
+          n.vy += (anchor.uy * H - n.y) * 0.008 + (cy - n.y) * 0.0001;
+        } else {
+          n.vx += (cx - n.x) * 0.0003; // 중심 인력: 크면 평형이 빽빽한 원반으로 붕괴한다
+          n.vy += (cy - n.y) * 0.0003;
+        }
         n.vx *= 0.8;
         n.vy *= 0.8;
         n.x += n.vx * alpha;
@@ -993,6 +1026,7 @@ function cloudState(freq, ids){
     egoRevealStart = performance.now() + EGO_TRANSITION_MS;
     ripples.push({ x: byId[id].x, y: byId[id].y, color: TEAM_COLOR[byId[id].team] || DEFAULT_COLOR, start: performance.now() });
     alpha = Math.max(alpha, 0.05);
+    resetCam(); // 에고 배치가 W/2,H/2 기준이라 줌 상태로 진입하면 중앙을 벗어나 보인다
     renderDetail();
     resetBtn.classList.add("visible");
   }
@@ -1011,6 +1045,7 @@ function cloudState(freq, ids){
     egoRevealStart = null;
     detailPanel.classList.remove("visible");
     resetBtn.classList.remove("visible");
+    resetCam();
     alpha = Math.max(alpha, 0.35);
   }
 
@@ -1059,7 +1094,9 @@ function cloudState(freq, ids){
   }
 
   function draw(){
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.clearRect(0, 0, W, H);
+    ctx.setTransform(DPR * cam.k, 0, 0, DPR * cam.k, DPR * cam.x, DPR * cam.y);
     var active = egoActiveIds();
     var revealed = active ? revealedCount() : 0;
     var revealedIds = null;
@@ -1195,11 +1232,18 @@ function cloudState(freq, ids){
   }
 
   function getPos(evt){
+    // 카메라 역변환: 반환값은 월드 좌표 (노드 좌표계)
     var rect = canvas.getBoundingClientRect();
-    return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+    return {
+      x: (evt.clientX - rect.left - cam.x) / cam.k,
+      y: (evt.clientY - rect.top - cam.y) / cam.k
+    };
   }
 
   var hoverTip = document.getElementById("hoverTip");
+  var panning = false;
+  var panLast = { x: 0, y: 0 }; // 스크린 좌표 (팬은 카메라 오프셋 델타라 월드 변환 불필요)
+  var panDist = 0;
 
   canvas.addEventListener("mousedown", function(evt){
     var p = getPos(evt);
@@ -1211,12 +1255,35 @@ function cloudState(freq, ids){
       dragPos.x = n.x; dragPos.y = n.y;
       canvas.classList.add("dragging");
       alpha = Math.max(alpha, 0.3);
+    } else { // 빈 공간, 또는 에고 모드(노드 드래그 없음) → 팬
+      panning = true;
+      panDist = 0;
+      panLast.x = evt.clientX; panLast.y = evt.clientY;
+      canvas.classList.add("dragging");
     }
   });
 
+  canvas.addEventListener("wheel", function(evt){
+    evt.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var sx = evt.clientX - rect.left, sy = evt.clientY - rect.top;
+    var k = Math.max(0.5, Math.min(4, cam.k * Math.pow(1.0015, -evt.deltaY)));
+    // 커서가 가리키는 월드 지점을 고정한 채 줌
+    cam.x = sx - (sx - cam.x) * (k / cam.k);
+    cam.y = sy - (sy - cam.y) * (k / cam.k);
+    cam.k = k;
+  }, { passive: false });
+
   window.addEventListener("mousemove", function(evt){
     var p = getPos(evt);
-    if (dragNode){
+    if (panning){
+      cam.x += evt.clientX - panLast.x;
+      cam.y += evt.clientY - panLast.y;
+      panDist += Math.abs(evt.clientX - panLast.x) + Math.abs(evt.clientY - panLast.y);
+      if (panDist > 3) dragMoved = true; // 3px 이하 이동은 클릭으로 취급 (에고 종료 등)
+      panLast.x = evt.clientX; panLast.y = evt.clientY;
+      hoverTip.classList.remove("show");
+    } else if (dragNode){
       dragPos = p;
       if (downPos && (Math.abs(p.x - downPos.x) > 3 || Math.abs(p.y - downPos.y) > 3)) dragMoved = true;
       hoverTip.classList.remove("show");
@@ -1230,8 +1297,8 @@ function cloudState(freq, ids){
         canvas.style.cursor = n ? "pointer" : "grab";
       }
       if (n){
-        hoverTip.style.left = p.x + "px";
-        hoverTip.style.top = p.y + "px";
+        hoverTip.style.left = (evt.clientX - rect.left) + "px";
+        hoverTip.style.top = (evt.clientY - rect.top) + "px";
         var html = escapeHtml(n.name) + ' <span class="team">· ' + escapeHtml(n.team) + '</span>';
         if (viewMode === "ego" && n.id !== selectedId){
           var nb = egoNeighbors.filter(function(x){ return x.node.id === n.id; })[0];
@@ -1246,13 +1313,17 @@ function cloudState(freq, ids){
   });
 
   window.addEventListener("mouseup", function(evt){
+    if (panning){
+      panning = false;
+      canvas.classList.remove("dragging");
+    }
     if (dragNode){
       var n = dragNode;
       dragNode = null;
       canvas.classList.remove("dragging");
       if (!dragMoved) enterEgo(n.id);
       alpha = Math.max(alpha, 0.15);
-    } else {
+    } else if (!dragMoved){ // 팬 후 놓는 건 클릭이 아니다
       var p = getPos(evt);
       var rect = canvas.getBoundingClientRect();
       var inCanvas = evt.clientX >= rect.left && evt.clientX <= rect.right && evt.clientY >= rect.top && evt.clientY <= rect.bottom;
@@ -1298,8 +1369,10 @@ function cloudState(freq, ids){
     html += '<div class="tag-chips">' + (n.tags || []).map(function(t){
       return '<button class="tag-chip" data-tag="' + escapeHtml(t) + '">' + escapeHtml(t) + '</button>';
     }).join("") + '</div>';
-    html += '<div class="detail-flavor"><span class="label">근원경쟁력 회고 원문 (더미)</span>';
-    html += '<div class="md-body">' + mdToHtml(n.text || "") + '</div></div>';
+    html += '<div class="detail-flavor"><span class="label">근원경쟁력 정리본</span>';
+    html += '<div class="md-body">' + mdToHtml(n.normalized_text || "") + '</div>';
+    html += '<button class="raw-toggle">원문 보기</button>';
+    html += '<div class="md-body raw-body">' + mdToHtml(n.text || "") + '</div></div>';
     html += '<div class="neighbor-label">유사도 상위 ' + neighbors.length + '명</div>';
     html += '<div class="neighbor-list">';
     neighbors.forEach(function(nb){
@@ -1320,6 +1393,13 @@ function cloudState(freq, ids){
     detailPanel.querySelectorAll(".neighbor-item").forEach(function(btn){
       btn.addEventListener("click", function(){
         enterEgo(parseInt(btn.getAttribute("data-id"), 10));
+      });
+    });
+
+    detailPanel.querySelectorAll(".raw-toggle").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var visible = btn.nextElementSibling.classList.toggle("visible");
+        btn.textContent = visible ? "원문 접기" : "원문 보기";
       });
     });
 
