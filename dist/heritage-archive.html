@@ -439,6 +439,24 @@
     font-size: 13px; color: var(--ink-faint);
     animation: fadeUp 0.6s ease-out 2.4s both;
   }
+  .intro-demo{
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    animation: fadeUp 0.6s ease-out 1.6s both;
+  }
+  .intro-demo .demo-sent{ font-size: clamp(16px, 1.9vw, 25px); color: var(--ink); }
+  .intro-demo .demo-sent em{
+    font-style: normal; color: var(--gold);
+    background: rgba(243,204,115,0.14); border-radius: 6px; padding: 2px 7px;
+  }
+  .intro-demo .demo-sent .demo-arrow{ color: var(--ink-faint); margin: 0 6px; }
+  .intro-demo .demo-note{ font-size: clamp(13px, 1.25vw, 17px); color: var(--ink-dim); line-height: 1.6; }
+  .intro-demo .demo-note b{ color: var(--ink); }
+  .intro-demo .demo-vec{
+    width: min(560px, 72vw); height: 16px; border-radius: 8px; margin-top: 4px;
+    background: repeating-linear-gradient(90deg,
+      #f2a154 0 10px, #57c9bd 10px 22px, #7c9ce6 22px 30px, #e0819f 30px 44px,
+      #9bd66b 44px 52px, #c792ea 52px 66px, #e8d15a 66px 74px, #5ab4d6 74px 88px);
+  }
   .intro-nav{
     position: absolute; top: 50%; transform: translateY(-50%); z-index: 1;
     width: 46px; height: 46px; border-radius: 50%;
@@ -625,17 +643,33 @@
     <p class="intro-caption">우리가 각자 커리어를 돌아보며 쓴<br><b>근원경쟁력</b> 자료입니다.</p>
   </div>
 
-  <!-- 슬라이드 2: 발표용 How it Works — 키워드 크게 -->
+  <!-- 슬라이드 2: How it Works ① — AI가 글을 읽는 법 (추출 + 임베딩) -->
   <div class="intro-slide">
-    <div class="intro-eyebrow">How it Works</div>
+    <div class="intro-eyebrow">How it Works ① — AI가 글을 읽는 법</div>
     <div class="intro-steps">
-      <div class="intro-step"><div class="step-icon">📄</div><div class="step-word">텍스트 추출</div><div class="step-sub">PPT 속 글을 전부 꺼내고</div></div>
+      <div class="intro-step"><div class="step-icon">📄</div><div class="step-word">텍스트 추출</div><div class="step-sub">150명의 PPT 속 글을 전부 꺼내서</div></div>
       <div class="intro-arrow">→</div>
-      <div class="intro-step"><div class="step-icon">🧬</div><div class="step-word">벡터 변환</div><div class="step-sub">AI가 의미를 숫자로 이해하고</div></div>
-      <div class="intro-arrow">→</div>
-      <div class="intro-step"><div class="step-icon">📐</div><div class="step-word">유사도 계산</div><div class="step-sub">누구의 글이 누구와 비슷한지</div></div>
-      <div class="intro-arrow">→</div>
-      <div class="intro-step"><div class="step-icon">☁️</div><div class="step-word">키워드 추출</div><div class="step-sub">형태소 분석으로 관통 키워드까지</div></div>
+      <div class="intro-step"><div class="step-icon">🧬</div><div class="step-word">임베딩</div><div class="step-sub">글 한 편의 의미를 통째로 숫자에 담는다</div></div>
+    </div>
+    <div class="intro-demo">
+      <div class="demo-sent">"<em>설비</em> 데이터를 모아 <em>현장</em> <em>불량</em>을 줄였습니다"</div>
+      <div class="demo-note">어텐션 — 단어들이 문장 안에서 서로를 비춰보며 의미를 맞춘다<br>'현장'이 설비 현장인지 고객 현장인지, 문맥이 정한다</div>
+      <div class="demo-vec"></div>
+      <div class="demo-note">그렇게 글 한 편이 <b>1024차원 벡터</b> 하나가 된다</div>
+    </div>
+  </div>
+
+  <!-- 슬라이드 3: How it Works ② — 연결과 키워드의 의미 -->
+  <div class="intro-slide">
+    <div class="intro-eyebrow">How it Works ② — 선과 구름의 의미</div>
+    <div class="intro-steps">
+      <div class="intro-step"><div class="step-icon">📐</div><div class="step-word">유사도 계산</div><div class="step-sub">벡터가 가까운 사람끼리 선으로 잇는다</div></div>
+      <div class="intro-arrow">＋</div>
+      <div class="intro-step"><div class="step-icon">☁️</div><div class="step-word">키워드 추출</div><div class="step-sub">형태소 분석으로 명사만 모아 빈도를 센다</div></div>
+    </div>
+    <div class="intro-demo">
+      <div class="demo-note">유사도가 높다 = 같은 단어가 아니라 <b>같은 의미</b> — "품질 개선" ≈ "불량률 저감"</div>
+      <div class="demo-sent">"적극적으로 <em>협업</em>하여 <em>성과</em>를 냅니다" <span class="demo-arrow">→</span> 협업 · 성과</div>
     </div>
     <p class="intro-caption">150명의 글을 AI가 전부 읽고 나면, <b>이런 모습이 됩니다.</b></p>
   </div>
