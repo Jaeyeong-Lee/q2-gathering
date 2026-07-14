@@ -1,6 +1,5 @@
-# 이웃 수 3계층 build-time config (PRD: K >= EGO_DISPLAY_N >= TOPN_MAX)
+# 이웃 수 build-time config (PRD: K >= TOPN_MAX). 에고 뷰 인원은 Top-N 슬라이더를 따른다
 K = 30              # neighbors.json 저장 이웃 수 (인당 상한)
-EGO_DISPLAY_N = 10  # 에고 뷰 표시 이웃 수
-TOPN_MAX = 10       # 전체 뷰 Top-N 슬라이더 상한
+TOPN_MAX = 10       # 전체 뷰 Top-N 슬라이더 상한 (에고 뷰 인원 상한 겸용)
 
-assert K >= EGO_DISPLAY_N >= TOPN_MAX
+assert K >= TOPN_MAX

@@ -5,7 +5,7 @@ import json
 import math
 from pathlib import Path
 
-from config import EGO_DISPLAY_N, TOPN_MAX
+from config import TOPN_MAX
 
 ROOT = Path(__file__).parent.parent
 TEMPLATE = ROOT / "archive" / "template.html"
@@ -96,7 +96,6 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
     else:
         html = html.replace("/*__ABOUT__*/null", "null")
     html = about_slots(html)
-    html = html.replace("/*__EGO_DISPLAY_N__*/10", str(EGO_DISPLAY_N))
     html = html.replace('max="__TOPN_MAX__"', f'max="{TOPN_MAX}"')
 
     out_path = Path(out_path)

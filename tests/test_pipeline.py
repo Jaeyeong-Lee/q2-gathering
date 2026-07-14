@@ -65,7 +65,6 @@ def test_build_injects_config_values(tmp_path):
     data_dir = generate_dummy.main(out_dir=tmp_path / "data")
     html = build.build(data_dir=data_dir, out_path=tmp_path / "archive.html").read_text()
 
-    assert f"var EGO_N = {config.EGO_DISPLAY_N};" in html
     assert f'max="{config.TOPN_MAX}"' in html
     neighbors = json.loads((data_dir / "neighbors.json").read_text())
     assert all(len(v) == config.K for v in neighbors.values())
