@@ -378,6 +378,81 @@
   .stage.cloud-max #cloudMaxBtn{ display: none; } /* 최대화 중엔 ×와 우상단에서 겹친다 */
   .about-overlay .overlay-close{ position: fixed; } /* 스크롤해도 우상단 고정 */
 
+  /* ---- 발표 인트로 오버레이 (클릭/→로 진행, 마지막에 네트워크 공개) ---- */
+  .intro-overlay{
+    position: fixed; inset: 0; z-index: 60; cursor: pointer;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(87,201,189,0.07), transparent 55%),
+      radial-gradient(ellipse at 75% 80%, rgba(242,161,84,0.05), transparent 55%),
+      var(--bg);
+    transition: opacity 0.7s ease;
+  }
+  .intro-overlay.gone{ opacity: 0; pointer-events: none; }
+  .intro-slide{
+    display: none;
+    position: absolute; inset: 0;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: clamp(28px, 5vh, 52px); padding: 24px; text-align: center;
+  }
+  .intro-slide.on{ display: flex; }
+  .intro-eyebrow{
+    font-size: clamp(14px, 1.3vw, 18px); font-weight: 600; letter-spacing: 0.14em;
+    color: var(--gold); text-transform: uppercase;
+    animation: fadeUp 0.6s ease-out both;
+  }
+  .intro-stats{ display: flex; gap: clamp(36px, 7vw, 110px); }
+  .intro-stats .stat{ animation: fadeUp 0.6s ease-out both; }
+  .intro-stats .stat:nth-child(1){ animation-delay: 0.4s; }
+  .intro-stats .stat:nth-child(2){ animation-delay: 0.9s; }
+  .intro-stats .stat:nth-child(3){ animation-delay: 1.4s; }
+  .intro-stats b{
+    display: block; font-size: clamp(52px, 7.5vw, 110px); font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .intro-stats b small{ font-size: 0.42em; font-weight: 600; color: var(--ink-dim); margin-left: 4px; }
+  .intro-stats span{ display: block; margin-top: 12px; font-size: clamp(13px, 1.2vw, 16px); color: var(--ink-dim); }
+  .intro-caption{
+    margin: 0; font-size: clamp(17px, 1.9vw, 26px); color: var(--ink-dim); line-height: 1.6;
+    animation: fadeUp 0.6s ease-out 2.1s both;
+  }
+  .intro-caption b{ color: var(--ink); }
+  .intro-steps{ display: flex; align-items: center; gap: clamp(14px, 2.4vw, 34px); flex-wrap: wrap; justify-content: center; }
+  .intro-step{ animation: fadeUp 0.6s ease-out both; }
+  .intro-step:nth-child(1){ animation-delay: 0.3s; }
+  .intro-step:nth-child(3){ animation-delay: 0.8s; }
+  .intro-step:nth-child(5){ animation-delay: 1.3s; }
+  .intro-step:nth-child(7){ animation-delay: 1.8s; }
+  .intro-step .step-icon{ font-size: clamp(26px, 2.6vw, 40px); }
+  .intro-step .step-word{
+    margin-top: 10px; font-size: clamp(24px, 2.9vw, 44px); font-weight: 700; letter-spacing: -0.02em;
+  }
+  .intro-step .step-sub{ margin-top: 10px; font-size: clamp(12px, 1.1vw, 15px); color: var(--ink-dim); }
+  .intro-arrow{
+    font-size: clamp(20px, 2.2vw, 34px); color: var(--ink-faint);
+    animation: fadeUp 0.6s ease-out both;
+  }
+  .intro-arrow:nth-child(2){ animation-delay: 0.55s; }
+  .intro-arrow:nth-child(4){ animation-delay: 1.05s; }
+  .intro-arrow:nth-child(6){ animation-delay: 1.55s; }
+  .intro-hint{
+    position: absolute; bottom: clamp(22px, 4vh, 44px); left: 0; right: 0;
+    font-size: 13px; color: var(--ink-faint);
+    animation: fadeUp 0.6s ease-out 2.4s both;
+  }
+  .intro-nav{
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 1;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid var(--panel-border); background: var(--panel);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    color: var(--ink-dim); font-size: 20px; line-height: 1; cursor: pointer;
+    animation: fadeUp 0.6s ease-out 2.4s both;
+  }
+  .intro-nav:hover{ color: var(--ink); border-color: rgba(255,255,255,0.2); }
+  .intro-nav:focus-visible{ outline: 2px solid var(--gold); outline-offset: 2px; }
+  .intro-nav.prev{ left: clamp(16px, 3vw, 40px); }
+  .intro-nav.next{ right: clamp(16px, 3vw, 40px); }
+  .intro-nav.prev[disabled]{ opacity: 0.25; cursor: default; }
+
   /* ---- "이렇게 만들었어요" 오버레이 ---- */
   .about-btn{
     position: absolute; top: clamp(18px, 3vh, 32px); right: clamp(18px, 3vw, 32px); z-index: 5;
@@ -537,6 +612,63 @@
 
   <button class="about-btn" id="aboutBtn">💡 How it Works</button>
 </div>
+
+<div class="intro-overlay" id="introOverlay">
+  <!-- 슬라이드 1: 숫자 훅 — 발표 숫자는 아래 세 개만 고치면 된다 -->
+  <div class="intro-slide on">
+    <div class="intro-eyebrow">2026 Q3 T-Talk</div>
+    <div class="intro-stats">
+      <div class="stat"><b>3<small>GB</small></b><span>파일 용량</span></div>
+      <div class="stat"><b>800<small>p</small></b><span>PPT 총 페이지</span></div>
+      <div class="stat"><b>150<small>명</small></b><span>작성 인원</span></div>
+    </div>
+    <p class="intro-caption">우리가 각자 커리어를 돌아보며 쓴<br><b>근원경쟁력</b> 자료입니다.</p>
+  </div>
+
+  <!-- 슬라이드 2: 발표용 How it Works — 키워드 크게 -->
+  <div class="intro-slide">
+    <div class="intro-eyebrow">How it Works</div>
+    <div class="intro-steps">
+      <div class="intro-step"><div class="step-icon">📄</div><div class="step-word">텍스트 추출</div><div class="step-sub">PPT 속 글을 전부 꺼내고</div></div>
+      <div class="intro-arrow">→</div>
+      <div class="intro-step"><div class="step-icon">🧬</div><div class="step-word">벡터 변환</div><div class="step-sub">AI가 의미를 숫자로 이해하고</div></div>
+      <div class="intro-arrow">→</div>
+      <div class="intro-step"><div class="step-icon">📐</div><div class="step-word">유사도 계산</div><div class="step-sub">누구의 글이 누구와 비슷한지</div></div>
+      <div class="intro-arrow">→</div>
+      <div class="intro-step"><div class="step-icon">☁️</div><div class="step-word">키워드 추출</div><div class="step-sub">형태소 분석으로 관통 키워드까지</div></div>
+    </div>
+    <p class="intro-caption">150명의 글을 AI가 전부 읽고 나면, <b>이런 모습이 됩니다.</b></p>
+  </div>
+
+  <button class="intro-nav prev" id="introPrev" aria-label="이전 슬라이드" disabled>←</button>
+  <button class="intro-nav next" id="introNext" aria-label="다음 슬라이드">→</button>
+  <div class="intro-hint">클릭 또는 → 키로 진행</div>
+</div>
+<script>
+(function(){
+  var ov = document.getElementById("introOverlay");
+  var slides = ov.querySelectorAll(".intro-slide");
+  var prevBtn = document.getElementById("introPrev");
+  var cur = 0;
+  function show(i){
+    slides[cur].classList.remove("on"); cur = i; slides[cur].classList.add("on");
+    prevBtn.disabled = cur === 0;
+  }
+  function next(){
+    if (cur < slides.length - 1) show(cur + 1);
+    else { ov.classList.add("gone"); setTimeout(function(){ ov.remove(); }, 700); }
+  }
+  function prev(){ if (cur > 0) show(cur - 1); }
+  ov.addEventListener("click", next);
+  prevBtn.addEventListener("click", function(e){ e.stopPropagation(); prev(); });
+  document.getElementById("introNext").addEventListener("click", function(e){ e.stopPropagation(); next(); });
+  window.addEventListener("keydown", function(e){
+    if (!document.body.contains(ov) || ov.classList.contains("gone")) return;
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " " || e.key === "Enter") { e.preventDefault(); next(); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); prev(); }
+  });
+})();
+</script>
 
 <div class="about-overlay" id="aboutOverlay">
   <button class="overlay-close" id="aboutClose" aria-label="설명 닫기">×</button>
