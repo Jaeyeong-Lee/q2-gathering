@@ -357,7 +357,7 @@
     mask-image: radial-gradient(circle, #000 99%, transparent 100%);
     -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
     -webkit-mask-position: center; mask-position: center;
-    animation: cloudReveal 1.5s ease-out;
+    animation: cloudReveal 0.8s ease-out;
   }
   /* 필터 안내문이 좌하단 범례 패널에 가려지지 않게 클라우드와 같은 오프셋으로 민다 */
   .stage.cloud-max .cloud-note{ margin-left: min(280px, 22vw); }
@@ -388,6 +388,7 @@
     transition: opacity 0.7s ease;
   }
   .intro-overlay.gone{ opacity: 0; pointer-events: none; }
+  .intro-overlay.hidden{ display: none; }
   .intro-slide{
     display: none;
     position: absolute; inset: 0;
@@ -451,6 +452,7 @@
   .intro-demo .demo-sent .demo-arrow{ color: var(--ink-faint); margin: 0 6px; }
   .intro-demo .demo-note{ font-size: clamp(13px, 1.25vw, 17px); color: var(--ink-dim); line-height: 1.6; }
   .intro-demo .demo-note b{ color: var(--ink); }
+  .intro-cmp{ width: min(560px, 80vw); text-align: left; }
   .intro-demo .demo-vec{
     width: min(560px, 72vw); height: 16px; border-radius: 8px; margin-top: 4px;
     background: repeating-linear-gradient(90deg,
@@ -472,8 +474,11 @@
   .intro-nav.prev[disabled]{ opacity: 0.25; cursor: default; }
 
   /* ---- "이렇게 만들었어요" 오버레이 ---- */
-  .about-btn{
+  .corner-btns{
     position: absolute; top: clamp(18px, 3vh, 32px); right: clamp(18px, 3vw, 32px); z-index: 5;
+    display: flex; gap: 10px;
+  }
+  .about-btn{
     padding: 9px 16px; border-radius: 100px;
     border: 1px solid var(--panel-border); background: var(--panel);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: var(--ink-dim);
@@ -628,7 +633,10 @@
 
   <aside class="panel detail-panel" id="detailPanel"></aside>
 
-  <button class="about-btn" id="aboutBtn">💡 How it Works</button>
+  <div class="corner-btns">
+    <button class="about-btn" id="introBtn">▶ Intro</button>
+    <button class="about-btn" id="aboutBtn">💡 How it Works</button>
+  </div>
 </div>
 
 <div class="intro-overlay" id="introOverlay">
@@ -668,8 +676,8 @@
       <div class="intro-step"><div class="step-icon">☁️</div><div class="step-word">키워드 추출</div><div class="step-sub">형태소 분석으로 명사만 모아 빈도를 센다</div></div>
     </div>
     <div class="intro-demo">
-      <div class="demo-note">유사도가 높다 = 같은 단어가 아니라 <b>같은 의미</b> — "품질 개선" ≈ "불량률 저감"</div>
-      <div class="demo-sent">"적극적으로 <em>협업</em>하여 <em>성과</em>를 냅니다" <span class="demo-arrow">→</span> 협업 · 성과</div>
+      <div class="demo-note">유사도가 높다 = 같은 단어가 아니라 <b>모델이 해석한 내용이 닮았다</b> — "품질 개선" ≈ "불량률 저감"</div>
+      <div class="intro-cmp" id="introCmp"></div>
     </div>
     <p class="intro-caption">150명의 글을 AI가 전부 읽고 나면, <b>이런 모습이 됩니다.</b></p>
   </div>
@@ -690,14 +698,17 @@
   }
   function next(){
     if (cur < slides.length - 1) show(cur + 1);
-    else { ov.classList.add("gone"); setTimeout(function(){ ov.remove(); }, 700); }
+    else { ov.classList.add("gone"); setTimeout(function(){ ov.classList.add("hidden"); }, 700); }
   }
   function prev(){ if (cur > 0) show(cur - 1); }
   ov.addEventListener("click", next);
   prevBtn.addEventListener("click", function(e){ e.stopPropagation(); prev(); });
   document.getElementById("introNext").addEventListener("click", function(e){ e.stopPropagation(); next(); });
+  document.getElementById("introBtn").addEventListener("click", function(){
+    ov.classList.remove("hidden"); ov.classList.remove("gone"); show(0); // 처음부터 다시 재생
+  });
   window.addEventListener("keydown", function(e){
-    if (!document.body.contains(ov) || ov.classList.contains("gone")) return;
+    if (ov.classList.contains("gone") || ov.classList.contains("hidden")) return;
     if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " " || e.key === "Enter") { e.preventDefault(); next(); }
     else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); prev(); }
   });
@@ -2071,24 +2082,37 @@ function cloudState(freq, ids){
     drawVecPattern(document.getElementById("anchorStrip"), anchorPattern);
     document.getElementById("anchorName2").innerHTML = escapeHtml(ABOUT.anchor.name) + "<small>본인</small>";
     drawVecPattern(document.getElementById("cmpAnchor"), anchorPattern);
-    var cmpRows = document.getElementById("cmpRows");
-    ABOUT.compares.forEach(function(c){
+    function addCmpRow(container, c){
       var row = document.createElement("div");
       row.className = "cmp-row";
-      
+
       var pct = 100;
       if (c.label.indexOf("유사 1위") === 0) pct = 95;
       else if (c.label.indexOf("중간") === 0) pct = 55;
       else if (c.label.indexOf("최하위") === 0) pct = 15;
-      
+
       row.innerHTML = '<span class="cmp-name">' + escapeHtml(c.name) + '<small>' + escapeHtml(c.label) + '</small></span>' +
         '<canvas class="vec-strip"></canvas>' +
         '<span class="cmp-score">유사도 ' + pct + '%</span>';
-      cmpRows.appendChild(row);
-      
+      container.appendChild(row);
+
       var comparePattern = getMutatedPattern(anchorPattern, pct, c.name);
       drawVecPattern(row.querySelector("canvas"), comparePattern);
-    });
+    }
+    var cmpRows = document.getElementById("cmpRows");
+    ABOUT.compares.forEach(function(c){ addCmpRow(cmpRows, c); });
+
+    // 인트로 3장에도 같은 대조를 재사용 (본인 + 3명)
+    var introCmp = document.getElementById("introCmp");
+    if (introCmp){
+      var ir = document.createElement("div");
+      ir.className = "cmp-row";
+      ir.innerHTML = '<span class="cmp-name">' + escapeHtml(ABOUT.anchor.name) + '<small>본인</small></span>' +
+        '<canvas class="vec-strip"></canvas><span class="cmp-score"></span>';
+      introCmp.appendChild(ir);
+      drawVecPattern(ir.querySelector("canvas"), anchorPattern);
+      ABOUT.compares.forEach(function(c){ addCmpRow(introCmp, c); });
+    }
     var topkList = document.getElementById("topkList");
     if (topkList) {
       ABOUT.topk.slice(0, 10).forEach(function(t, i){
