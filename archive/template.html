@@ -175,7 +175,7 @@
   .isolate-clear:hover{ text-decoration: underline; }
   .legend-list{ display: flex; flex-direction: column; gap: 2px; }
   .team-chip{
-    display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-dim);
+    display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #c9d0dc;
     background: none; border: none; width: 100%; text-align: left; padding: 5px 4px;
     border-radius: 7px; cursor: pointer; font-family: var(--sans);
   }
@@ -352,7 +352,7 @@
   /* 좌하단 범례 패널과 겹치지 않게 클라우드 영역을 오른쪽으로 민다.
      등장: 중앙→바깥 원형 리빌 — 큰 단어(골드)가 중앙이라 자연스럽게 중요도 순으로 드러난다 */
   .stage.cloud-max #cloudCanvas{
-    flex: 1; height: auto; margin-left: min(280px, 22vw);
+    flex: 1; height: auto; margin-left: min(120px, 10vw); /* 범례 패널 회피는 유지하되 중앙에 가깝게 */
     -webkit-mask-image: radial-gradient(circle, #000 99%, transparent 100%);
     mask-image: radial-gradient(circle, #000 99%, transparent 100%);
     -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
@@ -1443,6 +1443,7 @@
   });
 
   canvas.addEventListener("wheel", function(evt){
+    if (evt.ctrlKey) return; // 트랙패드 핀치(ctrl+wheel)는 브라우저 페이지 줌에 양보 — 대형 스크린에서 글씨 확대용
     evt.preventDefault();
     var rect = canvas.getBoundingClientRect();
     var sx = evt.clientX - rect.left, sy = evt.clientY - rect.top;
