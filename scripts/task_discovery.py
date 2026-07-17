@@ -14,8 +14,7 @@ log = get_logger("task_discovery")
 
 HORIZONS = ("단기", "장기", "불명")
 
-EXTRACT_PROMPT = """다음은 {name}({cl_level})의 근원경쟁력 회고 원문이다.
-본인이 하고 싶다고 쓴 미래 과제(tasks)와 확보했다고 쓴 역량(capabilities)을 항목화해
+_EXTRACT_RULES = """본인이 하고 싶다고 쓴 미래 과제(tasks)와 확보했다고 쓴 역량(capabilities)을 항목화해
 JSON 객체로만 답하라. 요약하지 말고 문장 단위로 쪼개라. quote는 반드시 원문에서
 글자 그대로 발췌하라. horizon은 단기/장기/불명 중 하나. 해당 내용이 없으면 빈 배열.
 
@@ -24,6 +23,13 @@ JSON 객체로만 답하라. 요약하지 말고 문장 단위로 쪼개라. quo
 
 원문:
 {text}"""
+
+# CL별 프롬프트 분리 (#4): CL2/3은 3단 구성, CL4는 미래 위주 별도 템플릿
+EXTRACT_PROMPT_CL23 = ("다음은 {name}({cl_level})의 근원경쟁력 회고 원문이다. "
+                       "3단 구성(①상반기 성과·하반기 전략 ②커리어 회고·확보 역량 ③미래 업무)이 "
+                       "원칙이나 미준수 문서도 있다.\n" + _EXTRACT_RULES)
+EXTRACT_PROMPT_CL4 = ("다음은 {name}({cl_level})의 근원경쟁력 회고 원문이다. "
+                      "CL4는 미래 위주 서술형 템플릿이다.\n" + _EXTRACT_RULES)
 
 PAGE_PROMPT = """다음은 팀원들이 근원경쟁력 회고에 직접 쓴 미래 과제 문장 묶음(한 군집)이다.
 이 군집의 제목(10자 내외 명사구)과 요지(1~2문장)를 JSON 객체로만 답하라.
@@ -90,7 +96,8 @@ def _parse_json(response):
 
 def extract_person(doc, call):
     """1인 추출 + 검증. quote가 원문 발췌가 아니면 ValueError(재시도용)."""
-    parsed = _parse_json(call(EXTRACT_PROMPT.format(**doc)))
+    tpl = EXTRACT_PROMPT_CL4 if doc["cl_level"] == "CL4" else EXTRACT_PROMPT_CL23
+    parsed = _parse_json(call(tpl.format(**doc)))
     tasks, capabilities = parsed.get("tasks", []), parsed.get("capabilities", [])
     for item in tasks + capabilities:
         if item["quote"] not in doc["text"]:
@@ -125,16 +132,15 @@ def run_extract(sources_path, out_path, call, retries=1, delay=0.5):
     return out
 
 
-def run_embed(extracted_path, out_path, embed, delay=0.0):
-    """과제 문장별 임베딩 (사람당 1개 아님) → task_vectors.json."""
+def run_embed(extracted_path, out_path, embed, delay=0.0, field="tasks"):
+    """문장별 임베딩 (사람당 1개 아님) → vectors.json. field로 과제/역량 평면 선택."""
     import time
     persons = json.loads(Path(extracted_path).read_text())
     vectors = []
     for p in persons:
-        for t in p["tasks"]:
+        for t in p[field]:
             vectors.append({"person_id": p["person_id"], "name": p["name"],
-                            "text": t["text"], "horizon": t["horizon"], "quote": t["quote"],
-                            "vec": embed(t["text"])})
+                            **{k: v for k, v in t.items()}, "vec": embed(t["text"])})
             if delay > 0:
                 time.sleep(delay)
     Path(out_path).write_text(json.dumps(vectors, ensure_ascii=False))
@@ -153,7 +159,7 @@ def run_cluster(vectors_path, out_path, k=8, seed=0):
     labels = KMeans(n_clusters=k, random_state=seed, n_init=10).fit_predict(X)
     clusters = []
     for cid in range(k):
-        members = [{key: it[key] for key in ("person_id", "name", "text", "horizon", "quote")}
+        members = [{key: v for key, v in it.items() if key != "vec"}
                    for it, lb in zip(items, labels) if lb == cid]
         clusters.append({"cluster_id": cid, "items": members})
     Path(out_path).write_text(json.dumps(clusters, ensure_ascii=False, indent=1))
@@ -191,6 +197,10 @@ def main(sources_path=ROOT / "data" / "task_discovery" / "sources.json", k=8):
     run_embed(out / "extracted.json", out / "task_vectors.json", embed=llm.embed_text, delay=0.5)
     run_cluster(out / "task_vectors.json", out / "clusters.json", k=k)
     pages = run_pages(out / "clusters.json", out / "pages", call=llm.call_gemini)
+    # 역량 평면 (#4) — 빈 칸 매트릭스(옵션)·발굴층의 재료, 페이지는 과제 평면만
+    run_embed(out / "extracted.json", out / "capability_vectors.json",
+              embed=llm.embed_text, delay=0.5, field="capabilities")
+    run_cluster(out / "capability_vectors.json", out / "capability_clusters.json", k=k)
     log.info(f"페이지 {len(pages)}개 생성: {out / 'pages'}")
 
 

@@ -121,6 +121,44 @@ def test_cluster_deterministic_and_separates(artifacts):
     assert cid[1] == cid[3] != cid[2]
 
 
+def test_cl_split_prompts(tmp_path):
+    src = tmp_path / "s.json"
+    src.write_text(json.dumps([SOURCES[0], SOURCES[2]], ensure_ascii=False))  # CL3 + CL4
+    prompts = []
+
+    def spy_call(prompt):
+        prompts.append(prompt)
+        return json.dumps({"tasks": [], "capabilities": []})
+
+    td.run_extract(src, tmp_path / "e.json", call=spy_call, delay=0)
+    cl3_prompt, cl4_prompt = prompts
+    assert cl3_prompt != cl4_prompt
+    assert "3단" in cl3_prompt          # CL2/3: 3단 구성 안내
+    assert "미래 위주" in cl4_prompt     # CL4: 별도 템플릿 안내
+
+
+def test_capability_plane_clustered(artifacts):
+    tmp_path = artifacts[0]
+    vectors = td.run_embed(tmp_path / "extracted.json", tmp_path / "cap_vectors.json",
+                           embed=mock_embed, field="capabilities")
+    assert vectors and all("person_id" in v and "quote" in v for v in vectors)
+    clusters = td.run_cluster(tmp_path / "cap_vectors.json", tmp_path / "cap_clusters.json", k=2, seed=0)
+    assert sum(len(c["items"]) for c in clusters) == len(vectors)
+
+
+def test_clusters_mix_horizons(artifacts):
+    clusters = artifacts[3]
+    mixed = [c for c in clusters if len({it["horizon"] for it in c["items"]}) > 1]
+    assert mixed  # 단기/불명이 같은 군집에 공존 (지평선으로 쪼개지 않음)
+
+
+def test_vectors_traceable_to_source(artifacts):
+    _, _, vectors, _, _ = artifacts
+    text_by_id = {s["id"]: s["text"] for s in SOURCES}
+    for v in vectors:
+        assert v["quote"] in text_by_id[v["person_id"]]
+
+
 def test_generate_sources_schema_and_templates(tmp_path):
     docs = td.generate_sources(20, seed=1, out_path=tmp_path / "sources.json")
     assert len(docs) == 20 and (tmp_path / "sources.json").exists()
