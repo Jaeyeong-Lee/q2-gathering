@@ -99,6 +99,21 @@ def test_quotes_are_substrings_of_source(artifacts):
     assert n_quotes > 0
 
 
+def test_quote_matches_across_linebreaks(tmp_path):
+    # 원문이 문장 중간에 줄바꿈돼도 줄바꿈 없는 인용은 유효 (실 LLM에서 실제 발생)
+    src = tmp_path / "s.json"
+    doc = {"id": 9, "name": "김민준", "cl_level": "CL3",
+           "text": "확보 역량은 PLC\n제어 경험이다."}
+    src.write_text(json.dumps([doc], ensure_ascii=False))
+
+    def call(prompt):
+        return json.dumps({"tasks": [], "capabilities": [
+            {"text": "PLC 제어", "quote": "확보 역량은 PLC 제어 경험이다."}]}, ensure_ascii=False)
+
+    extracted = td.run_extract(src, tmp_path / "e.json", call=call, retries=0, delay=0)
+    assert extracted and extracted[0]["capabilities"]
+
+
 def test_bad_quote_fails_person(tmp_path):
     src = tmp_path / "sources.json"
     src.write_text(json.dumps(SOURCES[:1], ensure_ascii=False))

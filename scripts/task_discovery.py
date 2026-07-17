@@ -91,6 +91,11 @@ def generate_sources(n=20, seed=0, out_path=None):
     return docs
 
 
+def _norm(s):
+    """인용 대조용 공백 정규화 — 원문 줄바꿈/들여쓰기 차이로 진짜 인용을 떨구지 않는다."""
+    return "".join(s.split())
+
+
 def _parse_json(response):
     start, end = response.find("{"), response.rfind("}")
     if start == -1 or end <= start:
@@ -104,7 +109,7 @@ def extract_person(doc, call):
     parsed = _parse_json(call(tpl.format(**doc)))
     tasks, capabilities = parsed.get("tasks", []), parsed.get("capabilities", [])
     for item in tasks + capabilities:
-        if item["quote"] not in doc["text"]:
+        if _norm(item["quote"]) not in _norm(doc["text"]):
             raise ValueError(f"인용 불일치 (id={doc['id']}): {item['quote'][:40]!r}")
     for t in tasks:
         if t.get("horizon") not in HORIZONS:
@@ -180,7 +185,7 @@ def _grounded(suggestion, items):
         return False
     for ev in evidence:
         if not any(it["person_id"] == ev["person_id"]
-                   and (ev["quote"] in it["quote"] or ev["quote"] in it["text"])
+                   and (_norm(ev["quote"]) in _norm(it["quote"]) or _norm(ev["quote"]) in _norm(it["text"]))
                    for it in items):
             log.warning(f"파생 제안 폐기 (인용 불일치): {suggestion.get('text', '?')!r}")
             return False
