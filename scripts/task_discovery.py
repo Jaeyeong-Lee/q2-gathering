@@ -33,6 +33,54 @@ PAGE_PROMPT = """다음은 팀원들이 근원경쟁력 회고에 직접 쓴 미
 {tasks}"""
 
 
+## 더미 원문 생성 (issue #3) — 실 pptx 원문 확보 전 입력 대체. generate_dummy.py 패턴.
+
+_SURNAMES = "김이박최정강조윤장임한오서신권황안송류전홍"
+_GIVENS = ["민준", "서연", "도윤", "하은", "지호", "수아", "예준", "지유", "시우", "채원",
+           "주원", "다은", "건우", "예린", "현우", "소율", "우진", "가은", "선우", "유나"]
+_DOMAINS = ["용접 비전검사", "공정 데이터 예지보전", "딥러닝 외관검사", "로봇 티칭 자동화",
+            "디지털트윈 시뮬레이션", "MES 데이터 표준화", "품질 데이터 분석", "설비 이상감지",
+            "PLC 제어 고도화", "물류 자동화", "금형 수명 예측", "에너지 사용 최적화"]
+_SKILLS = ["PLC 제어", "SQL 리포팅", "파이썬 데이터 분석", "로봇 티칭", "비전 알고리즘",
+           "MLOps 운영", "현장 개선", "공정 설계", "센서 캘리브레이션", "표준화 문서화"]
+
+_TPL_CL23 = """1. 상반기 성과 및 하반기 전략
+상반기에는 {d1} 과제를 수행해 성과를 냈다. 하반기에는 {d2} 개선을 이어가려 한다.
+2. 커리어 회고 및 확보 역량
+그동안 {s1}와(과) {s2} 역량을 확보했다.
+3. 미래 업무
+단기적으로는 {d3} 체계를 만들고 싶다. 장기적으로는 {d4} 플랫폼을 구축하고 싶다."""
+
+_TPL_CL4 = """앞으로의 방향
+{d1}을(를) 표준 플랫폼으로 통합하는 것이 목표다. 이를 위해 {s1}와(과) {s2} 역량을
+확보해 왔다. 단기적으로는 {d2} 파일럿을 추진하고 싶다."""
+
+_TPL_BAD = "그동안 여러 업무를 두루 경험했습니다. 앞으로도 팀에 보탬이 되도록 열심히 하겠습니다."
+
+
+def generate_sources(n=20, seed=0, out_path=None):
+    """더미 원문 n명 생성 — CL2/3 3단·CL4 별도 템플릿, ~10% 미준수. 고정 시드 재현."""
+    import random
+    rng = random.Random(seed)
+    docs = []
+    for i in range(1, n + 1):
+        cl = rng.choices(["CL2", "CL3", "CL4"], weights=[0.3, 0.45, 0.25])[0]
+        d = rng.sample(_DOMAINS, 4)
+        s = rng.sample(_SKILLS, 2)
+        if rng.random() < 0.1:
+            text = _TPL_BAD
+        elif cl == "CL4":
+            text = _TPL_CL4.format(d1=d[0], d2=d[1], s1=s[0], s2=s[1])
+        else:
+            text = _TPL_CL23.format(d1=d[0], d2=d[1], d3=d[2], d4=d[3], s1=s[0], s2=s[1])
+        docs.append({"id": i, "name": rng.choice(_SURNAMES) + rng.choice(_GIVENS),
+                     "cl_level": cl, "text": text})
+    if out_path:
+        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(out_path).write_text(json.dumps(docs, ensure_ascii=False, indent=1))
+    return docs
+
+
 def _parse_json(response):
     start, end = response.find("{"), response.rfind("}")
     if start == -1 or end <= start:

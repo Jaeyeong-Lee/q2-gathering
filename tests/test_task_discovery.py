@@ -121,6 +121,30 @@ def test_cluster_deterministic_and_separates(artifacts):
     assert cid[1] == cid[3] != cid[2]
 
 
+def test_generate_sources_schema_and_templates(tmp_path):
+    docs = td.generate_sources(20, seed=1, out_path=tmp_path / "sources.json")
+    assert len(docs) == 20 and (tmp_path / "sources.json").exists()
+    assert all({"id", "name", "cl_level", "text"} <= set(d) for d in docs)
+    cl4 = [d for d in docs if d["cl_level"] == "CL4"]
+    cl23 = [d for d in docs if d["cl_level"] in ("CL2", "CL3")]
+    assert cl4 and cl23
+    # CL2/3은 3단 템플릿, CL4는 별도 템플릿(단 미준수자 제외)
+    compliant23 = [d for d in cl23 if "미래 업무" in d["text"]]
+    assert compliant23 and all("커리어 회고" in d["text"] for d in compliant23)
+    assert any("앞으로의 방향" in d["text"] for d in cl4)
+    # 일부 미준수자 존재
+    assert any("미래 업무" not in d["text"] and "앞으로의 방향" not in d["text"] for d in docs)
+
+
+def test_generate_sources_deterministic_and_feeds_extract(tmp_path):
+    a = td.generate_sources(238, seed=7, out_path=tmp_path / "a.json")
+    b = td.generate_sources(238, seed=7, out_path=tmp_path / "b.json")
+    assert a == b
+    empty = json.dumps({"tasks": [], "capabilities": []})
+    extracted = td.run_extract(tmp_path / "a.json", tmp_path / "e.json", call=lambda p: empty, delay=0)
+    assert len(extracted) == 238
+
+
 def test_pages_have_name_and_quote(artifacts):
     *_, pages = artifacts
     text = "".join(p.read_text() for p in pages)
