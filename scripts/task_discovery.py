@@ -158,6 +158,9 @@ def run_cluster(vectors_path, out_path, k=8, seed=0):
     from sklearn.preprocessing import normalize
 
     items = json.loads(Path(vectors_path).read_text())
+    if not items:  # 예: 역량 문장이 하나도 안 뽑힌 세트
+        Path(out_path).write_text("[]")
+        return []
     k = min(k, len(items))
     X = normalize(np.array([it["vec"] for it in items]))
     labels = KMeans(n_clusters=k, random_state=seed, n_init=10).fit_predict(X)
@@ -222,26 +225,34 @@ def run_pages(clusters_path, out_dir, call):
     return [p for p, _, _ in pages] + [out_dir / "index.md"]
 
 
+def run_all(sources_path, out, pages_dir, call, embed, k=8, delay=2.0):
+    """전 스테이지 실행. 추출·임베딩 산출물이 있으면 캐시로 쓰고 건너뛴다(LLM 0콜) —
+    군집·페이지는 항상 재실행(k·프롬프트 변경 반영). 강제 재실행은 해당 JSON 삭제."""
+    out = Path(out)
+    if not (out / "extracted.json").exists():
+        run_extract(sources_path, out / "extracted.json", call=call, delay=delay)
+    for field, name in (("tasks", "task_vectors.json"), ("capabilities", "capability_vectors.json")):
+        if not (out / name).exists():
+            run_embed(out / "extracted.json", out / name, embed=embed, delay=delay / 4, field=field)
+    run_cluster(out / "task_vectors.json", out / "clusters.json", k=k)
+    # 역량 평면 (#4) — 빈 칸 매트릭스(옵션)·발굴층의 재료, 페이지는 과제 평면만
+    run_cluster(out / "capability_vectors.json", out / "capability_clusters.json", k=k)
+    pages = run_pages(out / "clusters.json", pages_dir, call=call)
+    log.info(f"페이지 {len(pages)}개 생성: {pages_dir}")
+    return pages
+
+
 def main(sources_path=ROOT / "data" / "task_discovery" / "sources.json", k=8):
     """실 LLM으로 전 스테이지 실행(GEMINI_API_KEY 필요). 마일스톤 1 데모:
     sources 없으면 더미 20명 생성, wiki는 dist/wiki/(추적됨), 중간 산출물은 data/(무시됨)."""
     import llm
     llm.init()
-    k = int(k)  # CLI 인자는 문자열로 들어온다
     sources_path = Path(sources_path)
     if not sources_path.exists():
         generate_sources(20, out_path=sources_path)
         log.info(f"더미 20명 생성: {sources_path}")
-    out = sources_path.parent
-    run_extract(sources_path, out / "extracted.json", call=llm.call_gemini, delay=2.0)
-    run_embed(out / "extracted.json", out / "task_vectors.json", embed=llm.embed_text, delay=0.5)
-    run_cluster(out / "task_vectors.json", out / "clusters.json", k=k)
-    pages = run_pages(out / "clusters.json", ROOT / "dist" / "wiki", call=llm.call_gemini)
-    # 역량 평면 (#4) — 빈 칸 매트릭스(옵션)·발굴층의 재료, 페이지는 과제 평면만
-    run_embed(out / "extracted.json", out / "capability_vectors.json",
-              embed=llm.embed_text, delay=0.5, field="capabilities")
-    run_cluster(out / "capability_vectors.json", out / "capability_clusters.json", k=k)
-    log.info(f"페이지 {len(pages)}개 생성: {out / 'pages'}")
+    run_all(sources_path, sources_path.parent, ROOT / "dist" / "wiki",
+            call=llm.call_gemini, embed=llm.embed_text, k=int(k))
 
 
 if __name__ == "__main__":

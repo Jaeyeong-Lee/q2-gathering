@@ -216,6 +216,41 @@ def test_index_links_all_cluster_pages(artifacts):
     assert "명" in index  # 군집 규모 표기
 
 
+def generic_call(prompt):
+    """임의 원문에서 첫 줄을 인용하는 범용 mock (238명 스케일용)."""
+    if "원문:" in prompt:
+        first_line = prompt.split("원문:\n", 1)[1].strip().splitlines()[0]
+        return json.dumps({"tasks": [{"text": first_line[:20], "horizon": "단기",
+                                      "quote": first_line}], "capabilities": []},
+                          ensure_ascii=False)
+    return json.dumps({"title": "군집", "summary": "요지."}, ensure_ascii=False)
+
+
+def test_run_all_238_and_cache(tmp_path):
+    src = tmp_path / "sources.json"
+    td.generate_sources(238, seed=3, out_path=src)
+    calls = {"extract": 0, "embed": 0}
+
+    def counting_call(prompt):
+        if "원문:" in prompt:
+            calls["extract"] += 1
+        return generic_call(prompt)
+
+    def counting_embed(text):
+        calls["embed"] += 1
+        return [hash(text) % 97, hash(text[::-1]) % 97]
+
+    pages = td.run_all(src, tmp_path, tmp_path / "wiki", call=counting_call,
+                       embed=counting_embed, k=8, delay=0)
+    assert calls["extract"] == 238 and calls["embed"] > 0
+    assert (tmp_path / "wiki" / "index.md").exists() and len(pages) > 1
+
+    calls["extract"] = calls["embed"] = 0
+    td.run_all(src, tmp_path, tmp_path / "wiki", call=counting_call,
+               embed=counting_embed, k=5, delay=0)  # k 변경 → 군집·페이지만 재실행
+    assert calls["extract"] == 0 and calls["embed"] == 0  # 추출·임베딩은 캐시
+
+
 def test_pages_have_name_and_quote(artifacts):
     *_, pages = artifacts
     text = "".join(p.read_text() for p in pages)
