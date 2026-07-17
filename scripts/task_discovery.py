@@ -183,20 +183,32 @@ def run_pages(clusters_path, out_dir, call):
                       f"> {it['quote']}", ""]
         path = out_dir / f"cluster-{c['cluster_id']:02d}.md"
         path.write_text("\n".join(lines))
-        pages.append(path)
-    return pages
+        pages.append((path, meta["title"], c["items"]))
+
+    index_lines = ["# 미래 과제 지도", "", "군집당 페이지 하나. 실명·원문 인용 — 사내 한정.", ""]
+    for path, title, items in pages:
+        people = len({it["person_id"] for it in items})
+        keywords = " · ".join(it["text"] for it in items[:3])
+        index_lines.append(f"- [{title}]({path.name}) — {people}명 / {keywords}")
+    (out_dir / "index.md").write_text("\n".join(index_lines) + "\n")
+    return [p for p, _, _ in pages] + [out_dir / "index.md"]
 
 
 def main(sources_path=ROOT / "data" / "task_discovery" / "sources.json", k=8):
-    """실 LLM으로 전 스테이지 실행. 산출물은 sources 옆에."""
+    """실 LLM으로 전 스테이지 실행(GEMINI_API_KEY 필요). 마일스톤 1 데모:
+    sources 없으면 더미 20명 생성, wiki는 dist/wiki/(추적됨), 중간 산출물은 data/(무시됨)."""
     import llm
     llm.init()
     k = int(k)  # CLI 인자는 문자열로 들어온다
-    out = Path(sources_path).parent
+    sources_path = Path(sources_path)
+    if not sources_path.exists():
+        generate_sources(20, out_path=sources_path)
+        log.info(f"더미 20명 생성: {sources_path}")
+    out = sources_path.parent
     run_extract(sources_path, out / "extracted.json", call=llm.call_gemini, delay=2.0)
     run_embed(out / "extracted.json", out / "task_vectors.json", embed=llm.embed_text, delay=0.5)
     run_cluster(out / "task_vectors.json", out / "clusters.json", k=k)
-    pages = run_pages(out / "clusters.json", out / "pages", call=llm.call_gemini)
+    pages = run_pages(out / "clusters.json", ROOT / "dist" / "wiki", call=llm.call_gemini)
     # 역량 평면 (#4) — 빈 칸 매트릭스(옵션)·발굴층의 재료, 페이지는 과제 평면만
     run_embed(out / "extracted.json", out / "capability_vectors.json",
               embed=llm.embed_text, delay=0.5, field="capabilities")

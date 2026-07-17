@@ -183,6 +183,16 @@ def test_generate_sources_deterministic_and_feeds_extract(tmp_path):
     assert len(extracted) == 238
 
 
+def test_index_links_all_cluster_pages(artifacts):
+    tmp_path, *_, pages = artifacts
+    index = (tmp_path / "pages" / "index.md").read_text()
+    cluster_pages = [p for p in pages if p.name != "index.md"]
+    assert cluster_pages
+    for p in cluster_pages:
+        assert p.name in index  # 각 군집 페이지로 링크
+    assert "명" in index  # 군집 규모 표기
+
+
 def test_pages_have_name_and_quote(artifacts):
     *_, pages = artifacts
     text = "".join(p.read_text() for p in pages)
