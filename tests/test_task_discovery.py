@@ -45,12 +45,23 @@ EXTRACT_RESPONSES = {
 }
 
 
+PAGE_RESPONSE = {
+    "title": "테스트 군집", "summary": "요지.",
+    "derived": [
+        {"text": "비전검사 데이터 표준화", "evidence": [
+            {"person_id": 1, "quote": "용접 비전검사 고도화"}]},          # 인용 일치 → 채택
+        {"text": "근거 없는 제안", "evidence": [
+            {"person_id": 1, "quote": "원문에 없는 문장"}]},              # 인용 불일치 → 폐기
+    ],
+}
+
+
 def mock_call(prompt):
     if "원문:" in prompt:  # 추출 프롬프트
         for name, resp in EXTRACT_RESPONSES.items():
             if name in prompt:
                 return json.dumps(resp, ensure_ascii=False)
-    return json.dumps({"title": "테스트 군집", "summary": "요지."}, ensure_ascii=False)
+    return json.dumps(PAGE_RESPONSE, ensure_ascii=False)
 
 
 def mock_embed(text):
@@ -181,6 +192,18 @@ def test_generate_sources_deterministic_and_feeds_extract(tmp_path):
     empty = json.dumps({"tasks": [], "capabilities": []})
     extracted = td.run_extract(tmp_path / "a.json", tmp_path / "e.json", call=lambda p: empty, delay=0)
     assert len(extracted) == 238
+
+
+def test_derived_suggestions_grounded_or_dropped(artifacts):
+    *_, pages = artifacts
+    text = "".join(p.read_text() for p in pages)
+    assert "비전검사 데이터 표준화" in text      # 근거 있는 제안 채택
+    assert "AI 제안" in text                     # 팀원 작성 과제와 구분 표기
+    assert "근거 없는 제안" not in text          # 인용 불일치 폐기
+    # 채택된 제안에는 근거 실명·인용이 붙는다
+    page = next(p.read_text() for p in pages if "비전검사 데이터 표준화" in p.read_text())
+    idx = page.index("비전검사 데이터 표준화")
+    assert "김민준" in page[idx:] and "용접 비전검사 고도화" in page[idx:]
 
 
 def test_index_links_all_cluster_pages(artifacts):

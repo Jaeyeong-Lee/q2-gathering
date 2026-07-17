@@ -32,8 +32,12 @@ EXTRACT_PROMPT_CL4 = ("다음은 {name}({cl_level})의 근원경쟁력 회고 �
                       "CL4는 미래 위주 서술형 템플릿이다.\n" + _EXTRACT_RULES)
 
 PAGE_PROMPT = """다음은 팀원들이 근원경쟁력 회고에 직접 쓴 미래 과제 문장 묶음(한 군집)이다.
-이 군집의 제목(10자 내외 명사구)과 요지(1~2문장)를 JSON 객체로만 답하라.
-{{"title": "...", "summary": "..."}}
+이 군집의 제목(10자 내외 명사구)과 요지(1~2문장), 그리고 이 과제들에서 파생 가능한
+새 관점의 과제 제안(derived) 0~3개를 JSON 객체로만 답하라. 자유 브레인스토밍 금지 —
+각 제안의 evidence는 아래 목록의 person_id와 그 사람의 과제 문장을 글자 그대로
+인용해야 하며, 인용할 수 없는 제안은 내지 마라.
+{{"title": "...", "summary": "...",
+  "derived": [{{"text": "...", "evidence": [{{"person_id": 1, "quote": "..."}}]}}]}}
 
 과제 문장:
 {tasks}"""
@@ -166,6 +170,20 @@ def run_cluster(vectors_path, out_path, k=8, seed=0):
     return clusters
 
 
+def _grounded(suggestion, items):
+    """파생 제안 검증: 모든 evidence가 군집 멤버의 실제 문장/인용과 대조돼야 채택."""
+    evidence = suggestion.get("evidence")
+    if not evidence:
+        return False
+    for ev in evidence:
+        if not any(it["person_id"] == ev["person_id"]
+                   and (ev["quote"] in it["quote"] or ev["quote"] in it["text"])
+                   for it in items):
+            log.warning(f"파생 제안 폐기 (인용 불일치): {suggestion.get('text', '?')!r}")
+            return False
+    return True
+
+
 def run_pages(clusters_path, out_dir, call):
     """군집당 LLM 1회(제목·요지) + 결정적 본문(실명·인용·horizon 배지) → md 파일들."""
     clusters = json.loads(Path(clusters_path).read_text())
@@ -175,12 +193,22 @@ def run_pages(clusters_path, out_dir, call):
     for c in clusters:
         if not c["items"]:
             continue
-        task_lines = "\n".join(f"- {it['text']} ({it['name']})" for it in c["items"])
+        task_lines = "\n".join(f"- [person_id={it['person_id']}] {it['text']} ({it['name']})"
+                               for it in c["items"])
         meta = _parse_json(call(PAGE_PROMPT.format(tasks=task_lines)))
         lines = [f"# {meta['title']}", "", meta["summary"], ""]
         for it in c["items"]:
             lines += [f"## {it['text']} — {it['name']} `{it['horizon']}`",
                       f"> {it['quote']}", ""]
+        derived = [d for d in meta.get("derived", []) if _grounded(d, c["items"])]
+        if derived:
+            lines += ["## 파생 과제 제안 `AI 제안`", ""]
+            name_by_id = {it["person_id"]: it["name"] for it in c["items"]}
+            for d in derived:
+                refs = " / ".join(f"{name_by_id[ev['person_id']]}: “{ev['quote']}”"
+                                  for ev in d["evidence"])
+                lines += [f"- **{d['text']}** — 근거: {refs}"]
+            lines += [""]
         path = out_dir / f"cluster-{c['cluster_id']:02d}.md"
         path.write_text("\n".join(lines))
         pages.append((path, meta["title"], c["items"]))
