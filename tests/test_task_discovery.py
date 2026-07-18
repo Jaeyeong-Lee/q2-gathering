@@ -229,6 +229,7 @@ def test_vectors_traceable_to_source(artifacts):
     text_by_id = {s["id"]: s["text"] for s in SOURCES}
     for v in vectors:
         assert v["quotes"] and all(q in text_by_id[v["person_id"]] for q in v["quotes"])
+        assert v["cl_level"] in ("CL2", "CL3", "CL4")  # 그래프 뷰 인용 카드 재료 (#10)
 
 
 def test_generate_sources_schema_and_templates(tmp_path):

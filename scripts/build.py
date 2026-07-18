@@ -48,6 +48,55 @@ def build_about(persons, neighbors, embeddings):
     }
 
 
+def build_tasks(vectors, clusters, wiki_dir, k=6):
+    """과제 문장 그래프 페이로드 (#10): 노드=군집 items, 엣지 재료=벡터 top-K,
+    외톨이=군집 중심 코사인이 (평균-표준편차) 미만인 문장(총평 소수 의견과 짝)."""
+    from similarity import top_k_neighbors
+
+    # 군집 items에는 vec이 없다 — (person_id, text)로 벡터를 되찾는다
+    pool = {}
+    for v in vectors:
+        pool.setdefault((v["person_id"], v["text"]), []).append(v["vec"])
+    nodes, vecs = [], []
+    for c in clusters:
+        for it in c["items"]:
+            nodes.append({"id": len(nodes), "cluster": c["cluster_id"],
+                          "person_id": it["person_id"], "name": it["name"],
+                          "cl": it.get("cl_level", ""), "horizon": it.get("horizon", "불명"),
+                          "text": it["text"], "quotes": it.get("quotes", [])})
+            vecs.append(pool[(it["person_id"], it["text"])].pop(0))
+
+    neighbors = {
+        i: [{"id": e["id"], "w": e["similarity"]} for e in nb]
+        for i, nb in top_k_neighbors({i: v for i, v in enumerate(vecs)}, k=k).items()
+    }
+
+    unit = [[x / math.hypot(*v) for x in v] for v in vecs]
+    cent = {}
+    for n, u in zip(nodes, unit):
+        c = cent.setdefault(n["cluster"], [0.0] * len(u))
+        for i, x in enumerate(u):
+            c[i] += x
+    for cid in cent:
+        cent[cid] = [x / math.hypot(*cent[cid]) for x in cent[cid]]
+    sims = [math.sumprod(u, cent[n["cluster"]]) for n, u in zip(nodes, unit)]
+    mean = sum(sims) / len(sims)
+    std = math.sqrt(sum((s - mean) ** 2 for s in sims) / len(sims))
+    # ponytail: 전역 평균-1σ 문턱 — 실데이터에서 표시가 과소/과다하면 군집별 문턱으로
+    for n, s in zip(nodes, sims):
+        n["outlier"] = s < mean - std
+
+    clusters_meta = []
+    for c in clusters:
+        page = f"cluster-{c['cluster_id']:02d}.md"
+        md = Path(wiki_dir) / page
+        title = md.read_text().splitlines()[0].lstrip("# ").strip() if md.exists() \
+            else f"군집 {c['cluster_id']}"
+        clusters_meta.append({"id": c["cluster_id"], "title": title,
+                              "page": "wiki/" + page, "count": len(c["items"])})
+    return {"nodes": nodes, "neighbors": neighbors, "clusters": clusters_meta}
+
+
 def about_slots(html):
     """archive/about/의 ppt.png·sample.md가 있으면 인라인, 없으면 플레이스홀더."""
     ppt = ROOT / "archive" / "about" / "ppt.png"
@@ -97,6 +146,16 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
         html = html.replace("/*__ABOUT__*/null", "null")
     html = about_slots(html)
     html = html.replace('max="__TOPN_MAX__"', f'max="{TOPN_MAX}"')
+
+    # 과제 문장 그래프 (#10): task-discovery 산출물이 있으면 주입, 없으면 null(토글 숨김)
+    td = data_dir / "task_discovery"
+    if (td / "task_vectors.json").exists() and (td / "clusters.json").exists():
+        tasks = build_tasks(json.loads((td / "task_vectors.json").read_text()),
+                            json.loads((td / "clusters.json").read_text()),
+                            Path(out_path).parent / "wiki")
+        html = html.replace("/*__TASKS__*/null", json.dumps(tasks, ensure_ascii=False))
+    else:
+        html = html.replace("/*__TASKS__*/null", "null")
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

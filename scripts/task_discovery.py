@@ -170,6 +170,7 @@ def run_embed(extracted_path, out_path, embed, delay=0.0, field="tasks"):
     for p in persons:
         for t in p[field]:
             vectors.append({"person_id": p["person_id"], "name": p["name"],
+                            "cl_level": p["cl_level"],
                             **{k: v for k, v in t.items()}, "vec": embed(t["text"])})
             if delay > 0:
                 time.sleep(delay)
@@ -241,7 +242,9 @@ def run_pages(clusters_path, out_dir, call):
         path.write_text("\n".join(lines))
         pages.append((path, meta, c["items"]))
 
-    index_lines = ["# 미래 과제 지도", "", "군집당 페이지 하나. 실명·원문 인용 — 사내 한정.", ""]
+    index_lines = ["# 미래 과제 지도", "",
+                   "군집당 페이지 하나. 실명·원문 인용 — 사내 한정. "
+                   "[그래프로 보기](../heritage-archive.html#view=tasks)", ""]
     index_lines += _overview_lines(pages, call)
     for path, meta, items in pages:
         people = len({it["person_id"] for it in items})
