@@ -45,6 +45,20 @@ PAGE_PROMPT = """다음은 팀원들이 근원경쟁력 회고에 직접 쓴 미
 과제 문장:
 {tasks}"""
 
+OVERVIEW_PROMPT = """다음은 팀 근원경쟁력 회고에서 뽑은 미래 과제 군집 요약과 과제 문장 전체다.
+① trends: 팀 전체가 어디로 수렴 중인지 큰 흐름 2~3개 서술
+② outliers: 한두 명만 쓴 독특한 과제, 군집에 잘 안 붙는 소수 의견·특이점 1~3개 조명
+을 JSON 객체로만 답하라. 각 항목의 evidence는 아래 목록의 person_id와 그 사람의
+과제 문장을 글자 그대로 인용해야 하며, 인용할 수 없는 항목은 내지 마라.
+{{"trends": [{{"text": "...", "evidence": [{{"person_id": 1, "quote": "..."}}]}}],
+  "outliers": [{{"text": "...", "evidence": [{{"person_id": 1, "quote": "..."}}]}}]}}
+
+군집 요약:
+{clusters}
+
+과제 문장:
+{tasks}"""
+
 
 ## 더미 원문 생성 (issue #3) — 실 pptx 원문 확보 전 입력 대체. generate_dummy.py 패턴.
 
@@ -220,22 +234,47 @@ def run_pages(clusters_path, out_dir, call):
         if derived:
             lines += ["## 파생 과제 제안 `AI 제안`", ""]
             name_by_id = {it["person_id"]: it["name"] for it in c["items"]}
-            for d in derived:
-                refs = " / ".join(f"{name_by_id[ev['person_id']]}: “{ev['quote']}”"
-                                  for ev in d["evidence"])
-                lines += [f"- **{d['text']}** — 근거: {refs}"]
+            lines += [f"- **{d['text']}** — 근거: {_refs(d['evidence'], name_by_id)}"
+                      for d in derived]
             lines += [""]
         path = out_dir / f"cluster-{c['cluster_id']:02d}.md"
         path.write_text("\n".join(lines))
-        pages.append((path, meta["title"], c["items"]))
+        pages.append((path, meta, c["items"]))
 
     index_lines = ["# 미래 과제 지도", "", "군집당 페이지 하나. 실명·원문 인용 — 사내 한정.", ""]
-    for path, title, items in pages:
+    index_lines += _overview_lines(pages, call)
+    for path, meta, items in pages:
         people = len({it["person_id"] for it in items})
         keywords = " · ".join(it["text"] for it in items[:3])
-        index_lines.append(f"- [{title}]({path.name}) — {people}명 / {keywords}")
+        index_lines.append(f"- [{meta['title']}]({path.name}) — {people}명 / {keywords}")
     (out_dir / "index.md").write_text("\n".join(index_lines) + "\n")
     return [p for p, _, _ in pages] + [out_dir / "index.md"]
+
+
+def _refs(evidence, name_by_id):
+    return " / ".join(f"{name_by_id[ev['person_id']]}: “{ev['quote']}”" for ev in evidence)
+
+
+def _overview_lines(pages, call):
+    """총평 (#9): 전 군집 요약+문장을 입력으로 LLM 1콜 — 큰 흐름·소수 의견.
+    인용 대조 실패 항목은 폐기, 남는 게 없으면 섹션 자체를 내지 않는다."""
+    all_items = [it for _, _, items in pages for it in items]
+    if not all_items:
+        return []
+    cluster_lines = "\n".join(f"- {m['title']} ({len(items)}건): {m['summary']}"
+                              for _, m, items in pages)
+    task_lines = "\n".join(f"- [person_id={it['person_id']}] {it['text']} ({it['name']})"
+                           for it in all_items)
+    meta = _parse_json(call(OVERVIEW_PROMPT.format(clusters=cluster_lines, tasks=task_lines)))
+    name_by_id = {it["person_id"]: it["name"] for it in all_items}
+    lines = []
+    for key, label in (("trends", "큰 흐름"), ("outliers", "소수 의견·특이점")):
+        kept = [t for t in meta.get(key, []) if _grounded(t, all_items)]
+        if kept:
+            lines += [f"**{label}**", ""]
+            lines += [f"- {t['text']} — 근거: {_refs(t['evidence'], name_by_id)}" for t in kept]
+            lines += [""]
+    return ["## 총평 `AI 요약`", ""] + lines if lines else []
 
 
 def run_all(sources_path, out, pages_dir, call, embed, k=8, delay=2.0):

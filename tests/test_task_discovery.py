@@ -56,11 +56,28 @@ PAGE_RESPONSE = {
 }
 
 
+# 총평 mock (#9) — 근거 있는 항목만 살아남아야 한다
+OVERVIEW_RESPONSE = {
+    "trends": [
+        {"text": "검사·데이터 계열로 수렴 중", "evidence": [
+            {"person_id": 1, "quote": "용접 비전검사 고도화"}]},        # 대조 성공 → 채택
+        {"text": "근거 없는 흐름", "evidence": [
+            {"person_id": 2, "quote": "원문에 없는 문장"}]},            # 대조 실패 → 폐기
+    ],
+    "outliers": [
+        {"text": "예지보전은 한 명만 언급", "evidence": [
+            {"person_id": 2, "quote": "공정 데이터 기반 예지보전"}]},
+    ],
+}
+
+
 def mock_call(prompt):
     if "원문:" in prompt:  # 추출 프롬프트
         for name, resp in EXTRACT_RESPONSES.items():
             if name in prompt:
                 return json.dumps(resp, ensure_ascii=False)
+    if "군집 요약:" in prompt:  # 총평 프롬프트
+        return json.dumps(OVERVIEW_RESPONSE, ensure_ascii=False)
     return json.dumps(PAGE_RESPONSE, ensure_ascii=False)
 
 
@@ -258,6 +275,31 @@ def test_derived_suggestions_grounded_or_dropped(artifacts):
     page = next(p.read_text() for p in pages if "비전검사 데이터 표준화" in p.read_text())
     idx = page.index("비전검사 데이터 표준화")
     assert "김민준" in page[idx:] and "용접 비전검사 고도화" in page[idx:]
+
+
+def test_index_overview_grounded_or_dropped(artifacts):
+    # 총평 (#9): index 상단에 큰 흐름 + 소수 의견, 인용 대조 실패 항목은 폐기
+    tmp_path = artifacts[0]
+    index = (tmp_path / "pages" / "index.md").read_text()
+    assert "총평" in index and index.index("총평") < index.index("cluster-")
+    assert "검사·데이터 계열로 수렴 중" in index          # 큰 흐름 채택
+    assert "예지보전은 한 명만 언급" in index              # 소수 의견 채택
+    assert "근거 없는 흐름" not in index                   # 인용 불일치 폐기
+    idx = index.index("검사·데이터 계열로 수렴 중")
+    assert "김민준" in index[idx:]                          # 근거 실명·인용 표기
+
+
+def test_overview_is_single_extra_call(artifacts):
+    tmp_path, _, _, clusters, _ = artifacts
+    prompts = []
+
+    def spy_call(prompt):
+        prompts.append(prompt)
+        return mock_call(prompt)
+
+    td.run_pages(tmp_path / "clusters.json", tmp_path / "pages2", call=spy_call)
+    n_clusters = len([c for c in clusters if c["items"]])
+    assert len(prompts) == n_clusters + 1  # 군집당 1콜 + 총평 1콜
 
 
 def test_index_links_all_cluster_pages(artifacts):
