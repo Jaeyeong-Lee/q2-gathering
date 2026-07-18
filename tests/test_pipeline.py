@@ -126,6 +126,8 @@ def test_build_tasks_payload(tmp_path):
     # 외톨이: 군집 중심에서 먼 문장 표시 — 정하은 벡터가 군집 1 중심에서 가장 멀다
     by_name = {n["name"]: n for n in payload["nodes"]}
     assert by_name["정하은"]["outlier"] and not by_name["김민준"]["outlier"]
+    # 빈 평면(run_cluster가 "[]"를 쓴 세트)이면 None → 호출부가 토글을 숨긴다
+    assert build.build_tasks([], [], wiki) is None
 
 
 def test_build_injects_tasks_or_null(tmp_path):

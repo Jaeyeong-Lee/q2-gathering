@@ -14,14 +14,15 @@ TEMPLATE = ROOT / "archive" / "template.html"
 ABOUT_ANCHOR_ID = 0
 
 
+def unit(v):
+    n = math.hypot(*v)
+    return [x / n for x in v]
+
+
 def build_about(persons, neighbors, embeddings):
     """앵커 1명의 실벡터 + 전원 코사인에서 1위/중간/최하 비교 3명 + top-K 페이로드."""
     name_by_id = {p["id"]: p["name"] for p in persons}
     ids = [p["id"] for p in persons]
-
-    def unit(v):
-        n = math.hypot(*v)
-        return [x / n for x in v]
 
     anchor_u = unit(embeddings[str(ABOUT_ANCHOR_ID)])
     scored = sorted(
@@ -48,12 +49,14 @@ def build_about(persons, neighbors, embeddings):
     }
 
 
-def build_tasks(vectors, clusters, wiki_dir, k=6):
+def build_tasks(vectors, clusters, wiki_dir):
     """과제 문장 그래프 페이로드 (#10): 노드=군집 items, 엣지 재료=벡터 top-K,
-    외톨이=군집 중심 코사인이 (평균-표준편차) 미만인 문장(총평 소수 의견과 짝)."""
+    외톨이=군집 중심 코사인이 (평균-표준편차) 미만인 문장(총평 소수 의견과 짝).
+    빈 평면(항목 0건)이면 None — 호출부가 null을 주입해 토글을 숨긴다."""
     from similarity import top_k_neighbors
 
-    # 군집 items에는 vec이 없다 — (person_id, text)로 벡터를 되찾는다
+    # ponytail: (person_id, text)로 벡터 재결합 — vectors/clusters가 같은 run_all 산출이라는
+    # 가정. 스테이지 캐시가 어긋나면 KeyError로 죽는 게 맞다(조용한 오배치보다 낫다)
     pool = {}
     for v in vectors:
         pool.setdefault((v["person_id"], v["text"]), []).append(v["vec"])
@@ -65,21 +68,23 @@ def build_tasks(vectors, clusters, wiki_dir, k=6):
                           "cl": it.get("cl_level", ""), "horizon": it.get("horizon", "불명"),
                           "text": it["text"], "quotes": it.get("quotes", [])})
             vecs.append(pool[(it["person_id"], it["text"])].pop(0))
+    if not nodes:
+        return None
 
     neighbors = {
         i: [{"id": e["id"], "w": e["similarity"]} for e in nb]
-        for i, nb in top_k_neighbors({i: v for i, v in enumerate(vecs)}, k=k).items()
+        for i, nb in top_k_neighbors({i: v for i, v in enumerate(vecs)}, k=6).items()
     }
 
-    unit = [[x / math.hypot(*v) for x in v] for v in vecs]
+    units = [unit(v) for v in vecs]
     cent = {}
-    for n, u in zip(nodes, unit):
+    for n, u in zip(nodes, units):
         c = cent.setdefault(n["cluster"], [0.0] * len(u))
         for i, x in enumerate(u):
             c[i] += x
     for cid in cent:
-        cent[cid] = [x / math.hypot(*cent[cid]) for x in cent[cid]]
-    sims = [math.sumprod(u, cent[n["cluster"]]) for n, u in zip(nodes, unit)]
+        cent[cid] = unit(cent[cid])
+    sims = [math.sumprod(u, cent[n["cluster"]]) for n, u in zip(nodes, units)]
     mean = sum(sims) / len(sims)
     std = math.sqrt(sum((s - mean) ** 2 for s in sims) / len(sims))
     # ponytail: 전역 평균-1σ 문턱 — 실데이터에서 표시가 과소/과다하면 군집별 문턱으로
@@ -149,13 +154,13 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
 
     # 과제 문장 그래프 (#10): task-discovery 산출물이 있으면 주입, 없으면 null(토글 숨김)
     td = data_dir / "task_discovery"
+    tasks = None
     if (td / "task_vectors.json").exists() and (td / "clusters.json").exists():
         tasks = build_tasks(json.loads((td / "task_vectors.json").read_text()),
                             json.loads((td / "clusters.json").read_text()),
                             Path(out_path).parent / "wiki")
-        html = html.replace("/*__TASKS__*/null", json.dumps(tasks, ensure_ascii=False))
-    else:
-        html = html.replace("/*__TASKS__*/null", "null")
+    html = html.replace("/*__TASKS__*/null",
+                        json.dumps(tasks, ensure_ascii=False) if tasks else "null")
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

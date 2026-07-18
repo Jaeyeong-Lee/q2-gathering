@@ -210,7 +210,7 @@ def _grounded(suggestion, items):
                    and (any(_norm(ev["quote"]) in _norm(q) for q in it["quotes"])
                         or _norm(ev["quote"]) in _norm(it["text"]))
                    for it in items):
-            log.warning(f"파생 제안 폐기 (인용 불일치): {suggestion.get('text', '?')!r}")
+            log.warning(f"제안 폐기 (인용 불일치): {suggestion.get('text', '?')!r}")
             return False
     return True
 
