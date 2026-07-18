@@ -15,11 +15,14 @@ log = get_logger("task_discovery")
 HORIZONS = ("단기", "장기", "불명")
 
 _EXTRACT_RULES = """본인이 하고 싶다고 쓴 미래 과제(tasks)와 확보했다고 쓴 역량(capabilities)을 항목화해
-JSON 객체로만 답하라. 요약하지 말고 문장 단위로 쪼개라. quote는 반드시 원문에서
-글자 그대로 발췌하라. horizon은 단기/장기/불명 중 하나. 해당 내용이 없으면 빈 배열.
+JSON 객체로만 답하라. text는 짧은 라벨이 아니라 원문의 구체성(대상 공정·방법·이유)을
+보존한 충실한 서술로 쓰라(여러 문장 허용) — 단, 항목은 과제/역량 단위로 쪼개라.
+한 항목의 언급이 원문 여러 곳에 흩어져 있으면 quotes에 인용을 여러 개 담으라.
+각 인용은 반드시 원문에서 글자 그대로 발췌하라. horizon은 단기/장기/불명 중 하나.
+해당 내용이 없으면 빈 배열.
 
-{{"tasks": [{{"text": "...", "horizon": "단기", "quote": "..."}}],
-  "capabilities": [{{"text": "...", "quote": "..."}}]}}
+{{"tasks": [{{"text": "...", "horizon": "단기", "quotes": ["...", "..."]}}],
+  "capabilities": [{{"text": "...", "quotes": ["..."]}}]}}
 
 원문:
 {text}"""
@@ -54,16 +57,17 @@ _DOMAINS = ["용접 비전검사", "공정 데이터 예지보전", "딥러닝 �
 _SKILLS = ["PLC 제어", "SQL 리포팅", "파이썬 데이터 분석", "로봇 티칭", "비전 알고리즘",
            "MLOps 운영", "현장 개선", "공정 설계", "센서 캘리브레이션", "표준화 문서화"]
 
+# verbose 서술형 (#8): 실 pptx처럼 문단 단위, 한 과제(d2·d1)의 언급이 여러 문단에 흩어짐
 _TPL_CL23 = """1. 상반기 성과 및 하반기 전략
-상반기에는 {d1} 과제를 수행해 성과를 냈다. 하반기에는 {d2} 개선을 이어가려 한다.
+상반기에는 {d1} 과제를 수행해 성과를 냈다. {d1} 데이터를 정리하는 과정에서 반복 수작업이 병목임을 확인했고, 이 경험이 하반기 계획의 출발점이 됐다. 하반기에는 {d2} 개선을 이어가려 한다. 특히 {d2}는 라인마다 수집 주기가 제각각이라 결과를 비교하기 어려웠는데, 표준 수집 절차를 정해 이 문제부터 정리하는 것이 목표다.
 2. 커리어 회고 및 확보 역량
-그동안 {s1}와(과) {s2} 역량을 확보했다.
+입사 후 현장 업무를 거치며 {s1} 역량을 확보했고, 최근에는 {s2}를 실무에 적용해 왔다. {s2}는 상반기 {d1} 과제에서 실제 개선 효과를 확인한 무기다.
 3. 미래 업무
-단기적으로는 {d3} 체계를 만들고 싶다. 장기적으로는 {d4} 플랫폼을 구축하고 싶다."""
+단기적으로는 {d3} 체계를 만들고 싶다. 지금은 담당자 개인의 경험에 의존하고 있어, 기준 데이터를 축적해 판단 근거를 만드는 것부터 시작하려 한다. 장기적으로는 {d4} 플랫폼을 구축하고 싶다. 하반기에 추진할 {d2} 개선 결과를 {d4} 플랫폼의 입력으로 연결하면 팀 전체가 재사용할 수 있다고 본다."""
 
 _TPL_CL4 = """앞으로의 방향
-{d1}을(를) 표준 플랫폼으로 통합하는 것이 목표다. 이를 위해 {s1}와(과) {s2} 역량을
-확보해 왔다. 단기적으로는 {d2} 파일럿을 추진하고 싶다."""
+{d1}을(를) 표준 플랫폼으로 통합하는 것이 목표다. 지금은 라인마다 {d1} 방식이 서로 달라 결과를 한곳에서 비교할 수 없고, 이를 하나의 기준으로 묶는 일이 남아 있다. 이를 위해 {s1}와(과) {s2} 역량을
+확보해 왔다. 단기적으로는 {d2} 파일럿을 추진하고 싶다. 파일럿에서 검증한 절차를 {d1} 표준 플랫폼에 반영하는 것까지가 계획이다."""
 
 _TPL_BAD = "그동안 여러 업무를 두루 경험했습니다. 앞으로도 팀에 보탬이 되도록 열심히 하겠습니다."
 
@@ -109,8 +113,11 @@ def extract_person(doc, call):
     parsed = _parse_json(call(tpl.format(**doc)))
     tasks, capabilities = parsed.get("tasks", []), parsed.get("capabilities", [])
     for item in tasks + capabilities:
-        if _norm(item["quote"]) not in _norm(doc["text"]):
-            raise ValueError(f"인용 불일치 (id={doc['id']}): {item['quote'][:40]!r}")
+        if not item.get("quotes"):
+            raise ValueError(f"인용 없음 (id={doc['id']}): {item.get('text', '?')[:40]!r}")
+        for q in item["quotes"]:
+            if _norm(q) not in _norm(doc["text"]):
+                raise ValueError(f"인용 불일치 (id={doc['id']}): {q[:40]!r}")
     for t in tasks:
         if t.get("horizon") not in HORIZONS:
             t["horizon"] = "불명"
@@ -185,7 +192,8 @@ def _grounded(suggestion, items):
         return False
     for ev in evidence:
         if not any(it["person_id"] == ev["person_id"]
-                   and (_norm(ev["quote"]) in _norm(it["quote"]) or _norm(ev["quote"]) in _norm(it["text"]))
+                   and (any(_norm(ev["quote"]) in _norm(q) for q in it["quotes"])
+                        or _norm(ev["quote"]) in _norm(it["text"]))
                    for it in items):
             log.warning(f"파생 제안 폐기 (인용 불일치): {suggestion.get('text', '?')!r}")
             return False
@@ -206,8 +214,8 @@ def run_pages(clusters_path, out_dir, call):
         meta = _parse_json(call(PAGE_PROMPT.format(tasks=task_lines)))
         lines = [f"# {meta['title']}", "", meta["summary"], ""]
         for it in c["items"]:
-            lines += [f"## {it['text']} — {it['name']} `{it['horizon']}`",
-                      f"> {it['quote']}", ""]
+            lines += [f"## {it['text']} — {it['name']} `{it['horizon']}`"]
+            lines += [f"> {q}" for q in it["quotes"]] + [""]
         derived = [d for d in meta.get("derived", []) if _grounded(d, c["items"])]
         if derived:
             lines += ["## 파생 과제 제안 `AI 제안`", ""]

@@ -24,22 +24,22 @@ SOURCES = [
     },
 ]
 
-# 사람별 mock 추출 응답 — quote는 원문 부분 문자열
+# 사람별 mock 추출 응답 — quotes[] 각각이 원문 부분 문자열 (#8 복수화)
 EXTRACT_RESPONSES = {
     "김민준": {
         "tasks": [{"text": "용접 비전검사 고도화", "horizon": "단기",
-                   "quote": "하반기에는 용접 비전검사 고도화를 하고 싶다"}],
-        "capabilities": [{"text": "PLC 제어", "quote": "확보 역량은 PLC 제어 경험이다"}],
+                   "quotes": ["하반기에는 용접 비전검사 고도화를 하고 싶다"]}],
+        "capabilities": [{"text": "PLC 제어", "quotes": ["확보 역량은 PLC 제어 경험이다"]}],
     },
     "이서연": {
         "tasks": [{"text": "공정 데이터 기반 예지보전", "horizon": "장기",
-                   "quote": "장기적으로 공정 데이터 기반 예지보전 체계를 만들고 싶다"}],
-        "capabilities": [{"text": "품질 데이터 분석", "quote": "품질 데이터 분석 업무를 해왔다"}],
+                   "quotes": ["장기적으로 공정 데이터 기반 예지보전 체계를 만들고 싶다"]}],
+        "capabilities": [{"text": "품질 데이터 분석", "quotes": ["품질 데이터 분석 업무를 해왔다"]}],
     },
     "박도윤": {
         "tasks": [{"text": "딥러닝 외관검사 플랫폼", "horizon": "이상한값",
-                   "quote": "딥러닝 기반 외관검사 표준 플랫폼을 구축하려 한다"}],
-        "capabilities": [{"text": "데이터 파이프라인 설계", "quote": "데이터 파이프라인 설계 역량을 확보했다"}],
+                   "quotes": ["딥러닝 기반 외관검사 표준 플랫폼을 구축하려 한다"]}],
+        "capabilities": [{"text": "데이터 파이프라인 설계", "quotes": ["데이터 파이프라인 설계 역량을 확보했다"]}],
     },
     "최하은": {"tasks": [], "capabilities": []},
 }
@@ -94,8 +94,9 @@ def test_quotes_are_substrings_of_source(artifacts):
     n_quotes = 0
     for person in extracted:
         for item in person["tasks"] + person["capabilities"]:
-            assert item["quote"] in text_by_id[person["person_id"]]
-            n_quotes += 1
+            for q in item["quotes"]:
+                assert q in text_by_id[person["person_id"]]
+                n_quotes += 1
     assert n_quotes > 0
 
 
@@ -108,7 +109,7 @@ def test_quote_matches_across_linebreaks(tmp_path):
 
     def call(prompt):
         return json.dumps({"tasks": [], "capabilities": [
-            {"text": "PLC 제어", "quote": "확보 역량은 PLC 제어 경험이다."}]}, ensure_ascii=False)
+            {"text": "PLC 제어", "quotes": ["확보 역량은 PLC 제어 경험이다."]}]}, ensure_ascii=False)
 
     extracted = td.run_extract(src, tmp_path / "e.json", call=call, retries=0, delay=0)
     assert extracted and extracted[0]["capabilities"]
@@ -119,11 +120,39 @@ def test_bad_quote_fails_person(tmp_path):
     src.write_text(json.dumps(SOURCES[:1], ensure_ascii=False))
 
     def bad_call(prompt):
-        return json.dumps({"tasks": [{"text": "x", "horizon": "단기", "quote": "원문에 없는 문장"}],
+        return json.dumps({"tasks": [{"text": "x", "horizon": "단기", "quotes": ["원문에 없는 문장"]}],
                            "capabilities": []}, ensure_ascii=False)
 
     extracted = td.run_extract(src, tmp_path / "e.json", call=bad_call, retries=0, delay=0)
     assert extracted == []  # 인용 검증 실패 → 그 사람 결과 폐기
+
+
+def test_scattered_mentions_become_multiple_quotes(tmp_path):
+    # verbose 원문: 한 과제의 언급이 흩어져 있으면 quotes 여러 개 — 각각 개별 대조 (#8)
+    src = tmp_path / "s.json"
+    doc = {"id": 9, "name": "김민준", "cl_level": "CL3",
+           "text": "하반기에는 용접 비전검사 개선을 이어가려 한다. 확보 역량은 PLC 제어다.\n"
+                   "3. 미래 업무\n장기적으로 용접 비전검사 결과를 표준 플랫폼으로 묶고 싶다."}
+    src.write_text(json.dumps([doc], ensure_ascii=False))
+
+    def call(prompt):
+        return json.dumps({"tasks": [{
+            "text": "용접 비전검사 개선을 이어가고, 장기적으로 결과를 표준 플랫폼으로 통합",
+            "horizon": "장기",
+            "quotes": ["하반기에는 용접 비전검사 개선을 이어가려 한다",
+                       "장기적으로 용접 비전검사 결과를 표준 플랫폼으로 묶고 싶다"]}],
+            "capabilities": []}, ensure_ascii=False)
+
+    extracted = td.run_extract(src, tmp_path / "e.json", call=call, retries=0, delay=0)
+    assert len(extracted[0]["tasks"][0]["quotes"]) == 2
+
+    def bad_call(prompt):  # 복수 인용 중 하나만 불일치해도 폐기
+        return json.dumps({"tasks": [{"text": "x", "horizon": "단기",
+                                      "quotes": ["하반기에는 용접 비전검사 개선을 이어가려 한다",
+                                                 "원문에 없는 문장"]}],
+                           "capabilities": []}, ensure_ascii=False)
+
+    assert td.run_extract(src, tmp_path / "e2.json", call=bad_call, retries=0, delay=0) == []
 
 
 def test_horizon_normalized(artifacts):
@@ -167,7 +196,7 @@ def test_capability_plane_clustered(artifacts):
     tmp_path = artifacts[0]
     vectors = td.run_embed(tmp_path / "extracted.json", tmp_path / "cap_vectors.json",
                            embed=mock_embed, field="capabilities")
-    assert vectors and all("person_id" in v and "quote" in v for v in vectors)
+    assert vectors and all("person_id" in v and "quotes" in v for v in vectors)
     clusters = td.run_cluster(tmp_path / "cap_vectors.json", tmp_path / "cap_clusters.json", k=2, seed=0)
     assert sum(len(c["items"]) for c in clusters) == len(vectors)
 
@@ -182,7 +211,7 @@ def test_vectors_traceable_to_source(artifacts):
     _, _, vectors, _, _ = artifacts
     text_by_id = {s["id"]: s["text"] for s in SOURCES}
     for v in vectors:
-        assert v["quote"] in text_by_id[v["person_id"]]
+        assert v["quotes"] and all(q in text_by_id[v["person_id"]] for q in v["quotes"])
 
 
 def test_generate_sources_schema_and_templates(tmp_path):
@@ -198,6 +227,16 @@ def test_generate_sources_schema_and_templates(tmp_path):
     assert any("앞으로의 방향" in d["text"] for d in cl4)
     # 일부 미준수자 존재
     assert any("미래 업무" not in d["text"] and "앞으로의 방향" not in d["text"] for d in docs)
+
+
+def test_generate_sources_verbose_with_scattered_mentions(tmp_path):
+    # 실 pptx 대응 (#8): 문단 단위 verbose 서술 + 한 과제의 언급이 원문 여러 곳에 흩어짐
+    docs = td.generate_sources(20, seed=1)
+    compliant = [d for d in docs if "미래 업무" in d["text"] or "앞으로의 방향" in d["text"]]
+    assert all(len(d["text"]) > 200 for d in compliant)  # 한 줄짜리가 아니다
+    for d in compliant:  # 어떤 도메인은 서로 다른 문단에서 두 번 이상 언급된다
+        paras = d["text"].split("\n")
+        assert any(sum(dom in p for p in paras) >= 2 for dom in td._DOMAINS)
 
 
 def test_generate_sources_deterministic_and_feeds_extract(tmp_path):
@@ -236,7 +275,7 @@ def generic_call(prompt):
     if "원문:" in prompt:
         first_line = prompt.split("원문:\n", 1)[1].strip().splitlines()[0]
         return json.dumps({"tasks": [{"text": first_line[:20], "horizon": "단기",
-                                      "quote": first_line}], "capabilities": []},
+                                      "quotes": [first_line]}], "capabilities": []},
                           ensure_ascii=False)
     return json.dumps({"title": "군집", "summary": "요지."}, ensure_ascii=False)
 
