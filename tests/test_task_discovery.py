@@ -90,7 +90,7 @@ def mock_embed(text):
 @pytest.fixture
 def artifacts(tmp_path):
     src = tmp_path / "sources.json"
-    src.write_text(json.dumps(SOURCES, ensure_ascii=False))
+    src.write_text(json.dumps(SOURCES, ensure_ascii=False), encoding="utf-8")
     extracted = td.run_extract(src, tmp_path / "extracted.json", call=mock_call, delay=0)
     vectors = td.run_embed(tmp_path / "extracted.json", tmp_path / "task_vectors.json", embed=mock_embed)
     clusters = td.run_cluster(tmp_path / "task_vectors.json", tmp_path / "clusters.json", k=2, seed=0)
@@ -122,7 +122,7 @@ def test_quote_matches_across_linebreaks(tmp_path):
     src = tmp_path / "s.json"
     doc = {"id": 9, "name": "김민준", "cl_level": "CL3",
            "text": "확보 역량은 PLC\n제어 경험이다."}
-    src.write_text(json.dumps([doc], ensure_ascii=False))
+    src.write_text(json.dumps([doc], ensure_ascii=False), encoding="utf-8")
 
     def call(prompt):
         return json.dumps({"tasks": [], "capabilities": [
@@ -134,7 +134,7 @@ def test_quote_matches_across_linebreaks(tmp_path):
 
 def test_bad_quote_fails_person(tmp_path):
     src = tmp_path / "sources.json"
-    src.write_text(json.dumps(SOURCES[:1], ensure_ascii=False))
+    src.write_text(json.dumps(SOURCES[:1], ensure_ascii=False), encoding="utf-8")
 
     def bad_call(prompt):
         return json.dumps({"tasks": [{"text": "x", "horizon": "단기", "quotes": ["원문에 없는 문장"]}],
@@ -150,7 +150,7 @@ def test_scattered_mentions_become_multiple_quotes(tmp_path):
     doc = {"id": 9, "name": "김민준", "cl_level": "CL3",
            "text": "하반기에는 용접 비전검사 개선을 이어가려 한다. 확보 역량은 PLC 제어다.\n"
                    "3. 미래 업무\n장기적으로 용접 비전검사 결과를 표준 플랫폼으로 묶고 싶다."}
-    src.write_text(json.dumps([doc], ensure_ascii=False))
+    src.write_text(json.dumps([doc], ensure_ascii=False), encoding="utf-8")
 
     def call(prompt):
         return json.dumps({"tasks": [{
@@ -195,7 +195,7 @@ def test_cluster_deterministic_and_separates(artifacts):
 
 def test_cl_split_prompts(tmp_path):
     src = tmp_path / "s.json"
-    src.write_text(json.dumps([SOURCES[0], SOURCES[2]], ensure_ascii=False))  # CL3 + CL4
+    src.write_text(json.dumps([SOURCES[0], SOURCES[2]], ensure_ascii=False), encoding="utf-8")  # CL3 + CL4
     prompts = []
 
     def spy_call(prompt):
@@ -268,12 +268,12 @@ def test_generate_sources_deterministic_and_feeds_extract(tmp_path):
 
 def test_derived_suggestions_grounded_or_dropped(artifacts):
     *_, pages = artifacts
-    text = "".join(p.read_text() for p in pages)
+    text = "".join(p.read_text(encoding="utf-8") for p in pages)
     assert "비전검사 데이터 표준화" in text      # 근거 있는 제안 채택
     assert "AI 제안" in text                     # 팀원 작성 과제와 구분 표기
     assert "근거 없는 제안" not in text          # 인용 불일치 폐기
     # 채택된 제안에는 근거 실명·인용이 붙는다
-    page = next(p.read_text() for p in pages if "비전검사 데이터 표준화" in p.read_text())
+    page = next(p.read_text(encoding="utf-8") for p in pages if "비전검사 데이터 표준화" in p.read_text(encoding="utf-8"))
     idx = page.index("비전검사 데이터 표준화")
     assert "김민준" in page[idx:] and "용접 비전검사 고도화" in page[idx:]
 
@@ -281,7 +281,7 @@ def test_derived_suggestions_grounded_or_dropped(artifacts):
 def test_index_overview_grounded_or_dropped(artifacts):
     # 총평 (#9): index 상단에 큰 흐름 + 소수 의견, 인용 대조 실패 항목은 폐기
     tmp_path = artifacts[0]
-    index = (tmp_path / "pages" / "index.md").read_text()
+    index = (tmp_path / "pages" / "index.md").read_text(encoding="utf-8")
     assert "총평" in index and index.index("총평") < index.index("cluster-")
     assert "검사·데이터 계열로 수렴 중" in index          # 큰 흐름 채택
     assert "예지보전은 한 명만 언급" in index              # 소수 의견 채택
@@ -305,7 +305,7 @@ def test_overview_is_single_extra_call(artifacts):
 
 def test_index_links_all_cluster_pages(artifacts):
     tmp_path, *_, pages = artifacts
-    index = (tmp_path / "pages" / "index.md").read_text()
+    index = (tmp_path / "pages" / "index.md").read_text(encoding="utf-8")
     cluster_pages = [p for p in pages if p.name != "index.md"]
     assert cluster_pages
     for p in cluster_pages:
@@ -350,7 +350,7 @@ def test_run_all_238_and_cache(tmp_path):
 
 def test_pages_have_name_and_quote(artifacts):
     *_, pages = artifacts
-    text = "".join(p.read_text() for p in pages)
+    text = "".join(p.read_text(encoding="utf-8") for p in pages)
     assert "김민준" in text and "이서연" in text
     assert "하반기에는 용접 비전검사 고도화를 하고 싶다" in text
     assert "단기" in text and "장기" in text  # horizon 배지

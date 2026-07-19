@@ -36,20 +36,20 @@ def test_dummy_vectors_through_build(tmp_path):
     # 더미 벡터 → similarity.main → neighbors.json 교체 → 001 빌드 조립까지 관통
     data_dir = tmp_path / "data"
     generate_dummy.main(out_dir=data_dir)
-    persons = json.loads((data_dir / "persons.json").read_text())
+    persons = json.loads((data_dir / "persons.json").read_text(encoding="utf-8"))
 
     rng = random.Random(1)
     emb = {str(p["id"]): [rng.gauss(0, 1) for _ in range(16)] for p in persons}
     emb_path = tmp_path / "embeddings.json"
-    emb_path.write_text(json.dumps(emb))
+    emb_path.write_text(json.dumps(emb), encoding="utf-8")
 
     out = similarity.main(emb_path, out_path=data_dir / "neighbors.json")
-    neighbors = json.loads(out.read_text())
+    neighbors = json.loads(out.read_text(encoding="utf-8"))
     assert set(neighbors) == {str(p["id"]) for p in persons}
     valid_ids = {p["id"] for p in persons}
     for entries in neighbors.values():
         assert len(entries) == config.K
         assert {e["id"] for e in entries} <= valid_ids  # 001과 같은 int id
 
-    html = build.build(data_dir=data_dir, out_path=tmp_path / "archive.html").read_text()
+    html = build.build(data_dir=data_dir, out_path=tmp_path / "archive.html").read_text(encoding="utf-8")
     assert "__DATA__" not in html

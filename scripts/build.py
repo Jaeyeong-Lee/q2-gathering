@@ -95,7 +95,7 @@ def build_tasks(vectors, clusters, wiki_dir):
     for c in clusters:
         page = f"cluster-{c['cluster_id']:02d}.md"
         md = Path(wiki_dir) / page
-        title = md.read_text().splitlines()[0].lstrip("# ").strip() if md.exists() \
+        title = md.read_text(encoding="utf-8").splitlines()[0].lstrip("# ").strip() if md.exists() \
             else f"군집 {c['cluster_id']}"
         clusters_meta.append({"id": c["cluster_id"], "title": title,
                               "page": "wiki/" + page, "count": len(c["items"])})
@@ -115,7 +115,7 @@ def about_slots(html):
 
     md = ROOT / "archive" / "about" / "sample.md"
     if md.exists():
-        md_html = f'<pre class="md-slot">{html_mod.escape(md.read_text())}</pre>'
+        md_html = f'<pre class="md-slot">{html_mod.escape(md.read_text(encoding="utf-8"))}</pre>'
     else:
         md_html = ('<div class="slot-placeholder">변환된 md 원문 자리<br>'
                    '<code>archive/about/sample.md</code> 추가 후 재빌드하면 여기에 인라인됩니다</div>')
@@ -124,9 +124,9 @@ def about_slots(html):
 
 def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.html"):
     data_dir = Path(data_dir)
-    persons = json.loads((data_dir / "persons.json").read_text())
-    neighbors = json.loads((data_dir / "neighbors.json").read_text())
-    freq = json.loads((data_dir / "freq.json").read_text())
+    persons = json.loads((data_dir / "persons.json").read_text(encoding="utf-8"))
+    neighbors = json.loads((data_dir / "neighbors.json").read_text(encoding="utf-8"))
+    freq = json.loads((data_dir / "freq.json").read_text(encoding="utf-8"))
 
     # 템플릿 JS는 프로토타입 필드명(team/w)을 쓰므로 스키마 필드에 별칭을 얹는다
     # ponytail: 별칭 대신 템플릿 JS 전체 개명은 화면 확장이 끝나는 시점에 정리
@@ -137,15 +137,15 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
         for p in persons
     }
 
-    html = TEMPLATE.read_text()
-    html = html.replace("/*__ECHARTS_JS__*/", (ROOT / "archive" / "echarts.min.js").read_text())
-    html = html.replace("/*__ECHARTS_WORDCLOUD_JS__*/", (ROOT / "archive" / "echarts-wordcloud.min.js").read_text())
-    html = html.replace("/*__CLOUD_LOGIC_JS__*/", (ROOT / "archive" / "cloud_logic.js").read_text())
+    html = TEMPLATE.read_text(encoding="utf-8")
+    html = html.replace("/*__ECHARTS_JS__*/", (ROOT / "archive" / "echarts.min.js").read_text(encoding="utf-8"))
+    html = html.replace("/*__ECHARTS_WORDCLOUD_JS__*/", (ROOT / "archive" / "echarts-wordcloud.min.js").read_text(encoding="utf-8"))
+    html = html.replace("/*__CLOUD_LOGIC_JS__*/", (ROOT / "archive" / "cloud_logic.js").read_text(encoding="utf-8"))
     html = html.replace("/*__DATA__*/null", json.dumps({"nodes": nodes, "neighbors": nb}, ensure_ascii=False))
     html = html.replace("/*__FREQ__*/null", json.dumps(freq, ensure_ascii=False))
     emb_path = data_dir / "embeddings.json"
     if emb_path.exists():
-        embeddings = json.loads(emb_path.read_text())
+        embeddings = json.loads(emb_path.read_text(encoding="utf-8"))
         html = html.replace("/*__ABOUT__*/null", json.dumps(build_about(persons, neighbors, embeddings), ensure_ascii=False))
     else:
         html = html.replace("/*__ABOUT__*/null", "null")
@@ -156,15 +156,15 @@ def build(data_dir=ROOT / "data", out_path=ROOT / "dist" / "heritage-archive.htm
     td = data_dir / "task_discovery"
     tasks = None
     if (td / "task_vectors.json").exists() and (td / "clusters.json").exists():
-        tasks = build_tasks(json.loads((td / "task_vectors.json").read_text()),
-                            json.loads((td / "clusters.json").read_text()),
+        tasks = build_tasks(json.loads((td / "task_vectors.json").read_text(encoding="utf-8")),
+                            json.loads((td / "clusters.json").read_text(encoding="utf-8")),
                             Path(out_path).parent / "wiki")
     html = html.replace("/*__TASKS__*/null",
                         json.dumps(tasks, ensure_ascii=False) if tasks else "null")
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(html)
+    out_path.write_text(html, encoding="utf-8")
     return out_path
 
 

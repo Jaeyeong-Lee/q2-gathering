@@ -15,7 +15,7 @@ SYNONYMS_PATH = Path(__file__).parent / "tag_synonyms.json"
 
 
 def load_synonyms(path=SYNONYMS_PATH):
-    return json.loads(Path(path).read_text())
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def normalize(tag_list, synonyms=None):
@@ -105,7 +105,7 @@ def main(persons_path=ROOT / "data" / "persons.json", call=None, retries=1, dela
     if call is None:
         raise SystemExit("LLM 호출 함수 미연결 — 실데이터 때 call 파라미터에 실제 호출부를 꽂아 실행")
     persons_path = Path(persons_path)
-    persons = json.loads(persons_path.read_text())
+    persons = json.loads(persons_path.read_text(encoding="utf-8"))
     by_id, failed = extract_all(persons, call, retries=retries, delay=delay)
     try:
         by_id = consolidate_pool(by_id, call)
@@ -115,7 +115,7 @@ def main(persons_path=ROOT / "data" / "persons.json", call=None, retries=1, dela
     for p in persons:
         if p["id"] in by_id:
             p["tags"] = by_id[p["id"]]
-    persons_path.write_text(json.dumps(persons, ensure_ascii=False, indent=1))
+    persons_path.write_text(json.dumps(persons, ensure_ascii=False, indent=1), encoding="utf-8")
     if failed:
         log.warning(f"추출 실패 {len(failed)}명 (기존 태그 유지): {failed}")
     return failed

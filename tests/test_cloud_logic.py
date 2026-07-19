@@ -12,7 +12,7 @@ LOGIC = Path(__file__).parent.parent / "archive" / "cloud_logic.js"
 
 def run_js(expr):
     """cloud_logic.js를 로드한 node에서 expr을 평가해 JSON으로 돌려받는다."""
-    script = LOGIC.read_text() + f"\nconsole.log(JSON.stringify({expr}));"
+    script = LOGIC.read_text(encoding="utf-8") + f"\nconsole.log(JSON.stringify({expr}));"
     out = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
     return json.loads(out.stdout)
 
@@ -87,7 +87,7 @@ def test_md_to_html_escapes_raw_html_and_renders_bullets():
 
 def test_build_inlines_wordcloud_lib_and_logic(tmp_path):
     data_dir = generate_dummy.main(out_dir=tmp_path / "data")
-    html = build.build(data_dir=data_dir, out_path=tmp_path / "a.html").read_text()
+    html = build.build(data_dir=data_dir, out_path=tmp_path / "a.html").read_text(encoding="utf-8")
     assert "__ECHARTS_JS__" not in html and "__ECHARTS_WORDCLOUD_JS__" not in html and "__CLOUD_LOGIC_JS__" not in html
     assert "echarts" in html
     assert "function cloudState" in html

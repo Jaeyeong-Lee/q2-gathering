@@ -105,7 +105,7 @@ def generate_sources(n=20, seed=0, out_path=None):
                      "cl_level": cl, "text": text})
     if out_path:
         Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-        Path(out_path).write_text(json.dumps(docs, ensure_ascii=False, indent=1))
+        Path(out_path).write_text(json.dumps(docs, ensure_ascii=False, indent=1), encoding="utf-8")
     return docs
 
 
@@ -142,7 +142,7 @@ def extract_person(doc, call):
 def run_extract(sources_path, out_path, call, retries=1, delay=0.5):
     """인당 1콜 배치 추출 → extracted.json. 검증 실패 인물은 재시도 후 폐기."""
     import time
-    docs = json.loads(Path(sources_path).read_text())
+    docs = json.loads(Path(sources_path).read_text(encoding="utf-8"))
     out, failed = [], []
     for doc in docs:
         for attempt in range(1 + retries):
@@ -156,7 +156,7 @@ def run_extract(sources_path, out_path, call, retries=1, delay=0.5):
                     failed.append(doc["id"])
         if delay > 0:
             time.sleep(delay)
-    Path(out_path).write_text(json.dumps(out, ensure_ascii=False, indent=1))
+    Path(out_path).write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     if failed:
         log.warning(f"추출 폐기 {len(failed)}명: {failed}")
     return out
@@ -165,7 +165,7 @@ def run_extract(sources_path, out_path, call, retries=1, delay=0.5):
 def run_embed(extracted_path, out_path, embed, delay=0.0, field="tasks"):
     """문장별 임베딩 (사람당 1개 아님) → vectors.json. field로 과제/역량 평면 선택."""
     import time
-    persons = json.loads(Path(extracted_path).read_text())
+    persons = json.loads(Path(extracted_path).read_text(encoding="utf-8"))
     vectors = []
     for p in persons:
         for t in p[field]:
@@ -174,7 +174,7 @@ def run_embed(extracted_path, out_path, embed, delay=0.0, field="tasks"):
                             **{k: v for k, v in t.items()}, "vec": embed(t["text"])})
             if delay > 0:
                 time.sleep(delay)
-    Path(out_path).write_text(json.dumps(vectors, ensure_ascii=False))
+    Path(out_path).write_text(json.dumps(vectors, ensure_ascii=False), encoding="utf-8")
     return vectors
 
 
@@ -184,9 +184,9 @@ def run_cluster(vectors_path, out_path, k=8, seed=0):
     from sklearn.cluster import KMeans
     from sklearn.preprocessing import normalize
 
-    items = json.loads(Path(vectors_path).read_text())
+    items = json.loads(Path(vectors_path).read_text(encoding="utf-8"))
     if not items:  # 예: 역량 문장이 하나도 안 뽑힌 세트
-        Path(out_path).write_text("[]")
+        Path(out_path).write_text("[]", encoding="utf-8")
         return []
     k = min(k, len(items))
     X = normalize(np.array([it["vec"] for it in items]))
@@ -196,7 +196,7 @@ def run_cluster(vectors_path, out_path, k=8, seed=0):
         members = [{key: v for key, v in it.items() if key != "vec"}
                    for it, lb in zip(items, labels) if lb == cid]
         clusters.append({"cluster_id": cid, "items": members})
-    Path(out_path).write_text(json.dumps(clusters, ensure_ascii=False, indent=1))
+    Path(out_path).write_text(json.dumps(clusters, ensure_ascii=False, indent=1), encoding="utf-8")
     return clusters
 
 
@@ -217,7 +217,7 @@ def _grounded(suggestion, items):
 
 def run_pages(clusters_path, out_dir, call):
     """군집당 LLM 1회(제목·요지) + 결정적 본문(실명·인용·horizon 배지) → md 파일들."""
-    clusters = json.loads(Path(clusters_path).read_text())
+    clusters = json.loads(Path(clusters_path).read_text(encoding="utf-8"))
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     pages = []
@@ -239,7 +239,7 @@ def run_pages(clusters_path, out_dir, call):
                       for d in derived]
             lines += [""]
         path = out_dir / f"cluster-{c['cluster_id']:02d}.md"
-        path.write_text("\n".join(lines))
+        path.write_text("\n".join(lines), encoding="utf-8")
         pages.append((path, meta, c["items"]))
 
     index_lines = ["# 미래 과제 지도", "",
@@ -250,7 +250,7 @@ def run_pages(clusters_path, out_dir, call):
         people = len({it["person_id"] for it in items})
         keywords = " · ".join(it["text"] for it in items[:3])
         index_lines.append(f"- [{meta['title']}]({path.name}) — {people}명 / {keywords}")
-    (out_dir / "index.md").write_text("\n".join(index_lines) + "\n")
+    (out_dir / "index.md").write_text("\n".join(index_lines) + "\n", encoding="utf-8")
     return [p for p, _, _ in pages] + [out_dir / "index.md"]
 
 

@@ -30,10 +30,10 @@ def top_k_neighbors(embeddings, k=K):
 
 def main(emb_path, out_path=ROOT / "data" / "neighbors.json"):
     # JSON 키는 문자열이므로 persons.json의 int id로 되돌린다
-    embeddings = {int(i): v for i, v in json.loads(Path(emb_path).read_text()).items()}
+    embeddings = {int(i): v for i, v in json.loads(Path(emb_path).read_text(encoding="utf-8")).items()}
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(top_k_neighbors(embeddings), ensure_ascii=False, indent=1))
+    out_path.write_text(json.dumps(top_k_neighbors(embeddings), ensure_ascii=False, indent=1), encoding="utf-8")
     return out_path
 
 

@@ -14,7 +14,7 @@ _kiwi = None  # Kiwi 로딩이 느려서 최초 사용 시 1회 생성
 
 
 def load_stopwords(path=STOPWORDS_PATH):
-    lines = Path(path).read_text().splitlines()
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
     return {w for w in (l.strip() for l in lines) if w and not w.startswith("#")}
 
 
@@ -41,12 +41,12 @@ def word_freq(text, stopwords=None):
 
 
 def main(persons_path=ROOT / "data" / "persons.json", out_path=ROOT / "data" / "freq.json"):
-    persons = json.loads(Path(persons_path).read_text())
+    persons = json.loads(Path(persons_path).read_text(encoding="utf-8"))
     stopwords = load_stopwords()
     counts = {str(p["id"]): dict(word_freq(p["text"], stopwords)) for p in persons}
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(counts, ensure_ascii=False, indent=1))
+    out_path.write_text(json.dumps(counts, ensure_ascii=False, indent=1), encoding="utf-8")
     return out_path
 
 

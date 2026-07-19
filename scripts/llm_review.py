@@ -62,8 +62,8 @@ def main(persons_path=ROOT / "data" / "persons.json", out_path=ROOT / "data" / "
         raise SystemExit("LLM 호출 함수 미연결 — call 파라미터에 실제 호출부(llm.call_gemini 등)를 꽂아 실행")
     persons_path = Path(persons_path)
     out_path = Path(out_path)
-    persons = json.loads(persons_path.read_text())
-    results = json.loads(out_path.read_text()) if out_path.exists() else {}
+    persons = json.loads(persons_path.read_text(encoding="utf-8"))
+    results = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {}
 
     try:
         failed = review_all(persons, results, call, retries=retries, delay=delay)

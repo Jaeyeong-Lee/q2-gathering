@@ -40,10 +40,10 @@ def test_persons_text_through_build(tmp_path):
     # 더미 persons.json의 text → freq.main → freq.json 교체 → 001 빌드 조립까지 관통
     data_dir = tmp_path / "data"
     generate_dummy.main(out_dir=data_dir)
-    persons = json.loads((data_dir / "persons.json").read_text())
+    persons = json.loads((data_dir / "persons.json").read_text(encoding="utf-8"))
 
     out = freq.main(persons_path=data_dir / "persons.json", out_path=data_dir / "freq.json")
-    counts = json.loads(out.read_text())
+    counts = json.loads(out.read_text(encoding="utf-8"))
     assert set(counts) == {str(p["id"]) for p in persons}
     for per_person in counts.values():
         assert per_person, "빈 빈도 딕셔너리 금지"
@@ -51,5 +51,5 @@ def test_persons_text_through_build(tmp_path):
             assert isinstance(n, int) and n >= 1
             assert len(word) >= 2
 
-    html = build.build(data_dir=data_dir, out_path=tmp_path / "archive.html").read_text()
+    html = build.build(data_dir=data_dir, out_path=tmp_path / "archive.html").read_text(encoding="utf-8")
     assert "__FREQ__" not in html

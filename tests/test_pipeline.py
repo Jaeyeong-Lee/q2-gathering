@@ -52,9 +52,9 @@ def test_build_inlines_data_into_single_html(tmp_path):
         assert (data_dir / f).exists()
 
     out = build.build(data_dir=data_dir, out_path=tmp_path / "dist" / "archive.html")
-    html = out.read_text()
+    html = out.read_text(encoding="utf-8")
 
-    persons = json.loads((data_dir / "persons.json").read_text())
+    persons = json.loads((data_dir / "persons.json").read_text(encoding="utf-8"))
     assert persons[0]["name"] in html
     assert "__DATA__" not in html and "__FREQ__" not in html
     import re
@@ -63,10 +63,10 @@ def test_build_inlines_data_into_single_html(tmp_path):
 
 def test_build_injects_config_values(tmp_path):
     data_dir = generate_dummy.main(out_dir=tmp_path / "data")
-    html = build.build(data_dir=data_dir, out_path=tmp_path / "archive.html").read_text()
+    html = build.build(data_dir=data_dir, out_path=tmp_path / "archive.html").read_text(encoding="utf-8")
 
     assert f'max="{config.TOPN_MAX}"' in html
-    neighbors = json.loads((data_dir / "neighbors.json").read_text())
+    neighbors = json.loads((data_dir / "neighbors.json").read_text(encoding="utf-8"))
     assert all(len(v) == config.K for v in neighbors.values())
 
 
@@ -100,10 +100,10 @@ TASK_CLUSTERS = [
 def _write_task_data(data_dir, wiki_dir):
     td = data_dir / "task_discovery"
     td.mkdir(parents=True)
-    (td / "task_vectors.json").write_text(json.dumps(TASK_VECTORS, ensure_ascii=False))
-    (td / "clusters.json").write_text(json.dumps(TASK_CLUSTERS, ensure_ascii=False))
+    (td / "task_vectors.json").write_text(json.dumps(TASK_VECTORS, ensure_ascii=False), encoding="utf-8")
+    (td / "clusters.json").write_text(json.dumps(TASK_CLUSTERS, ensure_ascii=False), encoding="utf-8")
     wiki_dir.mkdir(parents=True)
-    (wiki_dir / "cluster-00.md").write_text("# 지능형 검사 체계\n\n요지.\n")
+    (wiki_dir / "cluster-00.md").write_text("# 지능형 검사 체계\n\n요지.\n", encoding="utf-8")
 
 
 def test_build_tasks_payload(tmp_path):
@@ -134,11 +134,11 @@ def test_build_injects_tasks_or_null(tmp_path):
     data_dir = generate_dummy.main(out_dir=tmp_path / "data")
     out = tmp_path / "dist" / "archive.html"
 
-    html = build.build(data_dir=data_dir, out_path=out).read_text()
+    html = build.build(data_dir=data_dir, out_path=out).read_text(encoding="utf-8")
     assert "__TASKS__" not in html  # 데이터 없으면 null 주입 → 토글 숨김
 
     _write_task_data(data_dir, out.parent / "wiki")
-    html = build.build(data_dir=data_dir, out_path=out).read_text()
+    html = build.build(data_dir=data_dir, out_path=out).read_text(encoding="utf-8")
     assert "__TASKS__" not in html
     assert "용접 비전검사 고도화" in html and "지능형 검사 체계" in html
     assert "#view=tasks" in html  # 딥링크 패턴 존재
