@@ -50,16 +50,38 @@ scripts/build.py — 템플릿에 JSON·JS 전량 인라인 → dist/heritage-ar
 딥링크: `#ego=<id>` (특정 인물 궤도 뷰), `#view=cloudmax`, `#view=about` — 데모 점프와
 헤드리스 검증 겸용.
 
+## 미래 과제 발굴 (task-discovery)
+
+같은 회고 원문에서 "팀원이 직접 쓴 미래 과제 문장"만 뽑아 군집화한 별도 산출물.
+설계는 `docs/task-discovery.md`, 구현 상세(스키마·결정 경로·함정)는
+`docs/task-discovery-implementation.md` 참고.
+
+```bash
+export GEMINI_API_KEY=...
+.venv/bin/python scripts/task_discovery.py   # sources 없으면 더미 20명 자동 생성
+                                              # → dist/wiki/ (군집당 md + index.md 총평)
+.venv/bin/python scripts/build.py            # 위 wiki가 있으면 heritage-archive.html에
+                                              # "과제 지도" 토글로 통합 주입 (#view=tasks)
+```
+
+- 파이프라인: 인당 LLM 추출(과제/역량 항목화) → 문장별 임베딩 → KMeans 군집화 →
+  군집당 LLM 페이지 생성 + 총평 1콜. 코드는 `scripts/task_discovery.py` 단일 모듈.
+- 화면: `heritage-archive.html` 헤더의 [사람 지도|과제 지도] 토글, 또는 위키
+  index 상단 "그래프로 보기" 링크. 사람 지도와 상태 미공유(별도 IIFE).
+- 스테이지 캐시: `data/task_discovery/`(gitignore)에 추출·임베딩 결과가 있으면
+  재실행 시 건너뛴다(LLM 0콜). 스키마를 바꿨으면 해당 JSON을 지우고 재실행할 것.
+- 실명 + 원문 인용 산출물 — 사내 한정, `dist/wiki/`도 heritage-archive와 동일 배포 전제.
+
 ## 저장소 구조
 
 ```
-archive/          화면 소스 — template.html(전부 여기), cloud_logic.js(테스트되는 순수 로직),
+archive/          화면 소스 — template.html(전부 여기, 과제 지도 IIFE 포함), cloud_logic.js(테스트되는 순수 로직),
                   echarts*.min.js, about/(설명 오버레이 슬롯: ppt.png·sample.md 놓고 재빌드)
-scripts/          파이프라인 + build.py, config.py(K/EGO_DISPLAY_N/TOPN_MAX)
-data/             persons/neighbors/freq/embeddings JSON (빌드 입력)
-dist/             heritage-archive.html (유일한 배포 산출물)
-tests/            pytest — 순수 함수(빈도·유사도·태그·클라우드 로직) 단위 테스트
-docs/             PRD, handoff(현재 상태 스냅샷 — 에이전트 인수인계용)
+scripts/          파이프라인 + build.py, config.py(K/EGO_DISPLAY_N/TOPN_MAX), task_discovery.py(미래 과제 발굴)
+data/             persons/neighbors/freq/embeddings JSON (빌드 입력), task_discovery/(gitignore, 캐시 겸용)
+dist/             heritage-archive.html(유일한 배포 산출물) + wiki/(과제 군집 md, 실명·인용 — 사내 한정)
+tests/            pytest — 순수 함수(빈도·유사도·태그·클라우드 로직) + task_discovery 단위 테스트
+docs/             PRD, handoff(현재 상태 스냅샷), task-discovery.md(설계)/-implementation.md(구현 해설)
 todos/            파일 기반 이슈 트래커
 ```
 

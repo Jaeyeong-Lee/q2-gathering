@@ -242,22 +242,57 @@ pytest(`tests/test_pipeline.py`: `test_build_tasks_payload`, `test_build_injects
 - 과제 엣지 k=6 vs 사람 지도 `config.K` — 문법은 같고 값은 다름 (의도)
 - `_grounded`가 evidence를 `text`(LLM 서술)와도 대조 허용 — 총평 인용이 pptx 원문에
   글자 그대로는 없을 수 있음 (추출 항목 대조는 보장)
-- **커밋된 데모 실물(dist/)이 pre-#8 데이터 기준으로 구식** — 재생성 절차는 §7
+- **커밋된 데모 실물(dist/)이 pre-#8 데이터 기준으로 구식** — 재생성 시도와 현재 상태는 §6.1
+
+### 6.1 데모 재생성 시도 (2026-07-20) — 부분 성공, 중단
+
+실 키로 `data/task_discovery/*.json` 삭제 후 `scripts/task_discovery.py` 전체 재실행:
+
+- **추출·임베딩·군집화는 성공** — verbose 더미 20명, 실 Gemini(`gemini-2.5-flash`)로
+  `quotes[]` 복수 인용까지 정상 동작 확인(예: "품질 데이터 분석을(를) 표준 플랫폼으로
+  통합하는 것이 목표다" + "지금은 라인마다 ... 방식이 서로 달라 ..." 두 인용이 한
+  항목에 담김 — #8이 실 LLM에서도 의도대로 작동). 결과는 `data/task_discovery/`에
+  캐시돼 있다(gitignore, 디스크에는 남아 있음).
+- **페이지 생성 단계에서 쿼터 소진**: `run_pages`가 8군집 중 2개(cluster-00, 01)를
+  새 데이터로 다 쓴 뒤, 3번째 군집 호출에서 재시도 5회 초과로 `RuntimeError`.
+  같은 실행에서 `run_all`이 캐시를 스킵하는 건 추출·임베딩뿐이라, 군집·페이지는
+  항상 재실행 대상이라 부분 실패가 그대로 `dist/wiki/`에 반영될 뻔했다.
+- **되돌린 것**: `cluster-00.md`/`cluster-01.md`만 새 내용으로 덮이고 나머지 6개+
+  index.md는 예전 그대로 남아 있어 위키가 내적으로 불일치하는 상태였다 —
+  `git checkout -- dist/wiki/cluster-00.md cluster-01.md`로 커밋된 데모를 원상
+  복구했다. **의도적 판단**: 절반만 새로운 위키를 커밋하는 것보다, 캐시(추출·임베딩)는
+  살려두고 다음에 "군집+페이지 단계만" 저렴하게(약 9콜: 8페이지+총평 1) 재실행하는 게 낫다.
+- **시도했다가 되돌린 것**: 쿼터 우회로 `llm.py`의 `call_gemini` 기본 모델을
+  `gemini-3-flash-preview`로 바꿨었다 — 그런데 이 함수는 `run_extraction.py`(메인
+  아카이브 태그 추출 파이프라인)도 기본값으로 쓰므로, task-discovery만을 위한
+  우회가 무관한 파이프라인의 기본 동작까지 바꾸는 범위 이탈이었다. **원복함**
+  (`git checkout -- scripts/llm.py`). 다음에 재시도할 땐 기존 오버라이드 패턴을
+  따를 것 — `normalize_person_text.py`/`llm_review.py`가 이미 쓰는
+  `lambda p: llm.call_gemini(p, model="gpt-oss")` 식으로, `task_discovery.py`
+  호출부에서만 모델을 바꾼다(전역 기본값은 그대로 둔다).
+- **다음에 재개할 때**: `data/task_discovery/extracted.json`·벡터 파일은 지우지
+  말 것(캐시 재사용, LLM 0콜) — `clusters.json`도 그대로 둬도 무방(재실행 때
+  덮어써짐). 그냥 `task_discovery.py`를 모델 오버라이드와 함께 다시 돌리면
+  8페이지+총평만 호출한다. 성공하면 `build.py` 재빌드로 그래프 데이터까지 최신화된다.
 
 ---
 
 ## 7. 함정·제약 — 로컬 모델이 틀리기 쉬운 지점
 
-1. **데모 실물 재생성이 아직 안 됨**: `dist/wiki/`엔 총평이 없고 그래프 카드 인용이 빈
-   배열이다. 코드 문제가 아니라 옛 데이터(quote 단수)로 빌드된 탓. 절차:
-   `data/task_discovery/*.json` 삭제 → `GEMINI_API_KEY=... .venv/bin/python
-   scripts/task_discovery.py` (sources가 없으면 verbose 더미 20명 자동 생성) →
-   `.venv/bin/python scripts/build.py`.
+1. **데모 실물 재생성이 아직 안 끝남** (2026-07-20 재시도, §6.1): 추출·임베딩·군집화는
+   실 LLM으로 성공해 `data/task_discovery/`에 캐시돼 있다(gitignore, 디스크엔 있음).
+   페이지 생성만 쿼터로 중단됐다. **`data/task_discovery/*.json`을 지우지 말고**
+   그대로 `task_discovery.py`를 모델 오버라이드와 함께 재실행하면 캐시 덕에
+   추출·임베딩은 스킵되고 페이지+총평(약 9콜)만 다시 돈다.
 2. **스테이지 캐시**: `run_all`은 extracted.json/벡터가 있으면 LLM 0콜로 건너뛰고,
-   군집·페이지는 항상 재실행한다. 스키마를 바꿨으면 반드시 옛 JSON을 지울 것 —
-   지우지 않으면 옛 스키마가 그대로 하류로 흘러간다 (§6의 "구식 데모"가 정확히 이 사고).
-3. **무료 티어 Gemini 쿼터**: 2.5-flash 일일 한도가 금방 소진. 과거 페이지 생성은
-   `gemini-3-flash-preview`로 우회했다 (`llm.call_gemini`의 model 파라미터).
+   군집·페이지는 항상 재실행한다. **스키마를 바꿨을 때만** 옛 JSON을 지울 것 —
+   지금처럼 스키마는 그대로고 실행이 중단된 경우엔 지우면 오히려 손해(재추출 20콜 낭비).
+3. **무료 티어 Gemini 쿼터**: 2.5-flash 일일 한도가 금방 소진된다. 우회 모델
+   `gemini-3-flash-preview`를 쓰려면 **`llm.py`의 전역 기본값을 바꾸지 말고**
+   `task_discovery.py` 호출부에서만 `lambda p: llm.call_gemini(p,
+   model="models/gemini-3-flash-preview")`로 오버라이드할 것 — 전역 기본값을 바꾸면
+   `run_extraction.py`(메인 아카이브 태그 추출)까지 영향받는다(§6.1에서 실제로
+   이 실수를 했다가 되돌림).
 4. **인용 검증은 `_norm` 공백 정규화** — 엄격 비교로 "고치지" 말 것 (§2의 사연).
 5. **`data/`는 gitignore** — 중간 산출물이 커밋 안 되는 건 의도다 (실데이터 프라이버시).
 6. **헤드리스 검증은 `--headless=new`**, 배포는 GitHub Pages 정적, **로컬 dev 서버 제안 금지**.
