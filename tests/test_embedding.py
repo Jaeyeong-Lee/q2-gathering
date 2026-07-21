@@ -44,6 +44,6 @@ def test_embed_output_format(tmp_path):
 
     # JSON 저장 확인
     assert out_path.exists()
-    saved = json.loads(out_path.read_text())
+    saved = json.loads(out_path.read_text(encoding="utf-8"))
     assert all(v == [0.5] * 768 for v in saved.values())
     print(f"✓ 임베딩 {out_path.name} 저장 완료")

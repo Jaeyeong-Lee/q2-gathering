@@ -95,7 +95,7 @@ def main(out_dir=Path(__file__).parent.parent / "data"):
     data = generate()
     for name in ("persons", "neighbors", "freq"):
         path = out_dir / f"{name}.json"
-        path.write_text(json.dumps(data[name], ensure_ascii=False, indent=1))
+        path.write_text(json.dumps(data[name], ensure_ascii=False, indent=1), encoding="utf-8")
     return out_dir
 
 

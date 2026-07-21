@@ -576,6 +576,50 @@
   .topk-row .score{ font-family: var(--mono); font-size: 11.5px; color: var(--ink-dim); text-align: right; }
   .about-note{ margin: 6px 0 0; font-size: 12.5px; color: var(--ink-faint); }
 
+  /* ---- 과제 문장 그래프 (#10) — 사람 지도와 상태 미공유, 별도 스테이지·IIFE ---- */
+  /* 토글이 과제 스테이지(z30) 위에 떠야 해서 topbar를 30 위로 올린다 */
+  .topbar{ z-index: 35; }
+  .map-toggle{
+    display: inline-flex; pointer-events: auto; overflow: hidden;
+    border: 1px solid var(--panel-border); border-radius: 100px; background: var(--panel);
+  }
+  .map-toggle button{
+    border: none; background: none; cursor: pointer; font-family: var(--sans);
+    font-size: 11.5px; font-weight: 600; color: var(--ink-dim); padding: 4px 12px;
+  }
+  .map-toggle button.active{ color: #1a1608; background: var(--gold); }
+  .map-toggle button:focus-visible{ outline: 2px solid var(--gold); outline-offset: -2px; }
+  .task-stage{
+    position: fixed; inset: 0; z-index: 30; display: none;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(87,201,189,0.07), transparent 55%),
+      radial-gradient(ellipse at 75% 80%, rgba(242,161,84,0.05), transparent 55%),
+      var(--bg);
+  }
+  .task-stage.visible{ display: block; }
+  #taskGraph{ position: absolute; inset: 0; width: 100%; height: 100%; cursor: default; }
+  .task-legend{
+    left: clamp(18px, 3vw, 32px); bottom: clamp(18px, 3vh, 28px); z-index: 5;
+    width: min(330px, 36vw); max-height: 48vh; overflow-y: auto;
+    padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .cluster-row{ display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #c9d0dc; padding: 4px 2px; }
+  .cluster-row .count{ font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+  .cluster-row a{ margin-left: auto; font-size: 11px; color: var(--ink-faint); text-decoration: none; white-space: nowrap; }
+  .cluster-row a:hover{ color: var(--gold); }
+  .task-meta{ display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .task-meta span{
+    font-size: 11px; padding: 3px 9px; border-radius: 100px;
+    background: rgba(255,255,255,0.06); color: var(--ink-dim);
+  }
+  .task-quote{
+    margin: 10px 0 0; padding: 7px 10px; border-left: 2px solid var(--gold);
+    background: rgba(255,255,255,0.04); border-radius: 0 8px 8px 0;
+    font-size: 12.5px; line-height: 1.6; color: var(--ink-dim); overflow-wrap: anywhere;
+  }
+  .task-card-link{ display: inline-block; margin-top: 14px; font-size: 12.5px; color: var(--gold); text-decoration: none; }
+  .task-card-link:hover{ text-decoration: underline; }
+
   ::-webkit-scrollbar{ width: 8px; }
   ::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.12); border-radius: 4px; }
 
@@ -593,6 +637,10 @@
     <h1>근원경쟁력 유사도 네트워크</h1>
     <div class="sub">
       <span class="badge">2026 Q3 T-Talk</span>
+      <span class="map-toggle" id="mapToggle" role="group" aria-label="지도 전환">
+        <button id="mapPeopleBtn" class="active">사람 지도</button>
+        <button id="mapTasksBtn">과제 지도</button>
+      </span>
     </div>
   </header>
 
@@ -794,6 +842,18 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- 과제 문장 그래프 (#10): 오버레이 스테이지 — 데이터 없으면(TASKS=null) 토글째 숨김 -->
+<div class="task-stage" id="taskStage">
+  <canvas id="taskGraph"></canvas>
+  <div class="hover-tip" id="taskTip"></div>
+  <div class="panel task-legend">
+    <div class="panel-title"><span>과제 군집 (문장 클릭: 인용 카드)</span></div>
+    <div id="taskLegendList"></div>
+    <div class="hint">노드 = 팀원이 직접 쓴 과제 문장 · 색 = 군집 · 점선 테두리 = 소수 의견(군집 중심에서 먼 문장)</div>
+  </div>
+  <aside class="panel detail-panel" id="taskCard"></aside>
 </div>
 
 <script>/*__ECHARTS_JS__*/</script>
@@ -2032,5 +2092,254 @@
   // #view= 딥링크: 데모 점프 겸 헤드리스 검증용
   if (location.hash === "#view=cloudmax") setCloudMax(true);
   if (location.hash === "#view=about") aboutOverlay.classList.add("visible");
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  // ---- 과제 문장 그래프 (#10) — 빌드타임 주입. 사람 지도 IIFE와 상태 미공유(설계 결정:
+  // 팀/CL 필터 이월 없음). 물리 상수는 사람 지도와 동일 값을 쓴다.
+  var TASKS = /*__TASKS__*/null;
+  var toggle = document.getElementById("mapToggle");
+  if (!TASKS){ toggle.style.display = "none"; return; }
+
+  var stage = document.getElementById("taskStage");
+  var peopleBtn = document.getElementById("mapPeopleBtn");
+  var tasksBtn = document.getElementById("mapTasksBtn");
+  var h1 = document.querySelector(".topbar h1");
+
+  var PALETTE = ["#f2a154","#57c9bd","#7c9ce6","#e0819f","#9bd66b","#c792ea","#e8d15a","#5ab4d6","#d98a6a","#8fb4a8","#b3a1e6","#dd7f7f"];
+  function colorOf(cid){ return PALETTE[cid % PALETTE.length]; }
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  var clusterById = {};
+  TASKS.clusters.forEach(function(c){ clusterById[c.id] = c; });
+
+  var nodes = TASKS.nodes.map(function(n){
+    return Object.assign({ x: 0, y: 0, vx: 0, vy: 0, r: 5.5, _placed: false }, n);
+  });
+  var byId = {};
+  nodes.forEach(function(n){ byId[n.id] = n; });
+
+  // 군집 앵커: 사람 지도 팀 앵커와 같은 문법 — 중앙 원둘레 균등 배치
+  var ANCHOR = {};
+  TASKS.clusters.forEach(function(c, i){
+    var a = (i / TASKS.clusters.length) * Math.PI * 2 - Math.PI / 2;
+    ANCHOR[c.id] = { ux: 0.5 + Math.cos(a) * 0.30, uy: 0.5 + Math.sin(a) * 0.30 };
+  });
+  nodes.forEach(function(n){
+    var an = ANCHOR[n.cluster] || { ux: 0.5, uy: 0.5 };
+    var a = Math.random() * Math.PI * 2, rad = Math.sqrt(Math.random()) * 0.08;
+    n.ux = an.ux + Math.cos(a) * rad;
+    n.uy = an.uy + Math.sin(a) * rad;
+  });
+
+  // 엣지 = 유사도 top-K (빌드타임 계산, 중복 쌍 제거)
+  var edges = [], seen = {};
+  Object.keys(TASKS.neighbors).forEach(function(idStr){
+    TASKS.neighbors[idStr].forEach(function(e){
+      var a = byId[parseInt(idStr, 10)], b = byId[e.id];
+      var key = a.id < b.id ? a.id + "_" + b.id : b.id + "_" + a.id;
+      if (!seen[key]){ seen[key] = true; edges.push({ a: a, b: b, w: e.w }); }
+    });
+  });
+
+  var canvas = document.getElementById("taskGraph");
+  var ctx = canvas.getContext("2d");
+  var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+  function visible(){ return stage.classList.contains("visible"); }
+  function resize(){
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener("resize", function(){ if (visible()) resize(); });
+
+  var alpha = 1;
+  function tick(){
+    if (alpha < 0.012) alpha = 0.012;
+    var cx = W / 2, cy = H / 2, i, j;
+    nodes.forEach(function(n){
+      if (!n._placed){ n.x = n.ux * W; n.y = n.uy * H; n._placed = true; }
+    });
+    var repulseK = 900 * (W / 1400);
+    for (i = 0; i < nodes.length; i++){
+      for (j = i + 1; j < nodes.length; j++){
+        var n1 = nodes[i], n2 = nodes[j];
+        var dx = n1.x - n2.x, dy = n1.y - n2.y;
+        var distSq = dx * dx + dy * dy + 0.01;
+        if (distSq > 260000) continue;
+        var dist = Math.sqrt(distSq), force = repulseK / distSq;
+        var fx = dx / dist * force, fy = dy / dist * force;
+        n1.vx += fx; n1.vy += fy; n2.vx -= fx; n2.vy -= fy;
+      }
+    }
+    edges.forEach(function(e){
+      var dx = e.b.x - e.a.x, dy = e.b.y - e.a.y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
+      var restLen = (1 - Math.max(e.w, 0)) * 200 + 95;
+      var k = 0.02 + Math.max(e.w, 0) * 0.03;
+      if (e.a.cluster !== e.b.cluster) k *= 0.05; // 군집 간 스프링 약화 — 인접 관계만 배치에 남긴다
+      var f = (dist - restLen) * k;
+      e.a.vx += dx / dist * f; e.a.vy += dy / dist * f;
+      e.b.vx -= dx / dist * f; e.b.vy -= dy / dist * f;
+    });
+    nodes.forEach(function(n){
+      var an = ANCHOR[n.cluster] || { ux: 0.5, uy: 0.5 };
+      n.vx += (an.ux * W - n.x) * 0.008 + (cx - n.x) * 0.0001;
+      n.vy += (an.uy * H - n.y) * 0.008 + (cy - n.y) * 0.0001;
+      n.vx *= 0.8; n.vy *= 0.8;
+      n.x += n.vx * alpha; n.y += n.vy * alpha;
+      var pad = 24;
+      n.x = Math.max(pad, Math.min(W - pad, n.x));
+      n.y = Math.max(pad, Math.min(H - pad, n.y));
+    });
+    alpha *= 0.994;
+  }
+  function warmUp(t){ for (var i = 0; i < t; i++) tick(); } // 요동은 화면 밖에서 소화 (사람 지도와 동일)
+
+  var hoverId = null, selectedId = null;
+  var tip = document.getElementById("taskTip");
+  var card = document.getElementById("taskCard");
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    edges.forEach(function(e){
+      ctx.beginPath();
+      ctx.moveTo(e.a.x, e.a.y);
+      ctx.lineTo(e.b.x, e.b.y);
+      ctx.strokeStyle = "rgba(180,190,205," + (0.06 + e.w * 0.2) + ")";
+      ctx.lineWidth = 0.5 + Math.max(e.w, 0) * 1.3;
+      ctx.stroke();
+    });
+    // 군집 라벨: 실시간 중심 위
+    var cent = {};
+    nodes.forEach(function(n){
+      var c = cent[n.cluster] || (cent[n.cluster] = { x: 0, y: 0, c: 0 });
+      c.x += n.x; c.y += n.y; c.c++;
+    });
+    ctx.save();
+    ctx.font = "700 15px " + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    Object.keys(cent).forEach(function(cid){
+      var c = cent[cid], m = clusterById[cid];
+      ctx.fillStyle = colorOf(parseInt(cid, 10)) + "88";
+      ctx.fillText(m ? m.title : cid, c.x / c.c, c.y / c.c - 48);
+    });
+    ctx.restore();
+    nodes.forEach(function(n){
+      var color = colorOf(n.cluster);
+      var r = n.r + (n.id === hoverId ? 1.5 : 0);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      if (n.outlier){ // 소수 의견: 점선 링 — 총평의 소수 의견 항목과 짝
+        ctx.save();
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = "rgba(241,243,247,0.85)";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r + 3.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      if (n.id === selectedId){
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "#f3cc73";
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r + 1, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    });
+  }
+
+  var started = false;
+  function loop(){
+    if (visible()){ tick(); draw(); }
+    requestAnimationFrame(loop);
+  }
+
+  function nodeAt(px, py){
+    var hit = null, hd = Infinity;
+    nodes.forEach(function(n){
+      var d = Math.hypot(n.x - px, n.y - py);
+      if (d < n.r + 6 && d < hd){ hit = n; hd = d; }
+    });
+    return hit;
+  }
+  canvas.addEventListener("mousemove", function(evt){
+    var rect = canvas.getBoundingClientRect();
+    var n = nodeAt(evt.clientX - rect.left, evt.clientY - rect.top);
+    hoverId = n ? n.id : null;
+    canvas.style.cursor = n ? "pointer" : "default";
+    if (n){
+      tip.style.left = (evt.clientX - rect.left) + "px";
+      tip.style.top = (evt.clientY - rect.top) + "px";
+      var t = n.text.length > 46 ? n.text.slice(0, 46) + "…" : n.text;
+      tip.innerHTML = esc(t) + ' <span class="team">· ' + esc(n.name) + "</span>";
+      tip.classList.add("show");
+    } else {
+      tip.classList.remove("show");
+    }
+  });
+  canvas.addEventListener("click", function(evt){
+    var rect = canvas.getBoundingClientRect();
+    var n = nodeAt(evt.clientX - rect.left, evt.clientY - rect.top);
+    selectedId = n ? n.id : null;
+    if (n) renderCard(n);
+    else card.classList.remove("visible");
+  });
+
+  function renderCard(n){
+    var c = clusterById[n.cluster] || { title: "군집 " + n.cluster, page: "" };
+    var color = colorOf(n.cluster);
+    var html = '<div class="detail-name">' + esc(n.text) + "</div>";
+    html += '<div class="detail-team" style="background:' + color + '22;color:' + color + '">' +
+      '<span class="dot" style="background:' + color + '"></span>' + esc(c.title) + "</div>";
+    html += '<div class="task-meta"><span>' + esc(n.name) + "</span>" +
+      (n.cl ? "<span>" + esc(n.cl) + "</span>" : "") +
+      "<span>" + esc(n.horizon) + "</span>" +
+      (n.outlier ? "<span>소수 의견</span>" : "") + "</div>";
+    (n.quotes || []).forEach(function(q){
+      html += '<blockquote class="task-quote">' + esc(q) + "</blockquote>";
+    });
+    if (c.page) html += '<a class="task-card-link" href="' + esc(c.page) + '" target="_blank" rel="noopener">위키 페이지에서 군집 전체 보기 →</a>';
+    card.innerHTML = html;
+    card.classList.add("visible");
+  }
+
+  var legendList = document.getElementById("taskLegendList");
+  TASKS.clusters.forEach(function(c){
+    var row = document.createElement("div");
+    row.className = "cluster-row";
+    row.innerHTML = '<span class="dot" style="background:' + colorOf(c.id) + '"></span>' +
+      "<span>" + esc(c.title) + '</span><span class="count">' + c.count + "</span>" +
+      '<a href="' + esc(c.page) + '" target="_blank" rel="noopener">위키 ↗</a>';
+    legendList.appendChild(row);
+  });
+
+  function setView(tasksOn){
+    stage.classList.toggle("visible", tasksOn);
+    tasksBtn.classList.toggle("active", tasksOn);
+    peopleBtn.classList.toggle("active", !tasksOn);
+    h1.textContent = tasksOn ? "미래 과제 지도" : "근원경쟁력 유사도 네트워크";
+    if (tasksOn){
+      resize();
+      if (!started){ started = true; warmUp(300); loop(); }
+    }
+  }
+  tasksBtn.addEventListener("click", function(){ setView(true); });
+  peopleBtn.addEventListener("click", function(){ setView(false); });
+  // #view=tasks 딥링크 (기존 #view= 패턴과 동일: 로드 시 1회 해석) — 인트로는 건너뛴다
+  if (location.hash === "#view=tasks"){
+    document.getElementById("introOverlay").classList.add("hidden");
+    setView(true);
+  }
 })();
 </script>

@@ -78,7 +78,7 @@ def test_consolidate_failure_keeps_extracted_tags(tmp_path):
 
     failed = tags.main(persons_path=persons_path, call=call, retries=0)
     assert failed == []
-    after = json.loads(persons_path.read_text())
+    after = json.loads(persons_path.read_text(encoding="utf-8"))
     assert all(p["tags"] == ["신기술탐구"] for p in after)
 
 
@@ -86,7 +86,7 @@ def test_main_fills_tags_field_in_persons_json(tmp_path):
     data_dir = tmp_path / "data"
     generate_dummy.main(out_dir=data_dir)
     persons_path = data_dir / "persons.json"
-    before = {p["id"]: p for p in json.loads(persons_path.read_text())}
+    before = {p["id"]: p for p in json.loads(persons_path.read_text(encoding="utf-8"))}
 
     def call(prompt):
         if "회고:" in prompt:  # 인당 추출 호출
@@ -98,7 +98,7 @@ def test_main_fills_tags_field_in_persons_json(tmp_path):
     failed = tags.main(persons_path=persons_path, call=call, retries=0)
     assert failed == [1]
 
-    after = {p["id"]: p for p in json.loads(persons_path.read_text())}
+    after = {p["id"]: p for p in json.loads(persons_path.read_text(encoding="utf-8"))}
     assert set(after) == set(before)
     assert after[0]["tags"] == ["신기술탐구", "멘토형"]
     assert after[1]["tags"] == before[1]["tags"]  # 실패자는 기존 태그 유지

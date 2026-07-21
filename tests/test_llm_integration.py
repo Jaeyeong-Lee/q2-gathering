@@ -27,7 +27,7 @@ def test_extraction_with_mocked_gemini(tmp_path):
     failed = tags.main(persons_path=persons_path, call=mock_gemini, retries=0)
 
     assert failed == []
-    after = json.loads(persons_path.read_text())
+    after = json.loads(persons_path.read_text(encoding="utf-8"))
     assert after[0]["tags"] == ["혁신리더", "문제해결형", "데이터드리븐"]
     assert call_count[0] > 1  # 최소 배치 호출 + 풀 정리
     print(f"✓ LLM 호출 {call_count[0]}회, 태그 추출 완료")

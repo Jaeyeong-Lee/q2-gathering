@@ -20,7 +20,7 @@ def embed_persons(persons_path=ROOT / "data" / "persons.json", out_path=None, de
     import time
     llm.init()
     persons_path = Path(persons_path)
-    persons = json.loads(persons_path.read_text())
+    persons = json.loads(persons_path.read_text(encoding="utf-8"))
 
     embeddings = {}
     for i, p in enumerate(persons):
@@ -38,7 +38,7 @@ def embed_persons(persons_path=ROOT / "data" / "persons.json", out_path=None, de
     if out_path:
         out_path = Path(out_path)
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(json.dumps(embeddings, ensure_ascii=False))
+        out_path.write_text(json.dumps(embeddings, ensure_ascii=False), encoding="utf-8")
         print(f"저장: {out_path}", file=sys.stderr)
 
     return embeddings

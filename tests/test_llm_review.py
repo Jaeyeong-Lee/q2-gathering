@@ -102,7 +102,7 @@ def test_main_writes_progress_even_if_crashed_midway(tmp_path, monkeypatch):
     except KeyError:
         pass
 
-    results = json.loads(out_path.read_text())
+    results = json.loads(out_path.read_text(encoding="utf-8"))
     assert results == {"0": "리뷰 결과"}  # 죽기 전 진행분 보존, B는 다음 실행에서 재시도 대상
 
 
@@ -114,8 +114,8 @@ def test_main_does_not_mutate_persons_json(tmp_path):
 
     failed = lr.main(persons_path=persons_path, out_path=out_path, call=lambda p: "리뷰 결과", retries=0, delay=0)
     assert failed == []
-    assert json.loads(persons_path.read_text()) == before  # persons.json 불변
-    assert json.loads(out_path.read_text()) == {"0": "리뷰 결과"}
+    assert json.loads(persons_path.read_text(encoding="utf-8")) == before  # persons.json 불변
+    assert json.loads(out_path.read_text(encoding="utf-8")) == {"0": "리뷰 결과"}
 
 
 def test_main_resumes_from_existing_out_path(tmp_path):
@@ -135,4 +135,4 @@ def test_main_resumes_from_existing_out_path(tmp_path):
     failed = lr.main(persons_path=persons_path, out_path=out_path, call=call, retries=0, delay=0)
     assert failed == []
     assert len(calls) == 1  # id=0은 스킵, id=1만 새로 호출
-    assert json.loads(out_path.read_text()) == {"0": "기존 리뷰", "1": "새 리뷰"}
+    assert json.loads(out_path.read_text(encoding="utf-8")) == {"0": "기존 리뷰", "1": "새 리뷰"}

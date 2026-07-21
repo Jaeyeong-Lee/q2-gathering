@@ -2,3 +2,4 @@ pytest
 kiwipiepy  # todos/003 한국어 형태소 분석 (freq.py)
 google-generativeai
 openai  # OpenAI Compatible API (내부 LLM 서버, Ollama 등)
+scikit-learn  # task-discovery 군집화 (KMeans, docs/task-discovery.md)
