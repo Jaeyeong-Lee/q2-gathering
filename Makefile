@@ -1,4 +1,4 @@
-.PHONY: help pipeline embed freq similarity extract build clean test
+.PHONY: help pipeline embed freq similarity extract build clean test td
 
 help:
 	@echo "📦 Heritage Archive — 파이프라인 명령어"
@@ -40,6 +40,9 @@ extract:
 
 build:
 	python3 scripts/build.py
+
+td:
+	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py
 
 test:
 	python3 -m pytest tests/ -q
