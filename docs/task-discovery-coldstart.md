@@ -100,21 +100,38 @@
 
 ### 개발/검증 (인프라 불필요)
 ```bash
-make test                    # 전체 pytest (td 83 + 기존, 총 136 green)
+make test                    # 전체 pytest (td 84 + 기존)
 python -m pytest tests/test_td_*.py -q
 ```
 모든 스테이지 테스트는 **가짜 `call`/`embed`를 주입**해 실 API/ES 없이 돈다(seam = 주입된 call 하나).
-합성 코퍼스: `python scripts/td_sources.py 200 0` → `data/task_discovery/sources.json`.
+합성 코퍼스(개발용): `python scripts/td_sources.py 200 0` → `data/task_discovery/sources.json`.
 
-### 실 LLM 실행 (사내 보안환경, 키/내부망 필요)
+### 내부망 실행 (사내 보안환경)
+
+**1) 엔드포인트 env** (코드 수정 0 — `llm.py`가 라우팅):
 ```bash
-make td            # S1: 추출→taxonomy 유도→배정→집계→렌더
-make td-codebook   # S2: data/task_discovery/codebook.json 로 배정 (유도 skip)
-make td-search     # S4: 추출→색인→사전 조회 묶음
+export TEXT_PROVIDER=internal
+export TEXT_API_KEY=<사내 키>
+export TEXT_API_BASE=<사내 OpenAI호환 URL>
+export TD_TEXT_MODEL=<사내 텍스트 모델 id>     # ← 필수. 미지정 시 gemini 모델명이 넘어감
+# S4까지 갈 때만:
+export EMBED_PROVIDER=internal
+export EMBED_API_BASE=<BGE-M3 URL>
+export TD_EMBED_MODEL=<임베딩 모델 id>
 ```
-- 중간 산출물 있으면 skip(재실행 시 LLM 호출 0), 강제 재실행은 해당 JSON 삭제.
-- 모델 이원화: `td_pipeline.run_all`에서 유도=큰 모델, 배정=작은 모델을 서로 다른 call로 주입.
-- 산출물은 `data/task_discovery/`(gitignore). **`dist/`(GitHub Pages 배포 추적)에 합성물 커밋 금지.**
+
+**2) 실행** (추출 입력 = `data/persons.json`):
+```bash
+make td           SOURCES=data/persons.json     # S1: 추출→taxonomy 유도→배정→집계→렌더 (LLM만)
+make td-codebook  SOURCES=data/persons.json     # S2: codebook.json 먼저 작성 (LLM만)
+make td-search    SOURCES=data/persons.json     # S4: +임베딩(BGE-M3)
+```
+- `persons.json`은 `id·name·cl_level·pjt·text`를 그대로 먹는다. `part`는 없어도 됨(확산도 1차 축은 pjt).
+- `SOURCES` 없이 실행하면 **합성 코퍼스**를 생성해 돈다(개발용).
+- 중간 산출물 있으면 skip(재실행 시 LLM 호출 0), 강제 재실행은 해당 JSON 삭제(또는 `force`).
+- 모델 이원화(유도=큰/배정=작은)가 필요하면 `td_pipeline.main`에서 `taxo_call`/`assign_call`에 다른 call 주입.
+- 파일 I/O 전부 `encoding="utf-8"` + `ensure_ascii=False`(한글 안전).
+- 산출물은 `data/task_discovery/`(gitignore). **`dist/`(GitHub Pages 배포 추적)에 커밋 금지.**
 
 ---
 
@@ -141,7 +158,9 @@ make td-search     # S4: 추출→색인→사전 조회 묶음
 - **HDBSCAN/BERTopic 불채택** — 실측 노이즈 28%. S1은 LLM taxonomy 유도로.
 - **`confidence` 제거** — 자기보고 신뢰 낮음 + 하위 불필요(스키마 체크포인트).
 - **have/gap 2축 분리 유지** — 역량 갭 계산의 핵심(상사가 물은 것).
-- **인용 대조는 공백·개행 제거 정규화** — PPT 추출 개행이 진짜 인용을 떨구지 않게.
+- **인용 대조는 공백·개행 제거 정규화**(`norm`, 대조용) — PPT 추출 개행이 진짜 인용을 떨구지 않게.
+- **인용 표시는 개행 접기**(`oneline`, 표시용) — 인용 속 원문 `\n`이 md blockquote를 깨지 않게(렌더·digest).
+- **추출 입력에 `part` 없어도 동작** — `persons.json`은 `part`가 없으므로 프롬프트/스키마가 `.get` 기본값.
 - **항목 단위 폐기**(사람 전체 아님) — 부분 성공 보존.
 - **소수의견 별도 트랙** — map-reduce over-smoothing 방어(팀의 미래 씨앗이 소수일 수 있음).
 - **이름 구조상 분리** — 실명 정책이 익명화로 바뀌면 렌더 교체만으로.
