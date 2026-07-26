@@ -44,6 +44,9 @@ build:
 td:
 	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py
 
+td-codebook:
+	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py --codebook data/task_discovery/codebook.json
+
 test:
 	python3 -m pytest tests/ -q
 
