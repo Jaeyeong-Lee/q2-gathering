@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import td_query
+from td_common import oneline
 
 ROOT = Path(__file__).parent.parent
 
@@ -64,8 +65,8 @@ def render_markdown(index, embed, persons, *, queries=None, anonymize=False, top
             continue
         out.append(f"_기여 {d['people']}명 · {d['count']}건 · pjt {d['by_pjt']} · cl {d['by_cl']}_")
         for r in res["results"]:
-            q0 = (r["quotes"][0] if r.get("quotes") else r["text"])
-            out.append(f"- {r['text']}  \n  > {q0} — {_name(r, anonymize)} ({r['pjt']}/{r['cl_level']})")
+            q0 = oneline(r["quotes"][0] if r.get("quotes") else r["text"])
+            out.append(f"- {oneline(r['text'])}  \n  > {q0} — {_name(r, anonymize)} ({r['pjt']}/{r['cl_level']})")
         out.append("")
 
     cov = coverage(index, persons)

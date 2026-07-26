@@ -39,7 +39,10 @@ _HEADER_CL4 = ("다음은 {name}({cl_level}, {pjt}/{part})의 근원경쟁력 �
 
 
 def _build_prompt(doc):
-    header = (_HEADER_CL4 if doc["cl_level"] == "CL4" else _HEADER_CL23).format(**doc)
+    tpl = _HEADER_CL4 if doc["cl_level"] == "CL4" else _HEADER_CL23
+    # part는 실데이터(persons.json)에 없을 수 있으므로 .get 기본값 — .format(**doc)는 KeyError.
+    header = tpl.format(name=doc["name"], cl_level=doc["cl_level"],
+                        pjt=doc.get("pjt", ""), part=doc.get("part", ""))
     return f"{header}\n{_SCHEMA}\n\n원문:\n{doc['text']}"
 
 
@@ -90,7 +93,7 @@ def extract_person(doc, call, *, tries=2, attempts=4, sleep=None):
 
 def _person(doc, signal, clean, direction):
     return {"person_id": doc["id"], "name": doc["name"], "cl_level": doc["cl_level"],
-            "pjt": doc["pjt"], "part": doc.get("part"), "signal_present": signal,
+            "pjt": doc.get("pjt"), "part": doc.get("part"), "signal_present": signal,
             "direction": direction, **clean}
 
 

@@ -10,7 +10,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from td_common import load_json
+from td_common import load_json, oneline
 
 ROOT = Path(__file__).parent.parent
 
@@ -75,7 +75,7 @@ def render_markdown(aggregates, persons, assignments, *, anonymize=False,
         out.append(f"- 기여 {c['people']}명 · 확산도 pjt {c['pjt_spread']}/cl {c['cl_spread']} "
                    f"· 보유 {c['have']} / 갭 {c['gap']}")
         for pid, quote in ev_by_cat.get(c["name"], [])[:3]:
-            out.append(f"  > {quote} — {_name(pid, name_by_id, anonymize)}")
+            out.append(f"  > {oneline(quote)} — {_name(pid, name_by_id, anonymize)}")
         out.append("")
 
     out += ["## pjt × cl_level 교차표", "", _crosstab(assignments, persons), ""]

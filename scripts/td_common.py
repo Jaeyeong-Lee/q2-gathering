@@ -44,8 +44,13 @@ def iter_facets(persons):
 
 
 def norm(s):
-    """공백·개행·들여쓰기 제거. 원문 줄바꿈 차이로 진짜 인용을 떨구지 않기 위함."""
+    """공백·개행·들여쓰기 제거. 원문 줄바꿈 차이로 진짜 인용을 떨구지 않기 위함(대조용)."""
     return "".join(s.split())
+
+
+def oneline(s):
+    """개행·중복 공백을 한 칸으로 접음(표시용). 인용 속 원문 개행이 blockquote를 깨지 않게."""
+    return " ".join(s.split())
 
 
 def quote_in_source(quote, source):

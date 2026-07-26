@@ -41,14 +41,15 @@ extract:
 build:
 	python3 scripts/build.py
 
+# SOURCES=data/persons.json 로 실데이터 추출 입력 지정 (미지정 시 합성 코퍼스)
 td:
-	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py
+	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py $(SOURCES:%=--sources %)
 
 td-codebook:
-	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py --codebook data/task_discovery/codebook.json
+	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py --codebook data/task_discovery/codebook.json $(SOURCES:%=--sources %)
 
 td-search:
-	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py --search
+	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py --search $(SOURCES:%=--sources %)
 
 test:
 	python3 -m pytest tests/ -q

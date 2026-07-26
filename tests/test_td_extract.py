@@ -68,6 +68,14 @@ def test_valid_items_survive_when_one_item_dropped():
     assert len(person["future_task"]) == 1 and len(dropped) == 1
 
 
+def test_doc_without_part_extracts_ok():
+    # persons.json 등 실데이터엔 part가 없을 수 있다 — .format(**doc)가 KeyError 나면 안 됨
+    doc = {"id": 5, "name": "무파트", "cl_level": "CL3", "pjt": "공정기술", "text": SRC}
+    call = _resp(future_task=[{"text": "STDF로 FA를 자동화", "horizon": "단기", "quotes": ["STDF 기반 고장분석"]}])
+    person, dropped = td_extract.extract_person(doc, call, sleep=NOOP)
+    assert person["part"] is None and len(person["future_task"]) == 1
+
+
 def test_cl4_and_cl23_use_different_prompts():
     seen = []
 
