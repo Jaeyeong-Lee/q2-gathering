@@ -14,7 +14,9 @@ from pipeline_log import get_logger
 
 import td_aggregate
 import td_assign
+import td_digest
 import td_extract
+import td_index
 import td_render
 import td_sources
 import td_taxonomy
@@ -84,6 +86,31 @@ def run_all(data_dir, *, extract_call, taxo_call=None, assign_call=None, codeboo
     return {**{k: str(v) for k, v in p.items()}, "workshop": str(workshop)}
 
 
+def run_retrieval(data_dir, *, extract_call, embed, n=200, seed=0,
+                  force=False, sleep=None, anonymize=False):
+    """S4: 추출→색인→사전 조회 묶음. 카테고리화(taxonomy/codebook/배정) 스테이지 없음.
+    색인은 인메모리(비영속) — extracted·digest만 skip-if-exists."""
+    d = Path(data_dir)
+    d.mkdir(parents=True, exist_ok=True)
+    sources, extracted = d / "sources.json", d / "extracted.json"
+    digest = d / "digest.md"
+    dirty = force
+
+    if dirty or not sources.exists():
+        td_sources.write(sources, n=n, seed=seed)
+        dirty = True
+    if dirty or not extracted.exists():
+        td_extract.run_extract(sources, extracted, extract_call, sleep=sleep)
+        dirty = True
+    if dirty or not digest.exists():
+        persons = json.loads(extracted.read_text(encoding="utf-8"))
+        idx = td_index.build(persons, embed)
+        td_digest.write(idx, embed, persons, digest, anonymize=anonymize)
+        dirty = True
+    log.info(f"검색 파이프라인 완료 → {digest}")
+    return {"sources": str(sources), "extracted": str(extracted), "digest": str(digest)}
+
+
 def main(argv):
     """실 LLM 실행. --codebook <경로> 주면 S2(코드북 배정), 없으면 S1(taxonomy 유도).
     모델 이원화: 유도=큰 모델, 배정=작은 모델을 별도 call로 넘길 수 있다(기본 동일)."""
@@ -98,6 +125,11 @@ def main(argv):
     if args:
         data_dir = args[0]
     llm.init()
+    if "--search" in args:                      # S4: 검색 파이프라인(카테고리화 없음)
+        args.remove("--search")
+        run_retrieval(data_dir if not args else args[0],
+                      extract_call=llm.call_gemini, embed=llm.embed_text)
+        return
     run_all(data_dir, extract_call=llm.call_gemini, taxo_call=llm.call_gemini,
             assign_call=llm.call_gemini, codebook=codebook)
 
