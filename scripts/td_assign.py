@@ -44,10 +44,31 @@ def _parse(response):
     return json.loads(response[start:end + 1], strict=False)
 
 
+def _cat_view(c):
+    """배정 프롬프트에 실을 범주 뷰. inclusion/exclusion(있으면)까지 제시."""
+    view = {"name": c["name"], "definition": c.get("definition", "")}
+    inclusion = c.get("inclusion") or c.get("inclusion_criteria")  # 코드북/taxonomy 양쪽
+    if inclusion:
+        view["inclusion"] = inclusion
+    if c.get("exclusion"):
+        view["exclusion"] = c["exclusion"]
+    return view
+
+
 def _prompt(item, taxonomy):
-    cats = json.dumps([{"name": c["name"], "definition": c.get("definition", "")}
-                       for c in taxonomy], ensure_ascii=False)
-    return f"{_INSTRUCT}\n\ntaxonomy:\n{cats}\n\n항목:\n{item['text']}"
+    cats = json.dumps([_cat_view(c) for c in taxonomy], ensure_ascii=False)
+    return f"{_INSTRUCT}\n\n카테고리:\n{cats}\n\n항목:\n{item['text']}"
+
+
+def collect_other(assignments, *, threshold=0.2):
+    """Other 항목 별도 수집 + 비율. 고정 코드북(S2)의 '기타 뭉갬' 약점 방어 —
+    비율이 임계를 넘으면 코드북 갱신 신호."""
+    assignments = assignments if isinstance(assignments, list) else \
+        json.loads(Path(assignments).read_text(encoding="utf-8"))
+    others = [a for a in assignments if a["category"] == OTHER]
+    n = len(assignments)
+    ratio = len(others) / n if n else 0.0
+    return {"items": others, "count": len(others), "ratio": ratio, "warning": ratio > threshold}
 
 
 def _assign_one(item, taxonomy, names, call, tries, kw):
