@@ -2,7 +2,7 @@
 
 sources.json → extracted.json. 사람 단위로 signal_present + 4축을 뽑는다:
   future_task[] (horizon 포함) / capability_have[] / capability_gap[] / direction(단수)
-각 항목은 text·quotes[]·confidence. 무내용 문서는 signal_present=false + 빈 축.
+각 항목은 text·quotes[]. 무내용 문서는 signal_present=false + 빈 축.
 
 인용검증·재시도는 td_common 공유 헬퍼 재사용. 검증 실패는 재시도를 유발하고,
 소진 시 사람 전체가 아니라 **항목 단위로** 폐기해 나머지를 보존한다.
@@ -13,7 +13,8 @@ import sys
 from pathlib import Path
 
 from pipeline_log import get_logger
-from td_common import Nonretryable, quote_in_source, retry_call, text_is_copy_of_quotes
+from td_common import (Nonretryable, load_json, parse_json, quote_in_source, retry_call,
+                       text_is_copy_of_quotes)
 
 ROOT = Path(__file__).parent.parent
 log = get_logger("td_extract")
@@ -40,13 +41,6 @@ _HEADER_CL4 = ("다음은 {name}({cl_level}, {pjt}/{part})의 근원경쟁력 �
 def _build_prompt(doc):
     header = (_HEADER_CL4 if doc["cl_level"] == "CL4" else _HEADER_CL23).format(**doc)
     return f"{header}\n{_SCHEMA}\n\n원문:\n{doc['text']}"
-
-
-def _parse(response):
-    start, end = response.find("{"), response.rfind("}")
-    if start == -1 or end <= start:
-        raise ValueError(f"JSON 없음: {response[:80]!r}")
-    return json.loads(response[start:end + 1], strict=False)  # quote 내 raw 개행 허용
 
 
 def _valid_item(item, source):
@@ -81,7 +75,7 @@ def extract_person(doc, call, *, tries=2, attempts=4, sleep=None):
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
     last = None
     for attempt in range(tries):
-        parsed = _parse(retry_call(call, prompt, **kw))
+        parsed = parse_json(retry_call(call, prompt, **kw))
         signal = bool(parsed.get("signal_present"))
         if not signal:
             clean = {axis: [] for axis in LIST_AXES}
@@ -103,8 +97,7 @@ def _person(doc, signal, clean, direction):
 def run_extract(sources, out_path, call, *, tries=2, attempts=4, sleep=None):
     """배치 추출 → extracted.json(즉시 영속화). 한 사람 실패는 배치를 멈추지 않는다.
     반환: {persons, failed, dropped}."""
-    docs = sources if isinstance(sources, list) else \
-        json.loads(Path(sources).read_text(encoding="utf-8"))
+    docs = load_json(sources)
     persons, failed, dropped_all = [], [], []
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -9,6 +9,8 @@ import json
 import sys
 from pathlib import Path
 
+from td_common import load_json
+
 ROOT = Path(__file__).parent.parent
 
 # 소수의견 문턱 — 기여 인원이 이 수 이하면 weak signal(선행 신호)로 별도 트랙
@@ -17,8 +19,8 @@ WEAK = 2
 
 def aggregate(assignments, persons, out_path=None, *, weak=WEAK):
     """카테고리별 집계 + 소수의견 트랙. 반환: {categories, minority}."""
-    assignments = _load(assignments)
-    persons = _load(persons)
+    assignments = load_json(assignments)
+    persons = load_json(persons)
     meta = {p["person_id"]: p for p in persons}
 
     cats = {}
@@ -60,10 +62,6 @@ def aggregate(assignments, persons, out_path=None, *, weak=WEAK):
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     return result
-
-
-def _load(x):
-    return x if isinstance(x, list) else json.loads(Path(x).read_text(encoding="utf-8"))
 
 
 def main(assignments_path=ROOT / "data" / "task_discovery" / "assignments.json",

@@ -13,13 +13,10 @@ import sys
 from pathlib import Path
 
 from pipeline_log import get_logger
-from td_common import retry_call
+from td_common import iter_facets, load_json, parse_json, retry_call
 
 ROOT = Path(__file__).parent.parent
 log = get_logger("td_taxonomy")
-
-# taxonomy 재료가 되는 축 (역량/방향). future_task=미래 방향, capability_*=역량.
-DEFAULT_AXES = ("future_task", "capability_gap", "capability_have", "direction")
 
 _INSTRUCT = """너는 반도체 후공정 테스트 팀의 근원경쟁력 회고에서 뽑은 항목들을 읽고,
 팀의 역량/방향 카테고리 taxonomy를 만든다. 카테고리 개수는 고정하지 말고 데이터가
@@ -29,28 +26,8 @@ JSON 객체로만 답하라: {"taxonomy": [{"name": "...", "definition": "...", 
 
 
 def _facet_texts(persons):
-    """무신호 제외, 지정 축의 항목 text를 평면화."""
-    texts = []
-    for p in persons:
-        if not p.get("signal_present"):
-            continue
-        for axis in DEFAULT_AXES:
-            val = p.get(axis)
-            if val is None:
-                continue
-            items = val if isinstance(val, list) else [val]
-            for it in items:
-                t = (it or {}).get("text")
-                if t:
-                    texts.append(t)
-    return texts
-
-
-def _parse(response):
-    start, end = response.find("{"), response.rfind("}")
-    if start == -1 or end <= start:
-        raise ValueError(f"JSON 없음: {response[:80]!r}")
-    return json.loads(response[start:end + 1], strict=False)
+    """무신호 제외, 4축 항목 text 평면화 (공용 iter_facets)."""
+    return [item["text"] for _, _, item in iter_facets(persons)]
 
 
 def _normalize(taxo):
@@ -77,8 +54,7 @@ def _prompt(facets, existing):
 
 def induce(extracted, out_path, call, *, batch_size=30, attempts=4, sleep=None):
     """facet들을 배치 반복으로 LLM에 넣어 taxonomy 생성·정제. 반환: taxonomy(list)."""
-    persons = extracted if isinstance(extracted, list) else \
-        json.loads(Path(extracted).read_text(encoding="utf-8"))
+    persons = load_json(extracted)
     facets = _facet_texts(persons)
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
     taxonomy = []
@@ -86,7 +62,7 @@ def induce(extracted, out_path, call, *, batch_size=30, attempts=4, sleep=None):
         batch = facets[i:i + batch_size]
         if not batch:
             break
-        taxonomy = _normalize(_parse(retry_call(call, _prompt(batch, taxonomy), **kw)).get("taxonomy"))
+        taxonomy = _normalize(parse_json(retry_call(call, _prompt(batch, taxonomy), **kw)).get("taxonomy"))
     if out_path is not None:
         out_path = Path(out_path)
         out_path.parent.mkdir(parents=True, exist_ok=True)

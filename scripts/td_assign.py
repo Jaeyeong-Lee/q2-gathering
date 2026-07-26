@@ -10,38 +10,16 @@ import sys
 from pathlib import Path
 
 from pipeline_log import get_logger
-from td_common import quote_in_source, retry_call
+from td_common import iter_facets, load_json, parse_json, quote_in_source, retry_call
 
 ROOT = Path(__file__).parent.parent
 log = get_logger("td_assign")
 
 OTHER = "Other"
-AXES = ("future_task", "capability_gap", "capability_have", "direction")
 
-_INSTRUCT = """아래 taxonomy에서 이 항목이 속할 카테고리 하나를 고른다. 맞는 게 없으면 "Other".
+_INSTRUCT = """아래 카테고리에서 이 항목이 속할 카테고리 하나를 고른다. 맞는 게 없으면 "Other".
 새 카테고리를 지어내지 말 것. 근거로 항목에서 인용을 하나 뽑는다.
 JSON 객체로만 답하라: {"category": "카테고리명 또는 Other", "quote": "항목 근거 인용"}"""
-
-
-def _facets(persons):
-    """(person_id, axis, item) 평면화. 무신호·빈 축 제외."""
-    for p in persons:
-        if not p.get("signal_present"):
-            continue
-        for axis in AXES:
-            val = p.get(axis)
-            if val is None:
-                continue
-            for it in (val if isinstance(val, list) else [val]):
-                if it and it.get("text"):
-                    yield p["person_id"], axis, it
-
-
-def _parse(response):
-    start, end = response.find("{"), response.rfind("}")
-    if start == -1 or end <= start:
-        raise ValueError(f"JSON 없음: {response[:80]!r}")
-    return json.loads(response[start:end + 1], strict=False)
 
 
 def _cat_view(c):
@@ -63,8 +41,7 @@ def _prompt(item, taxonomy):
 def collect_other(assignments, *, threshold=0.2):
     """Other 항목 별도 수집 + 비율. 고정 코드북(S2)의 '기타 뭉갬' 약점 방어 —
     비율이 임계를 넘으면 코드북 갱신 신호."""
-    assignments = assignments if isinstance(assignments, list) else \
-        json.loads(Path(assignments).read_text(encoding="utf-8"))
+    assignments = load_json(assignments)
     others = [a for a in assignments if a["category"] == OTHER]
     n = len(assignments)
     ratio = len(others) / n if n else 0.0
@@ -75,7 +52,7 @@ def _assign_one(item, taxonomy, names, call, tries, kw):
     """유효한 배정을 얻으면 (category, quote), 실패하면 None."""
     evidence = item["text"] + " " + " ".join(item.get("quotes") or [])
     for attempt in range(tries):
-        parsed = _parse(retry_call(call, _prompt(item, taxonomy), **kw))
+        parsed = parse_json(retry_call(call, _prompt(item, taxonomy), **kw))
         cat, quote = parsed.get("category"), parsed.get("quote", "")
         ok_cat = cat == OTHER or cat in names
         ok_quote = bool(quote) and quote_in_source(quote, evidence)
@@ -87,14 +64,13 @@ def _assign_one(item, taxonomy, names, call, tries, kw):
 def assign(extracted, taxonomy, out_path, call, *, tries=2, attempts=4, sleep=None):
     """각 facet을 카테고리에 배정. 검증 실패 항목은 폐기, 나머지는 보존.
     반환: {assignments, dropped}."""
-    persons = extracted if isinstance(extracted, list) else \
-        json.loads(Path(extracted).read_text(encoding="utf-8"))
-    taxonomy = taxonomy if isinstance(taxonomy, list) else \
-        json.loads(Path(taxonomy).read_text(encoding="utf-8"))
+    persons = load_json(extracted)
+    taxonomy = load_json(taxonomy)
     names = {c["name"] for c in taxonomy}
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
     assignments, dropped = [], []
-    for pid, axis, item in _facets(persons):
+    for person, axis, item in iter_facets(persons):
+        pid = person["person_id"]
         result = _assign_one(item, taxonomy, names, call, tries, kw)
         if result is None:
             dropped.append({"person_id": pid, "axis": axis, "text": item["text"]})

@@ -10,16 +10,14 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from td_common import load_json
+
 ROOT = Path(__file__).parent.parent
-
-
-def _load(x):
-    return x if not isinstance(x, (str, Path)) else json.loads(Path(x).read_text(encoding="utf-8"))
 
 
 def coverage(persons, assignments, *, failed=None, extract_dropped=0, assign_dropped=0):
     """결과 신뢰도의 방어선. 순수 함수 — 폐기·무신호·Other·인용실패 비율."""
-    persons, assignments = _load(persons), _load(assignments)
+    persons, assignments = load_json(persons), load_json(assignments)
     total = len(persons)
     no_signal = sum(1 for p in persons if not p.get("signal_present"))
     other = sum(1 for a in assignments if a["category"] == "Other")
@@ -61,7 +59,7 @@ def _crosstab(assignments, persons):
 
 def render_markdown(aggregates, persons, assignments, *, anonymize=False,
                     failed=None, extract_dropped=0, assign_dropped=0):
-    aggregates, persons, assignments = _load(aggregates), _load(persons), _load(assignments)
+    aggregates, persons, assignments = load_json(aggregates), load_json(persons), load_json(assignments)
     name_by_id = {p["person_id"]: p.get("name") for p in persons}
     ev_by_cat = {}  # category -> [(pid, quote)]
     for a in assignments:
