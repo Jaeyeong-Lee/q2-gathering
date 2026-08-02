@@ -61,6 +61,33 @@ def test_writes_taxonomy_file(tmp_path):
     assert written[0]["name"] == "Yield 최적화"
 
 
+def test_relations_default_to_empty_list():
+    call = lambda _: json.dumps({"taxonomy": [_cat("Burn-in 신뢰성")]}, ensure_ascii=False)
+    taxo = td_taxonomy.induce(_persons(), None, call, sleep=NOOP)
+    assert taxo[0]["relations"] == []
+
+
+def test_relations_kept_when_target_exists_in_taxonomy():
+    taxo_resp = [_cat("AX 기반 자동화"), _cat("Yield 최적화")]
+    taxo_resp[1]["relations"] = [{"to": "AX 기반 자동화", "type": "broader"}]
+    call = lambda _: json.dumps({"taxonomy": taxo_resp}, ensure_ascii=False)
+    taxo = td_taxonomy.induce(_persons(), None, call, sleep=NOOP)
+    by_name = {c["name"]: c for c in taxo}
+    assert by_name["Yield 최적화"]["relations"] == [{"to": "AX 기반 자동화", "type": "broader"}]
+
+
+def test_dangling_self_and_bad_type_relations_are_dropped():
+    c = _cat("Yield 최적화")
+    c["relations"] = [
+        {"to": "존재안함", "type": "broader"},       # 댕글링 참조
+        {"to": "Yield 최적화", "type": "related"},   # 자기참조
+        {"to": "Yield 최적화", "type": "unknown"},   # type 잘못됨(자기참조 아니어도 걸러짐 확인용 이름 재사용)
+    ]
+    call = lambda _: json.dumps({"taxonomy": [c]}, ensure_ascii=False)
+    taxo = td_taxonomy.induce(_persons(), None, call, sleep=NOOP)
+    assert taxo[0]["relations"] == []
+
+
 def test_no_signal_facets_excluded():
     persons = _persons() + [{"person_id": 3, "signal_present": False, "future_task": [],
                              "capability_have": [], "capability_gap": [], "direction": None}]
