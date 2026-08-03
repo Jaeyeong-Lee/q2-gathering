@@ -18,6 +18,7 @@ import td_assign
 import td_digest
 import td_extract
 import td_index
+import td_narrate
 import td_render
 import td_sources
 import td_taxonomy
@@ -26,15 +27,17 @@ ROOT = Path(__file__).parent.parent
 log = get_logger("td_pipeline")
 
 
-def run_all(data_dir, *, extract_call, taxo_call=None, assign_call=None, codebook=None,
-            sources_path=None, n=200, seed=0, batch_size=30, force=False, sleep=None):
+def run_all(data_dir, *, extract_call, taxo_call=None, assign_call=None, narrate_call=None,
+            codebook=None, sources_path=None, n=200, seed=0, batch_size=30, force=False, sleep=None):
     """전 스테이지 실행. dirty 캐스케이드로 앞 스테이지가 돌면 뒤도 재실행.
 
     codebook 지정(S2): taxonomy 유도를 건너뛰고 코드북으로 배정. 코드북이 assignments
     보다 새로우면 재배정(추출 재사용). codebook=None(S1): taxonomy 유도로 카테고리 생성.
+    render 다음에 Layer 2(해석, td_narrate) — interpretation/ 아래 별도 산출(Layer 1과 안 섞음).
     """
     taxo_call = taxo_call or extract_call
     assign_call = assign_call or extract_call
+    narrate_call = narrate_call or extract_call
     d = Path(data_dir)
     d.mkdir(parents=True, exist_ok=True)
     p = {name: d / f"{name}.json" for name in
@@ -87,8 +90,16 @@ def run_all(data_dir, *, extract_call, taxo_call=None, assign_call=None, codeboo
                         failed=ex_summary["failed"],
                         extract_dropped=len(ex_summary["dropped"]),
                         assign_dropped=len(as_summary["dropped"]))
+
+    interpretation = d / "interpretation"
+    if dirty or not (interpretation / "index.md").exists():
+        taxonomy_for_narrate = p["taxonomy"] if p["taxonomy"].exists() else None
+        td_narrate.narrate(p["aggregates"], p["assignments"], p["extracted"], taxonomy_for_narrate,
+                           interpretation, narrate_call, sleep=sleep)
+
     log.info(f"파이프라인 완료 → {workshop}")
-    return {**{k: str(v) for k, v in p.items()}, "workshop": str(workshop)}
+    return {**{k: str(v) for k, v in p.items()}, "workshop": str(workshop),
+            "interpretation": str(interpretation)}
 
 
 def run_retrieval(data_dir, *, extract_call, embed, sources_path=None, n=200, seed=0,
@@ -147,7 +158,7 @@ def main(argv):
     if search:
         run_retrieval(data_dir, extract_call=call, embed=embed, sources_path=sources)
         return
-    run_all(data_dir, extract_call=call, taxo_call=call, assign_call=call,
+    run_all(data_dir, extract_call=call, taxo_call=call, assign_call=call, narrate_call=call,
             codebook=codebook, sources_path=sources)
 
 
