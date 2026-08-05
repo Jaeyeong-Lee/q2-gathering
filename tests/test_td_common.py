@@ -1,3 +1,4 @@
+import json
 import logging
 
 import pytest
@@ -103,6 +104,38 @@ def test_retry_json_per_attempt_failure_logs_bytes_only(caplog):
     ecs = warnings[0].ecs
     assert ecs["error.type"] == "ValueError"
     assert "http.request.body" not in ecs  # 시도별 실패는 바이트 수만, 원문 없음
+
+
+def test_retry_json_dumps_successful_call(tmp_path, monkeypatch):
+    monkeypatch.setattr(c, "CALLS_DIR", tmp_path)
+
+    def call(prompt):
+        return '{"ok": true}'
+
+    c.retry_json(call, "prompt", stage="taxonomy", call_id=3, sleep=lambda _: None)
+
+    input_doc = json.loads((tmp_path / "taxonomy" / "3_input.json").read_text())
+    output_doc = json.loads((tmp_path / "taxonomy" / "3_output.json").read_text())
+    assert input_doc["prompt"] == "prompt"
+    assert input_doc["stage"] == "taxonomy"
+    assert input_doc["call_id"] == 3
+    assert output_doc == {"response": '{"ok": true}', "success": True}
+    assert not (tmp_path / "taxonomy" / "ABNORMAL").exists()
+
+
+def test_retry_json_dumps_final_failure_to_abnormal_too(tmp_path, monkeypatch):
+    monkeypatch.setattr(c, "CALLS_DIR", tmp_path)
+
+    def always_bad(prompt):
+        return "JSON 아님"
+
+    with pytest.raises(ValueError):
+        c.retry_json(always_bad, "prompt", stage="assign", call_id=7,
+                     attempts=1, base=0.0, sleep=lambda _: None)
+
+    for base in (tmp_path / "assign", tmp_path / "assign" / "ABNORMAL"):
+        output_doc = json.loads((base / "7_output.json").read_text())
+        assert output_doc == {"response": "JSON 아님", "success": False}
 
 
 def test_retry_json_final_failure_logs_full_prompt_and_response(caplog):

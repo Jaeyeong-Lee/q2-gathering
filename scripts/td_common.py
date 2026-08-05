@@ -5,12 +5,15 @@
 import json
 import random
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 from pipeline_log import get_logger
 
 # facet 4축 (consumer 공용). 추출은 direction을 단수로 별도 처리하므로 td_extract는 자체 상수 사용.
 AXES = ("future_task", "capability_gap", "capability_have", "direction")
+
+CALLS_DIR = Path(__file__).parent.parent / "data" / "task_discovery" / "calls"
 
 
 class Nonretryable(Exception):
@@ -82,6 +85,24 @@ def retry_call(call, prompt, *, attempts=4, base=0.5, jitter=True, sleep=time.sl
             sleep(delay)
 
 
+def _dump_call(stage, call_id, prompt, response, *, success):
+    """콜 하나의 입출력을 파일로 남긴다 — 순수 감사·재현용, 재개 판정(#35, #36)엔 안 쓴다.
+    모든 콜(성공 포함)을 calls/{stage}/에, 최종 실패는 ABNORMAL/에도 중복 저장해
+    디렉토리만 보고 실패 개수를 알 수 있게 한다."""
+    dirs = [CALLS_DIR / str(stage)]
+    if not success:
+        dirs.append(CALLS_DIR / str(stage) / "ABNORMAL")
+    input_doc = {"stage": stage, "call_id": call_id, "prompt": prompt,
+                "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+    output_doc = {"response": response, "success": success}
+    for d in dirs:
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{call_id}_input.json").write_text(
+            json.dumps(input_doc, ensure_ascii=False, indent=1), encoding="utf-8")
+        (d / f"{call_id}_output.json").write_text(
+            json.dumps(output_doc, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def retry_json(call, prompt, *, stage, call_id, **kw):
     """retry_call과 동일하지만 JSON 파싱까지 재시도 범위 안에 넣는다 — 모델이 JSON이
     아닌 걸 뱉어도(서문·reasoning 등) 재시도 대상이 된다. 이전엔 parse_json(retry_call(...))
@@ -91,6 +112,9 @@ def retry_json(call, prompt, *, stage, call_id, **kw):
     성공·시도별 실패는 바이트 수만, 재시도 소진 뒤 최종 실패는 프롬프트·응답 원문 전체를
     별도 WARNING으로 — 내부망 페이로드 한도(요청/응답, 정확한 값)를 다음 실행 한 번으로
     판명하기 위함(#30). 성공 로그에 원문을 안 싣는 건 호출 수백 건에 로그가 부풀지 않게.
+
+    콜마다 입출력을 data/task_discovery/calls/{stage}/{call_id}_*.json으로도 남긴다
+    (_dump_call, #34) — 순수 감사·재현용이라 재개 판정엔 안 쓴다.
     """
     log = get_logger(stage)
     prompt_bytes = len(prompt.encode("utf-8"))
@@ -120,9 +144,12 @@ def retry_json(call, prompt, *, stage, call_id, **kw):
         return parsed
 
     try:
-        return retry_call(attempt, prompt, **kw)
+        result = retry_call(attempt, prompt, **kw)
     except Exception as e:
         log.warning(f"[{call_id}] 최종 실패(재시도 종료): {e}", extra={"ecs": {
             "error.type": type(e).__name__, "error.message": str(e),
             "http.request.body": prompt, "http.response.body": last_response["text"]}})
+        _dump_call(stage, call_id, prompt, last_response["text"], success=False)
         raise
+    _dump_call(stage, call_id, prompt, last_response["text"], success=True)
+    return result
