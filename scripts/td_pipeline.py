@@ -69,7 +69,7 @@ def run_all(data_dir, *, extract_call, taxo_call=None, assign_call=None, narrate
             dirty = True
 
     as_summary = {"dropped": []}
-    if dirty or not p["assignments"].exists():
+    if dirty or not td_assign.is_complete(p["assignments"]):
         as_summary = td_assign.assign(p["extracted"], assign_source, p["assignments"],
                                       assign_call, sleep=sleep)
         dirty = True

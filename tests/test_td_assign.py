@@ -1,4 +1,7 @@
 import json
+import os
+
+import pytest
 
 import td_assign
 
@@ -62,3 +65,122 @@ def test_writes_assignments_file(tmp_path):
     td_assign.assign(_persons(FT), TAXO, out_path, _resp("Burn-in 신뢰성", "MBT Burn-in"), sleep=NOOP)
     written = json.loads(out_path.read_text(encoding="utf-8"))
     assert written[0]["category"] == "Burn-in 신뢰성"
+
+
+def _write(tmp_path, name, data):
+    path = tmp_path / name
+    path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+FT2 = {"text": "ATE를 운영한다", "horizon": "단기", "quotes": ["ATE 운영"]}
+
+
+def test_crash_midway_persists_progress_and_resumes_without_recalling_done_items(tmp_path):
+    extracted_path = _write(tmp_path, "extracted.json", _persons(FT, FT2))
+    taxo_path = _write(tmp_path, "taxonomy.json", TAXO)
+    out = tmp_path / "assignments.json"
+    calls = []
+
+    def fail_from_second_call(prompt):
+        calls.append(prompt)
+        if len(calls) >= 2:
+            raise RuntimeError("내부망 에러")
+        return json.dumps({"category": "Burn-in 신뢰성", "quote": "MBT Burn-in"}, ensure_ascii=False)
+
+    with pytest.raises(RuntimeError):
+        td_assign.assign(extracted_path, taxo_path, out, fail_from_second_call,
+                         tries=1, attempts=1, sleep=NOOP)
+
+    written = json.loads(out.read_text(encoding="utf-8"))
+    assert len(written) == 1 and written[0]["category"] == "Burn-in 신뢰성"
+    progress = json.loads((tmp_path / "assignments.progress.json").read_text(encoding="utf-8"))
+    assert progress["processed"] == 1
+    assert progress["total_facets"] == 2
+    assert not td_assign.is_complete(out)
+
+    seen = []
+
+    def succeed(prompt):
+        seen.append(prompt)
+        return json.dumps({"category": "ATE 운영", "quote": "ATE 운영"}, ensure_ascii=False)
+
+    res = td_assign.assign(extracted_path, taxo_path, out, succeed, sleep=NOOP)
+    assert len(seen) == 1  # 이미 처리된 1번 항목은 재호출 안 됨, 2번만
+    assert len(res["assignments"]) == 2
+    assert td_assign.is_complete(out)
+
+
+def test_resume_handles_duplicate_text_facets_by_position_not_content(tmp_path):
+    dup = {"text": "동일 텍스트 항목", "horizon": "단기", "quotes": ["동일"]}
+    extracted_path = _write(tmp_path, "extracted.json", _persons(dup, dup))  # 텍스트 완전 동일한 두 항목
+    taxo_path = _write(tmp_path, "taxonomy.json", TAXO)
+    out = tmp_path / "assignments.json"
+    calls = []
+
+    def fail_from_second_call(prompt):
+        calls.append(prompt)
+        if len(calls) >= 2:
+            raise RuntimeError("실패")
+        return json.dumps({"category": "Burn-in 신뢰성", "quote": "동일"}, ensure_ascii=False)
+
+    with pytest.raises(RuntimeError):
+        td_assign.assign(extracted_path, taxo_path, out, fail_from_second_call,
+                         tries=1, attempts=1, sleep=NOOP)
+    assert len(json.loads(out.read_text(encoding="utf-8"))) == 1
+
+    seen = []
+
+    def succeed(prompt):
+        seen.append(prompt)
+        return json.dumps({"category": "ATE 운영", "quote": "동일"}, ensure_ascii=False)
+
+    res = td_assign.assign(extracted_path, taxo_path, out, succeed, sleep=NOOP)
+    assert len(seen) == 1  # 텍스트가 같아도 위치상 두 번째 항목만 재호출됨
+    assert len(res["assignments"]) == 2
+
+
+def test_extracted_mtime_change_restarts_assign_from_scratch(tmp_path):
+    extracted_path = _write(tmp_path, "extracted.json", _persons(FT, FT2))
+    taxo_path = _write(tmp_path, "taxonomy.json", TAXO)
+    out = tmp_path / "assignments.json"
+    calls = []
+
+    def call(prompt):
+        calls.append(prompt)
+        quote = "ATE 운영" if "ATE를 운영한다" in prompt else "MBT Burn-in"
+        return json.dumps({"category": "Burn-in 신뢰성", "quote": quote}, ensure_ascii=False)
+
+    td_assign.assign(extracted_path, taxo_path, out, call, sleep=NOOP)
+    assert len(calls) == 2
+
+    os.utime(extracted_path, (extracted_path.stat().st_mtime + 10,) * 2)  # 상류 변경 시뮬레이션
+    calls.clear()
+    td_assign.assign(extracted_path, taxo_path, out, call, sleep=NOOP)
+    assert len(calls) == 2  # 스킵 없이 처음부터 다시
+
+
+def test_taxonomy_mtime_change_restarts_assign_from_scratch(tmp_path):
+    extracted_path = _write(tmp_path, "extracted.json", _persons(FT, FT2))
+    taxo_path = _write(tmp_path, "taxonomy.json", TAXO)
+    out = tmp_path / "assignments.json"
+    calls = []
+
+    def call(prompt):
+        calls.append(prompt)
+        quote = "ATE 운영" if "ATE를 운영한다" in prompt else "MBT Burn-in"
+        return json.dumps({"category": "Burn-in 신뢰성", "quote": quote}, ensure_ascii=False)
+
+    td_assign.assign(extracted_path, taxo_path, out, call, sleep=NOOP)
+    assert len(calls) == 2
+
+    os.utime(taxo_path, (taxo_path.stat().st_mtime + 10,) * 2)  # 코드북/taxonomy 편집 시뮬레이션
+    calls.clear()
+    td_assign.assign(extracted_path, taxo_path, out, call, sleep=NOOP)
+    assert len(calls) == 2  # 스킵 없이 처음부터 다시
+
+
+def test_is_complete_false_without_progress_sidecar(tmp_path):
+    out = tmp_path / "assignments.json"
+    out.write_text("[]", encoding="utf-8")
+    assert not td_assign.is_complete(out)
