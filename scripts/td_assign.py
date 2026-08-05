@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from pipeline_log import get_logger
-from td_common import iter_facets, load_json, parse_json, quote_in_source, retry_call
+from td_common import iter_facets, load_json, quote_in_source, retry_json
 
 ROOT = Path(__file__).parent.parent
 log = get_logger("td_assign")
@@ -48,11 +48,11 @@ def collect_other(assignments, *, threshold=0.2):
     return {"items": others, "count": len(others), "ratio": ratio, "warning": ratio > threshold}
 
 
-def _assign_one(item, taxonomy, names, call, tries, kw):
+def _assign_one(item, taxonomy, names, call, tries, kw, call_id):
     """유효한 배정을 얻으면 (category, quote), 실패하면 None."""
     evidence = item["text"] + " " + " ".join(item.get("quotes") or [])
     for attempt in range(tries):
-        parsed = parse_json(retry_call(call, _prompt(item, taxonomy), **kw))
+        parsed = retry_json(call, _prompt(item, taxonomy), stage="assign", call_id=call_id, **kw)
         cat, quote = parsed.get("category"), parsed.get("quote", "")
         ok_cat = cat == OTHER or cat in names
         ok_quote = bool(quote) and quote_in_source(quote, evidence)
@@ -69,9 +69,9 @@ def assign(extracted, taxonomy, out_path, call, *, tries=2, attempts=4, sleep=No
     names = {c["name"] for c in taxonomy}
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
     assignments, dropped = [], []
-    for person, axis, item in iter_facets(persons):
+    for call_id, (person, axis, item) in enumerate(iter_facets(persons), start=1):
         pid = person["person_id"]
-        result = _assign_one(item, taxonomy, names, call, tries, kw)
+        result = _assign_one(item, taxonomy, names, call, tries, kw, call_id)
         if result is None:
             dropped.append({"person_id": pid, "axis": axis, "text": item["text"]})
             continue

@@ -78,3 +78,14 @@ def retry_call(call, prompt, *, attempts=4, base=0.5, jitter=True, sleep=time.sl
                 raise
             delay = base * (2 ** attempt) + (random.random() * base if jitter else 0)
             sleep(delay)
+
+
+def retry_json(call, prompt, *, stage, call_id, **kw):
+    """retry_call과 동일하지만 JSON 파싱까지 재시도 범위 안에 넣는다 — 모델이 JSON이
+    아닌 걸 뱉어도(서문·reasoning 등) 재시도 대상이 된다. 이전엔 parse_json(retry_call(...))
+    순서라 파싱 실패가 즉시 위로 터졌다.
+
+    stage/call_id(예: "taxonomy"/배치 순번)는 이 함수에선 아직 안 쓰이지만, 로깅·콜 덤프가
+    이 seam 하나에 붙을 예정이라 호출부 시그니처를 미리 통일해둔다(#33, #34).
+    """
+    return retry_call(lambda p: parse_json(call(p)), prompt, **kw)

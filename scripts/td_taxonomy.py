@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from pipeline_log import get_logger
-from td_common import iter_facets, load_json, parse_json, retry_call
+from td_common import iter_facets, load_json, retry_json
 
 ROOT = Path(__file__).parent.parent
 log = get_logger("td_taxonomy")
@@ -80,7 +80,9 @@ def induce(extracted, out_path, call, *, batch_size=30, attempts=4, sleep=None):
         batch = facets[i:i + batch_size]
         if not batch:
             break
-        taxonomy = _normalize(parse_json(retry_call(call, _prompt(batch, taxonomy), **kw)).get("taxonomy"))
+        batch_no = i // batch_size + 1
+        parsed = retry_json(call, _prompt(batch, taxonomy), stage="taxonomy", call_id=batch_no, **kw)
+        taxonomy = _normalize(parsed.get("taxonomy"))
     if out_path is not None:
         out_path = Path(out_path)
         out_path.parent.mkdir(parents=True, exist_ok=True)

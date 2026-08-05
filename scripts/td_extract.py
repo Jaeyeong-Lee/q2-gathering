@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from pipeline_log import get_logger
-from td_common import (Nonretryable, load_json, parse_json, quote_in_source, retry_call,
+from td_common import (Nonretryable, load_json, quote_in_source, retry_json,
                        text_is_copy_of_quotes)
 
 ROOT = Path(__file__).parent.parent
@@ -78,7 +78,7 @@ def extract_person(doc, call, *, tries=2, attempts=4, sleep=None):
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
     last = None
     for attempt in range(tries):
-        parsed = parse_json(retry_call(call, prompt, **kw))
+        parsed = retry_json(call, prompt, stage="extract", call_id=doc["id"], **kw)
         signal = bool(parsed.get("signal_present"))
         if not signal:
             clean = {axis: [] for axis in LIST_AXES}

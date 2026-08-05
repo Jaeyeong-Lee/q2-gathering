@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 from pipeline_log import get_logger
-from td_common import load_json, oneline, parse_json, retry_call
+from td_common import load_json, oneline, retry_json
 
 ROOT = Path(__file__).parent.parent
 log = get_logger("td_narrate")
@@ -101,7 +101,7 @@ def narrate_team(categories, flat_evidence, call, *, tries=2, attempts=4, sleep=
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
     prompt = _team_prompt(categories, flat_evidence)
     for attempt in range(tries):
-        parsed = parse_json(retry_call(call, prompt, **kw))
+        parsed = retry_json(call, prompt, stage="narrate", call_id="team", **kw)
         trends = _clean_bullets(parsed.get("trends"), flat_evidence)
         notes = _clean_bullets(parsed.get("minority_notes"), flat_evidence)
         if trends or notes or attempt == tries - 1:
@@ -109,12 +109,12 @@ def narrate_team(categories, flat_evidence, call, *, tries=2, attempts=4, sleep=
     return {"trends": [], "minority_notes": []}
 
 
-def narrate_category(cat, evidence, call, *, tries=2, attempts=4, sleep=None):
+def narrate_category(cat, evidence, call, *, call_id=0, tries=2, attempts=4, sleep=None):
     """근거 없는 서사는 페이지를 만들지 않는다(None)."""
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
     prompt = _category_prompt(cat, evidence)
     for attempt in range(tries):
-        parsed = parse_json(retry_call(call, prompt, **kw))
+        parsed = retry_json(call, prompt, stage="narrate", call_id=call_id, **kw)
         ids = _valid_ids(parsed.get("citation_ids"), len(evidence))
         text = (parsed.get("narrative") or "").strip()
         if text and ids:
@@ -189,7 +189,7 @@ def narrate(aggregates, assignments, persons, taxonomy, out_dir, call, *,
         ev = evidence_by_cat.get(c["name"], [])
         if not ev:
             continue
-        res = narrate_category(c, ev, call, tries=tries, attempts=attempts, sleep=sleep)
+        res = narrate_category(c, ev, call, call_id=idx, tries=tries, attempts=attempts, sleep=sleep)
         if res is None:
             continue
         pages.append({"idx": idx, "category": c, **res})
