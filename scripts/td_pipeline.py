@@ -57,7 +57,7 @@ def run_all(data_dir, *, extract_call, taxo_call=None, assign_call=None, narrate
         dirty = True
 
     if codebook is None:
-        if dirty or not p["taxonomy"].exists():
+        if dirty or not td_taxonomy.is_complete(p["taxonomy"]):
             td_taxonomy.induce(p["extracted"], p["taxonomy"], taxo_call,
                                batch_size=batch_size, sleep=sleep)
             dirty = True

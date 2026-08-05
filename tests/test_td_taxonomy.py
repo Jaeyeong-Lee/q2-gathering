@@ -1,4 +1,7 @@
 import json
+import os
+
+import pytest
 
 import td_taxonomy
 
@@ -100,3 +103,67 @@ def test_no_signal_facets_excluded():
     td_taxonomy.induce(persons, None, call, batch_size=100, sleep=NOOP)
     # 무신호(3번)는 facet이 없으므로 프롬프트에 실릴 항목이 2개뿐
     assert seen and "MBT Burn-in" in seen[0] and "Advantest ATE" in seen[0]
+
+
+def _write_extracted(tmp_path, persons):
+    path = tmp_path / "extracted.json"
+    path.write_text(json.dumps(persons, ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+def test_batch_failure_persists_progress_and_resumes_without_recalling_done_batches(tmp_path):
+    extracted_path = _write_extracted(tmp_path, _persons())  # 2 facets, batch_size=1 → 2배치
+    out = tmp_path / "taxonomy.json"
+    calls = []
+
+    def fail_from_second_call(prompt):
+        calls.append(prompt)
+        if len(calls) >= 2:
+            raise RuntimeError("내부망 에러")
+        return json.dumps({"taxonomy": [_cat("Burn-in 신뢰성")]}, ensure_ascii=False)
+
+    with pytest.raises(RuntimeError):
+        td_taxonomy.induce(extracted_path, out, fail_from_second_call, batch_size=1,
+                           attempts=1, sleep=NOOP)
+
+    written = json.loads(out.read_text(encoding="utf-8"))
+    assert {c["name"] for c in written} == {"Burn-in 신뢰성"}
+    progress = json.loads((tmp_path / "taxonomy.progress.json").read_text(encoding="utf-8"))
+    assert progress["batches_done"] == 1
+    assert progress["total_batches"] == 2
+    assert not td_taxonomy.is_complete(out)
+
+    seen = []
+
+    def succeed(prompt):
+        seen.append(prompt)
+        return json.dumps({"taxonomy": [_cat("Burn-in 신뢰성"), _cat("ATE 운영")]}, ensure_ascii=False)
+
+    taxo = td_taxonomy.induce(extracted_path, out, succeed, batch_size=1, sleep=NOOP)
+    assert len(seen) == 1  # 배치 1은 재호출 안 됨(스킵), 배치 2만
+    assert {c["name"] for c in taxo} == {"Burn-in 신뢰성", "ATE 운영"}
+    assert td_taxonomy.is_complete(out)
+
+
+def test_extracted_mtime_change_restarts_from_scratch(tmp_path):
+    extracted_path = _write_extracted(tmp_path, _persons())
+    out = tmp_path / "taxonomy.json"
+    calls = []
+
+    def call(prompt):
+        calls.append(prompt)
+        return json.dumps({"taxonomy": [_cat("Burn-in 신뢰성")]}, ensure_ascii=False)
+
+    td_taxonomy.induce(extracted_path, out, call, batch_size=1, sleep=NOOP)
+    assert len(calls) == 2  # 2배치 전부 호출됨
+
+    os.utime(extracted_path, (extracted_path.stat().st_mtime + 10,) * 2)  # 상류 변경 시뮬레이션
+    calls.clear()
+    td_taxonomy.induce(extracted_path, out, call, batch_size=1, sleep=NOOP)
+    assert len(calls) == 2  # 스킵 없이 처음부터 다시 호출됨
+
+
+def test_is_complete_false_without_progress_sidecar(tmp_path):
+    out = tmp_path / "taxonomy.json"
+    out.write_text("[]", encoding="utf-8")
+    assert not td_taxonomy.is_complete(out)

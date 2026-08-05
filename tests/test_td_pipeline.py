@@ -1,6 +1,8 @@
 import json
 from collections import Counter
 
+import pytest
+
 import td_pipeline
 
 NOOP = lambda _: None
@@ -75,3 +77,27 @@ def test_force_reruns_stages(tmp_path):
     td_pipeline.run_all(tmp_path, extract_call=ex, taxo_call=tx, assign_call=asg, narrate_call=nr,
                         n=12, sleep=NOOP, force=True)
     assert calls["extract"] > 0  # force면 재실행
+
+
+def test_partial_taxonomy_resumes_via_run_all_instead_of_being_skipped(tmp_path):
+    # n=12/batch_size=6 → facet 12개(가짜 extract는 사람당 1개), 2배치.
+    calls, ex, tx, asg, nr = _fakes()
+    taxo_calls = {"n": 0}
+
+    def flaky_taxo(prompt):
+        taxo_calls["n"] += 1
+        if taxo_calls["n"] >= 2:  # 배치 1은 통과, 배치 2부터는 재시도해도 계속 실패
+            raise RuntimeError("내부망 에러")
+        return tx(prompt)
+
+    with pytest.raises(RuntimeError):
+        td_pipeline.run_all(tmp_path, extract_call=ex, taxo_call=flaky_taxo, assign_call=asg,
+                            narrate_call=nr, n=12, seed=0, batch_size=6, sleep=NOOP)
+    assert not (tmp_path / "assignments.json").exists()  # taxonomy에서 중단 — 뒤 스테이지 없음
+
+    calls.clear()
+    td_pipeline.run_all(tmp_path, extract_call=ex, taxo_call=tx, assign_call=asg, narrate_call=nr,
+                        n=12, seed=0, batch_size=6, sleep=NOOP)
+    assert calls["taxo"] == 1  # 배치 1은 스킵(이미 완료), 배치 2만 재호출 — 게이트가 완료율 기반
+    md = (tmp_path / "workshop-input.md").read_text(encoding="utf-8")
+    assert "합성역량" in md

@@ -70,23 +70,69 @@ def _prompt(facets, existing):
     return _INSTRUCT + "\n\n항목들:\n" + lines
 
 
+def _progress_path(out_path):
+    return out_path.parent / "taxonomy.progress.json"
+
+
+def is_complete(out_path):
+    """taxonomy.json이 끝까지 처리됐는지 — 존재만으로는 모른다(배치별 즉시저장이라 부분
+    저장 상태로도 파일이 있을 수 있음). 진행 사이드카의 batches_done==total_batches로 판정.
+    td_pipeline의 skip-if-exists 게이트가 부분 저장을 완료로 착각하지 않도록 이걸 쓴다."""
+    out_path = Path(out_path)
+    progress_path = _progress_path(out_path)
+    if not out_path.exists() or not progress_path.exists():
+        return False
+    progress = json.loads(progress_path.read_text(encoding="utf-8"))
+    return progress.get("batches_done") == progress.get("total_batches")
+
+
 def induce(extracted, out_path, call, *, batch_size=30, attempts=4, sleep=None):
-    """facet들을 배치 반복으로 LLM에 넣어 taxonomy 생성·정제. 반환: taxonomy(list)."""
+    """facet들을 배치 반복으로 LLM에 넣어 taxonomy 생성·정제. 반환: taxonomy(list).
+
+    out_path가 있으면 배치마다 즉시 저장 + taxonomy.progress.json에 진행 상태를 남겨 중단된
+    지점부터 재개한다. extracted가 경로로 주어지면 그 mtime을 사이드카와 비교 — 다르면
+    (상류가 바뀜) 처음부터 다시 시작한다. 배치 하나가 재시도 끝에 실패하면 건너뛰지 않고
+    그대로 전파해 스테이지를 중단한다 — taxonomy는 전체 facet을 봐야 의미가 있어서, 실패한
+    배치를 조용히 건너뛰면 그만큼 누락된 채 정상 완료처럼 보이는 게 더 나쁘다.
+    """
     persons = load_json(extracted)
     facets = _facet_texts(persons)
     kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
-    taxonomy = []
-    for i in range(0, max(len(facets), 1), batch_size):
-        batch = facets[i:i + batch_size]
-        if not batch:
-            break
-        batch_no = i // batch_size + 1
-        parsed = retry_json(call, _prompt(batch, taxonomy), stage="taxonomy", call_id=batch_no, **kw)
-        taxonomy = _normalize(parsed.get("taxonomy"))
-    if out_path is not None:
-        out_path = Path(out_path)
+
+    out_path = Path(out_path) if out_path is not None else None
+    progress_path = _progress_path(out_path) if out_path is not None else None
+    extracted_mtime = Path(extracted).stat().st_mtime if isinstance(extracted, (str, Path)) else None
+
+    batch_starts = list(range(0, len(facets), batch_size))
+    total_batches = len(batch_starts)
+
+    taxonomy, batches_done = [], 0
+    if progress_path is not None and progress_path.exists() and out_path.exists():
+        progress = json.loads(progress_path.read_text(encoding="utf-8"))
+        if progress.get("extracted_mtime") == extracted_mtime:
+            batches_done = progress.get("batches_done", 0)
+            taxonomy = json.loads(out_path.read_text(encoding="utf-8"))
+        # mtime이 다르면 상류가 바뀐 것 — batches_done=0/taxonomy=[] 그대로 둬 처음부터 재시작
+
+    def save():
+        if out_path is None:
+            return
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(taxonomy, ensure_ascii=False, indent=1), encoding="utf-8")
+        progress_path.write_text(json.dumps(
+            {"batches_done": batches_done, "total_batches": total_batches,
+             "extracted_mtime": extracted_mtime}, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    for batch_no, i in enumerate(batch_starts, start=1):
+        if batch_no <= batches_done:
+            continue
+        batch = facets[i:i + batch_size]
+        parsed = retry_json(call, _prompt(batch, taxonomy), stage="taxonomy", call_id=batch_no, **kw)
+        taxonomy = _normalize(parsed.get("taxonomy"))
+        batches_done = batch_no
+        save()
+
+    save()  # 무신호(배치 0개)거나 이미 완료 상태로 진입해도 항상 한 번은 저장 보장
     return taxonomy
 
 
