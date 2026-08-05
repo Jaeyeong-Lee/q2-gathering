@@ -19,6 +19,9 @@
 
 ## 지금 실행할 것
 
+**내부망에서 돌리기 전에 `docs/task-discovery-internal-run-guide.md`를 읽어라.** 재개·로그·
+콜 덤프·20kb 진단 방법이 전부 거기 있다(S1-8, 이슈 #30 반영).
+
 `extracted.json`은 이미 만들어져 있고 검증됐다. **다시 추출하지 마라.** 재실행 범위는
 taxonomy부터다:
 
@@ -31,7 +34,12 @@ make td SOURCES=data/persons.json
 ```
 
 중간 산출물(`data/task_discovery/*.json`)이 있으면 자동 skip한다. taxonomy를 다시 만들고
-싶으면 `taxonomy.json`(또는 그 이후 산출물)만 지우고 돌려라 — `extracted.json`은 지우지 마라.
+싶으면 `taxonomy.json`과 `taxonomy.progress.json`을 **같이** 지우고 돌려라 —
+`extracted.json`은 지우지 말고 `touch`도 하지 마라(mtime이 바뀌면 taxonomy·assign이 전부
+처음부터 다시 돈다).
+
+**중단되면 임시 스크립트를 만들지 말고 같은 명령을 다시 쳐라.** taxonomy·assign은 배치/항목
+단위로 저장되므로 죽은 지점부터 자동으로 이어간다(예전엔 안 됐지만 이제 된다).
 
 ## 지켜야 할 것
 
