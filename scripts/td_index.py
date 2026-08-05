@@ -50,7 +50,7 @@ def build(extracted, embed, backend=None):
 def main(extracted_path=ROOT / "data" / "task_discovery" / "extracted.json"):
     import llm
     llm.init()
-    idx = build(extracted_path, llm.embed_text)
+    idx = build(extracted_path, llm.embed_call())
     print(f"색인 {idx.count()}개 문서 (인메모리)", file=sys.stderr)
 
 

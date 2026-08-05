@@ -7,7 +7,6 @@
 파일 영속화로 충분 — 오케스트레이션 프레임워크·멀티에이전트 미도입.
 """
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -151,9 +150,8 @@ def main(argv):
     data_dir = args[0] if args else ROOT / "data" / "task_discovery"
 
     llm.init()
-    tmodel, emodel = os.getenv("TD_TEXT_MODEL"), os.getenv("TD_EMBED_MODEL")
-    call = (lambda p: llm.call_gemini(p, model=tmodel)) if tmodel else llm.call_gemini
-    embed = (lambda t: llm.embed_text(t, model=emodel)) if emodel else llm.embed_text
+    call = llm.text_call()
+    embed = llm.embed_call()
 
     if search:
         run_retrieval(data_dir, extract_call=call, embed=embed, sources_path=sources)

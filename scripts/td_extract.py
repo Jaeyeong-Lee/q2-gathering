@@ -121,7 +121,7 @@ def main(sources_path=ROOT / "data" / "task_discovery" / "sources.json"):
     import llm
     llm.init()
     out = Path(sources_path).parent / "extracted.json"
-    summary = run_extract(sources_path, out, llm.call_gemini)
+    summary = run_extract(sources_path, out, llm.text_call())
     log.info(f"추출 {len(summary['persons'])}명 / 폐기 {len(summary['failed'])} / "
              f"항목폐기 {len(summary['dropped'])} → {out}")
 

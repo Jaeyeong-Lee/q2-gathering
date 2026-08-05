@@ -107,6 +107,20 @@ def _call_openai_text(prompt, model="gpt-3.5-turbo", max_retries=5):
                 raise
     raise RuntimeError(f"Max retries ({max_retries}) exceeded")
 
+def text_call():
+    """TD_TEXT_MODEL이 있으면 그 모델로 호출하는 call을 반환, 없으면 기본 call_gemini.
+    내부망 스테이지 단독 실행에서 모델 주입을 일원화하려고 존재 — td_pipeline.py에만
+    있던 로직을 여기로 옮겨 모든 스테이지 main()이 공유한다."""
+    model = os.getenv("TD_TEXT_MODEL")
+    return (lambda p: call_gemini(p, model=model)) if model else call_gemini
+
+
+def embed_call():
+    """TD_EMBED_MODEL이 있으면 그 모델로 호출하는 embed를 반환, 없으면 기본 embed_text."""
+    model = os.getenv("TD_EMBED_MODEL")
+    return (lambda t: embed_text(t, model=model)) if model else embed_text
+
+
 def embed_text(text, model="models/gemini-embedding-2", max_retries=5):
     """텍스트를 벡터로 임베딩. 기존 인터페이스 유지."""
     if _embed_provider != "gemini":

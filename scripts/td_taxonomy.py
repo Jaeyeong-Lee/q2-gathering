@@ -94,7 +94,7 @@ def main(extracted_path=ROOT / "data" / "task_discovery" / "extracted.json"):
     import llm
     llm.init()
     out = Path(extracted_path).parent / "taxonomy.json"
-    taxo = induce(extracted_path, out, llm.call_gemini)
+    taxo = induce(extracted_path, out, llm.text_call())
     log.info(f"taxonomy {len(taxo)}개 생성 → {out}")
 
 

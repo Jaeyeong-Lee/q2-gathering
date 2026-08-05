@@ -90,7 +90,7 @@ def main(extracted_path=ROOT / "data" / "task_discovery" / "extracted.json",
     import llm
     llm.init()
     out = Path(extracted_path).parent / "assignments.json"
-    res = assign(extracted_path, taxonomy_path, out, llm.call_gemini)
+    res = assign(extracted_path, taxonomy_path, out, llm.text_call())
     log.info(f"배정 {len(res['assignments'])} / 폐기 {len(res['dropped'])} → {out}")
 
 

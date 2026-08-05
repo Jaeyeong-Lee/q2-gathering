@@ -209,7 +209,7 @@ def main(data_dir=ROOT / "data" / "task_discovery"):
     d = Path(data_dir)
     out_dir = d / "interpretation"
     res = narrate(d / "aggregates.json", d / "assignments.json", d / "extracted.json",
-                 d / "taxonomy.json", out_dir, llm.call_gemini)
+                 d / "taxonomy.json", out_dir, llm.text_call())
     log.info(f"해석 총평 + 카테고리 {len(res['pages'])}개 → {out_dir}")
 
 

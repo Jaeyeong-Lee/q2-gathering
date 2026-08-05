@@ -89,9 +89,10 @@ def main(extracted_path=ROOT / "data" / "task_discovery" / "extracted.json"):
     import llm
     import td_index
     llm.init()
+    embed = llm.embed_call()
     persons = json.loads(Path(extracted_path).read_text(encoding="utf-8"))
-    idx = td_index.build(persons, llm.embed_text)
-    out = write(idx, llm.embed_text, persons, Path(extracted_path).parent / "digest.md")
+    idx = td_index.build(persons, embed)
+    out = write(idx, embed, persons, Path(extracted_path).parent / "digest.md")
     print(f"사전 조회 묶음 → {out}", file=sys.stderr)
 
 
