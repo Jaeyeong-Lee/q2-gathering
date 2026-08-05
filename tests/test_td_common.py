@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 
 import td_common as c
@@ -55,3 +57,66 @@ def test_retry_call_does_not_retry_nonretryable():
     with pytest.raises(c.Nonretryable):
         c.retry_call(bad_request, "p", attempts=5, base=0.0, sleep=lambda _: None)
     assert calls["n"] == 1  # 4xx는 재시도하지 않는다
+
+
+def test_retry_json_retries_on_bad_json_then_succeeds():
+    calls = {"n": 0}
+
+    def flaky(prompt):
+        calls["n"] += 1
+        return "이건 JSON이 아님" if calls["n"] < 2 else '{"ok": true}'
+
+    result = c.retry_json(flaky, "p", stage="test-json-retry", call_id=1,
+                          base=0.0, sleep=lambda _: None)
+    assert result == {"ok": True}
+    assert calls["n"] == 2  # 파싱 실패도 재시도 대상
+
+
+def test_retry_json_success_logs_bytes_only_no_full_text(caplog):
+    def call(prompt):
+        return '{"a": 1}'
+
+    with caplog.at_level(logging.INFO, logger="test-json-success"):
+        c.retry_json(call, "prompt", stage="test-json-success", call_id=1, sleep=lambda _: None)
+
+    infos = [r for r in caplog.records if r.name == "test-json-success" and r.levelno == logging.INFO]
+    assert len(infos) == 1
+    ecs = infos[0].ecs
+    assert ecs["http.request.body.bytes"] == len("prompt".encode("utf-8"))
+    assert "http.response.body.bytes" in ecs
+    assert "http.request.body" not in ecs
+    assert "http.response.body" not in ecs
+
+
+def test_retry_json_per_attempt_failure_logs_bytes_only(caplog):
+    def call(prompt):
+        call.n = getattr(call, "n", 0) + 1
+        return "JSON 아님" if call.n < 2 else '{"ok": true}'
+
+    with caplog.at_level(logging.WARNING, logger="test-json-attempt-fail"):
+        c.retry_json(call, "p", stage="test-json-attempt-fail", call_id=1,
+                     base=0.0, sleep=lambda _: None)
+
+    warnings = [r for r in caplog.records
+               if r.name == "test-json-attempt-fail" and r.levelno == logging.WARNING]
+    assert len(warnings) == 1
+    ecs = warnings[0].ecs
+    assert ecs["error.type"] == "ValueError"
+    assert "http.request.body" not in ecs  # 시도별 실패는 바이트 수만, 원문 없음
+
+
+def test_retry_json_final_failure_logs_full_prompt_and_response(caplog):
+    def always_bad(prompt):
+        return "여전히 JSON 아님"
+
+    with caplog.at_level(logging.WARNING, logger="test-json-final-fail"):
+        with pytest.raises(ValueError):
+            c.retry_json(always_bad, "내 프롬프트", stage="test-json-final-fail", call_id=1,
+                        attempts=2, base=0.0, sleep=lambda _: None)
+
+    warnings = [r for r in caplog.records
+               if r.name == "test-json-final-fail" and r.levelno == logging.WARNING]
+    final = warnings[-1]  # 시도별 실패 로그들 뒤에 최종 실패 로그가 별도로 온다
+    assert final.ecs["http.request.body"] == "내 프롬프트"
+    assert final.ecs["http.response.body"] == "여전히 JSON 아님"
+    assert final.ecs["error.type"] == "ValueError"

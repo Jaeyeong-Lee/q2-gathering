@@ -7,6 +7,8 @@ import random
 import time
 from pathlib import Path
 
+from pipeline_log import get_logger
+
 # facet 4축 (consumer 공용). 추출은 direction을 단수로 별도 처리하므로 td_extract는 자체 상수 사용.
 AXES = ("future_task", "capability_gap", "capability_have", "direction")
 
@@ -85,7 +87,42 @@ def retry_json(call, prompt, *, stage, call_id, **kw):
     아닌 걸 뱉어도(서문·reasoning 등) 재시도 대상이 된다. 이전엔 parse_json(retry_call(...))
     순서라 파싱 실패가 즉시 위로 터졌다.
 
-    stage/call_id(예: "taxonomy"/배치 순번)는 이 함수에선 아직 안 쓰이지만, 로깅·콜 덤프가
-    이 seam 하나에 붙을 예정이라 호출부 시그니처를 미리 통일해둔다(#33, #34).
+    stage/call_id(예: "taxonomy"/배치 순번)로 ECS 로그(data/pipeline.ecs.jsonl)를 남긴다:
+    성공·시도별 실패는 바이트 수만, 재시도 소진 뒤 최종 실패는 프롬프트·응답 원문 전체를
+    별도 WARNING으로 — 내부망 페이로드 한도(요청/응답, 정확한 값)를 다음 실행 한 번으로
+    판명하기 위함(#30). 성공 로그에 원문을 안 싣는 건 호출 수백 건에 로그가 부풀지 않게.
     """
-    return retry_call(lambda p: parse_json(call(p)), prompt, **kw)
+    log = get_logger(stage)
+    prompt_bytes = len(prompt.encode("utf-8"))
+    last_response = {"text": None}
+
+    def attempt(p):
+        try:
+            response = call(p)
+        except Exception as e:
+            log.warning(f"[{call_id}] 호출 실패: {e}", extra={"ecs": {
+                "error.type": type(e).__name__, "error.message": str(e),
+                "http.request.body.bytes": prompt_bytes}})
+            raise
+        last_response["text"] = response
+        response_bytes = len(response.encode("utf-8"))
+        try:
+            parsed = parse_json(response)
+        except Exception as e:
+            log.warning(f"[{call_id}] JSON 파싱 실패: {e}", extra={"ecs": {
+                "error.type": type(e).__name__, "error.message": str(e),
+                "http.request.body.bytes": prompt_bytes,
+                "http.response.body.bytes": response_bytes}})
+            raise
+        log.info(f"[{call_id}] 성공", extra={"ecs": {
+            "http.request.body.bytes": prompt_bytes,
+            "http.response.body.bytes": response_bytes}})
+        return parsed
+
+    try:
+        return retry_call(attempt, prompt, **kw)
+    except Exception as e:
+        log.warning(f"[{call_id}] 최종 실패(재시도 종료): {e}", extra={"ecs": {
+            "error.type": type(e).__name__, "error.message": str(e),
+            "http.request.body": prompt, "http.response.body": last_response["text"]}})
+        raise
