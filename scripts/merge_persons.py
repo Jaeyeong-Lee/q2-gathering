@@ -29,7 +29,7 @@ def build_persons(rows, raw_dir):
     next_id = 0
     for r in rows:
         if not r.get("normalized_filename"):
-            skipped.append(r["name"])
+            skipped.append(r["seq"])       # 실명 대신 seq — 콘솔에 이름을 안 흘린다
             continue
         persons.append({
             "id": next_id,
@@ -54,7 +54,7 @@ def main(db_path=ROOT / "data" / "roster.db", raw_dir=ROOT / "data" / "raw_secti
     out_path.write_text(json.dumps(persons, ensure_ascii=False, indent=1), encoding="utf-8")
 
     if skipped:
-        print(f"제외 {len(skipped)}명 (정제 미완료): {skipped}", file=sys.stderr)
+        print(f"제외 {len(skipped)}명 (정제 미완료) seq={skipped}", file=sys.stderr)
     print(f"persons.json {len(persons)}명 작성: {out_path}", file=sys.stderr)
     return skipped
 
