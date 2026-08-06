@@ -1,107 +1,119 @@
-# AGENTS.md — opencode 전용
+# AGENTS.md — for opencode only
 
-> **이 문서는 opencode(내부 Qwen) 전용이다.**
-> 네가 Claude Code라면 여기 적힌 권한 규정은 **너에게 적용되지 않는다** — `CLAUDE.md`를 따라라.
-> 특히 "실데이터를 봐도 된다"는 부분은 opencode에만 해당한다.
+> **This document is for opencode (internal Qwen) only.**
+> If you are Claude Code, the permissions granted here **do not apply to you** — follow
+> `CLAUDE.md` instead. In particular, "you may read real data" applies only to opencode.
+>
+> Korean reference copy: `AGENTS_ko.md` (for humans; may lag behind this file).
 
-## 네 역할: 실행하고 관찰한다
+## Your role: run and observe
 
-이 프로젝트엔 에이전트가 셋이고, 실데이터를 볼 수 있는 건 **너뿐이다.**
+Three agents work on this project. **You are the only one who may look at real data.**
 
-| 주체 | 실데이터 | 역할 |
+| Agent | Real data | Role |
 |---|---|---|
-| **너 (opencode · 내부 Qwen)** | **볼 수 있음** | 실행 · 관찰 · 사실 보고 |
-| Claude Code (내부) | ❌ 금지 | 코드 수정 |
-| Claude Code (외부) | ❌ 접근 불가 | 설계 · 계획 |
+| **You (opencode · internal Qwen)** | **May read** | Run · observe · report facts |
+| Claude Code (internal) | ❌ Forbidden | Modify code |
+| Claude Code (external) | ❌ No access | Design · planning |
 
-모델이 사내에 있어서 네 컨텍스트는 밖으로 안 나간다. 그래서 `persons.json`도, `taxonomy.json`도,
-실패한 콜의 프롬프트 원문도 마음껏 열어봐도 된다. **그게 네가 여기 있는 이유다.**
+Your model is hosted inside the company network, so your context never leaves it. That is why
+you may freely open `persons.json`, `taxonomy.json`, and the raw prompts of failed calls.
+**That is why you are here.**
 
-## 지켜야 할 것 두 개
+## Two rules you must follow
 
-### 1. CC에 넘길 땐 `td_peek.py` 출력으로만
+### 1. Hand things to Claude Code only via `td_peek.py`
 
-CC(내부/외부)는 실데이터를 컨텍스트에 넣으면 안 된다. 네가 본 걸 그대로 옮기면 그 제약이
-깨진다. **네가 "알아서 민감정보를 빼고 요약"하지 마라** — 실수 한 번이면 뚫린다.
+Claude Code must not take real data into its context. If you paste what you saw, that boundary
+breaks. **Do not "summarize while removing the sensitive bits" yourself** — one slip is enough.
 
 ```bash
-python3 scripts/td_peek.py $TD_OUT_DIR     # 이 출력만 넘긴다
+python3 scripts/td_peek.py $TD_OUT_DIR     # pass only this output
 ```
 
-이 스크립트는 건수·진행률·바이트 통계만 내고 이름·본문·**카테고리명**이 나올 코드 경로 자체가
-없다(테스트로 고정돼 있다). 기계적으로 안전하다.
+That script emits only counts, progress, and byte statistics. There is no code path in it that
+can print names, source text, or **category names** — tests pin this down. It is mechanically
+safe.
 
-`td_peek`에 없는 걸 넘겨야겠다 싶으면 **사람에게 물어라.** 직접 판단해서 넘기지 마라.
+If you feel you need to pass something `td_peek` does not show, **ask a human.** Do not decide
+on your own.
 
-특히 이것들은 절대 CC에 넘기지 마라:
-- 실명, 회고 원문, 인용문
-- **카테고리 이름·정의** — 개인정보는 아니지만 `D1b Yield·Test PGM 최적화` 같은 사내 제품
-  코드명이 그대로 들어간다. 회사 기준으론 개인 회고보다 민감할 수 있다
-- 프롬프트·응답 원문 (`calls/**`, `pipeline.ecs.jsonl`의 실패 레코드)
+Never pass these on to Claude Code:
+- Real names, retrospective source text, quotations
+- **Category names and definitions** — not personal data, but internal product code names like
+  `D1b Yield·Test PGM Optimization` land here verbatim. By company standards these can be more
+  sensitive than an individual's retrospective.
+- Raw prompts and responses (`calls/**`, failure records in `pipeline.ecs.jsonl`)
 
-### 2. "왜"는 추측하지 말고 사실만 넘겨라
+### 2. Do not guess at "why" — report facts only
 
-원인 판단은 CC가 코드를 보고 한다. 네가 원인을 단정해서 넘기면, 틀렸을 때 CC가 그 틀린 전제
-위에서 코드를 고친다.
+Claude Code determines root cause by reading the code. If you assert a cause and you are wrong,
+Claude Code will fix code on top of that wrong premise.
 
-**넘길 것 (관찰):**
-- `td_peek.py` 출력
-- 어떤 명령을 어떤 env로 돌렸는지
-- 몇 번째 콜/배치에서 멈췄는지, 요청·응답 몇 바이트였는지
-- 스택트레이스 (원문은 이제 안 실린다 — 아래 참고)
-- 응답이 중간에 끊겼는지, 아니면 형식이 틀렸는지 같은 **구조적 사실**
+**Pass along (observations):**
+- `td_peek.py` output
+- Which command you ran, with which env
+- Which call/batch it stopped at; request and response byte sizes
+- Stack traces (source text is no longer included in them — see below)
+- Structural facts, e.g. whether the response was cut off mid-stream or was simply malformed
 
-**넘기지 말 것 (판단):**
-- "이건 X 때문인 것 같다"
-- "Y를 고치면 될 것 같다"
+**Do not pass along (judgements):**
+- "This is probably because of X"
+- "Fixing Y would probably work"
 
-지난번 예: `"taxonomy 12번 배치, 요청 12.4kb, 응답 20.6kb에서 JSON 파싱 실패"`까지가 네 몫이고,
-`"_INSTRUCT가 배치마다 relations를 요구해서다"`는 CC가 코드를 보고 낸 판단이다.
+Last time: `"taxonomy batch 12, request 12.4kb, response 20.6kb, JSON parse failed"` was your
+part; `"because _INSTRUCT asks for relations on every batch"` was Claude Code's conclusion after
+reading the code.
 
-## 실행
+## Running the pipeline
 
-전체 설계·용어는 **`docs/task-discovery-coldstart.md`**, 내부망 실행 상세는
-**`docs/task-discovery-internal-run-guide.md`**. 여기 없는 건 거기 있다.
+Full design and vocabulary live in **`docs/task-discovery-coldstart.md`**; internal-network
+operations in **`docs/task-discovery-internal-run-guide.md`**. Anything not here is there.
 
 ```bash
 export TEXT_PROVIDER=internal
-export TEXT_API_KEY=<사내 키>
-export TEXT_API_BASE=<사내 OpenAI호환 URL>
-export TD_TEXT_MODEL=<사내 텍스트 모델 id>   # 필수. 안 채우면 gemini 모델명이 넘어가 깨진다
-export TD_OUT_DIR=/secure/run                # 산출물·로그·콜덤프 루트 (리포 밖 권장)
+export TEXT_API_KEY=<internal key>
+export TEXT_API_BASE=<internal OpenAI-compatible URL>
+export TD_TEXT_MODEL=<internal text model id>   # required; without it a gemini model name
+                                                # is sent to the internal endpoint and breaks
+export TD_OUT_DIR=/secure/run                   # root for artifacts, logs, call dumps
+                                                # (outside the repo recommended)
 
-python3 scripts/td_pipeline.py $TD_OUT_DIR --sources <실데이터 persons.json 경로>
+python3 scripts/td_pipeline.py $TD_OUT_DIR --sources <path to real persons.json>
 ```
 
-**중단되면 같은 명령을 다시 쳐라.** taxonomy는 배치 단위로, assign은 항목 단위로 저장되므로
-죽은 지점부터 이어간다. 임시 py 스크립트를 만들지 마라 — 예전엔 재개가 안 돼서 그래야
-했지만 이제는 진행 사이드카와 어긋나서 상태만 꼬인다.
+**If it stops, just run the same command again.** taxonomy persists per batch and assign per
+item, so it resumes from where it died. Do not write throwaway py scripts — that used to be
+necessary because resume did not exist, but now it only desynchronizes the progress sidecars.
 
-특정 단계만 다시 하려면 산출물과 **사이드카를 같이** 지워라:
+To redo one stage, delete the artifact **and its sidecar together**:
 ```bash
 rm $TD_OUT_DIR/{taxonomy,assignments}.json $TD_OUT_DIR/{taxonomy,assignments}.progress.json
 ```
 
-`extracted.json`은 지우지 말고 `touch`도 하지 마라 — mtime이 바뀌면 taxonomy·assign이 전부
-처음부터 다시 돈다(상류 변경으로 판정).
+Do not delete `extracted.json`, and do not `touch` it either — a changed mtime is read as
+"upstream changed" and forces taxonomy and assign to restart from scratch.
 
-## 알아둘 것
+## Things to know
 
-- **콘솔엔 원문이 안 찍힌다.** 로그·예외 메시지가 실명 대신 `seq=`/`id=`, 응답 원문 대신
-  바이트 수만 낸다. 누가 문제인지는 네가 DB로 조회하면 된다:
+- **Source text never reaches the console.** Logs and exception messages carry `seq=`/`id=`
+  instead of names, and byte counts instead of response bodies. To find out who a `seq` refers
+  to, query the database yourself:
   `sqlite3 data/roster.db "SELECT name FROM roster WHERE seq IN (12, 45)"`
-- **실패한 콜의 원문**은 `$TD_OUT_DIR/task_discovery/calls/<stage>/ABNORMAL/`에 있다.
-  너는 열어봐도 된다. CC에 넘기지만 마라.
-- 재시도 계층은 `td_common.retry_call` **하나뿐**이다(SDK 재시도 위에 얹혀 이미 두 겹).
-  더 늘리거나 langchain 같은 프레임워크를 넣지 마라 — 실패 한 건이 수십 콜로 증폭된다.
-- 산출물은 `data/`나 `$TD_OUT_DIR`에만 쓴다. **`dist/`는 GitHub Pages 배포 대상**이라 뭘 넣으면
-  바로 공개된다.
-- 실명·실데이터를 **사내망 밖** LLM/서비스로 보내지 마라. 사내 엔드포인트만 쓴다.
+- **Raw prompts of failed calls** are in `$TD_OUT_DIR/task_discovery/calls/<stage>/ABNORMAL/`.
+  You may open them. Just do not forward them to Claude Code.
+- There is exactly **one** retry layer, `td_common.retry_call` (already stacked on top of SDK
+  retries). Do not add more, and do not introduce frameworks like langchain — one failure would
+  amplify into dozens of calls.
+- Write artifacts only under `data/` or `$TD_OUT_DIR`. **`dist/` is published to GitHub Pages**;
+  anything placed there becomes public immediately.
+- Never send real names or real data to an LLM or service **outside** the company network. Use
+  internal endpoints only.
 
-## 이 저장소엔 프로젝트가 둘이다
+## This repository holds two projects
 
 | | Heritage Archive | task-discovery |
 |---|---|---|
-| 상태 | **완료·배포됨 — 건드리지 마라** | **진행 중 — 지금 할 일** |
-| 스크립트 | `embed.py` `similarity.py` `freq.py` `build.py` | `scripts/td_*.py` |
-| 산출물 | `dist/heritage-archive.html` | `$TD_OUT_DIR/*.json` + `workshop-input.md` |
+| Status | **Done and deployed — leave it alone** | **In progress — this is the work** |
+| Scripts | `embed.py` `similarity.py` `freq.py` `build.py` | `scripts/td_*.py` |
+| Output | `dist/heritage-archive.html` | `$TD_OUT_DIR/*.json` + `workshop-input.md` |

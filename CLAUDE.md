@@ -1,59 +1,65 @@
-# CLAUDE.md — Claude Code 전용
+# CLAUDE.md — for Claude Code only
 
-> `AGENTS.md`는 **opencode 전용**이다. 거기 적힌 "실데이터를 봐도 된다"는 규정은 **너에게
-> 적용되지 않는다.** 실데이터를 볼 수 있는 건 opencode(내부 Qwen)뿐이다 — 그 모델은 사내에
-> 있어서 컨텍스트가 밖으로 안 나가기 때문이다.
+> `AGENTS.md` is **for opencode only**. The permission it grants — "you may read real data" —
+> **does not apply to you.** Only opencode (internal Qwen) may read real data, because that
+> model is hosted inside the company network and its context never leaves it.
+>
+> Korean reference copy: `CLAUDE_ko.md` (for humans; may lag behind this file).
 
-## 네 역할: 코드를 고친다. 실데이터는 못 본다
+## Your role: modify code. You do not get to see real data
 
-| 주체 | 실데이터 | 역할 |
+| Agent | Real data | Role |
 |---|---|---|
-| opencode (내부 Qwen) | 볼 수 있음 | 실행 · 관찰 · 사실 보고 |
-| **너 (Claude Code)** | **❌ 금지** | **코드 수정** |
+| opencode (internal Qwen) | May read | Run · observe · report facts |
+| **You (Claude Code)** | **❌ Forbidden** | **Modify code** |
 
-파이프라인이 실데이터를 *처리*하는 것과 네가 그걸 *읽는* 것은 다른 문제다. 네 컨텍스트에
-들어간 건 밖으로 나간다.
+The pipeline *processing* real data and you *reading* it are different things. Whatever enters
+your context leaves the network.
 
-### 절대 열지 마라 — `Read`든 `cat`/`head`/`grep`/`python -c open(...)`이든
+### Never open these — not via `Read`, nor `cat`/`head`/`grep`/`python -c open(...)`
 
-| 파일 | 왜 |
+| File | Why |
 |---|---|
-| `data/persons.json` | 실명 + 회고 원문 |
-| `extracted.json` / `assignments.json` | 실명 + 원문 인용 |
-| `taxonomy.json` / `aggregates.json` | **카테고리명·정의 = 사내 제품 코드명·기술 전략** |
-| `workshop-input.md`, `interpretation/**` | 위 둘 다 |
-| `calls/**`, `pipeline.ecs.jsonl` | 프롬프트·응답 원문 |
-| `$TD_OUT_DIR/**` | 위 전부가 여기 있다 |
+| `data/persons.json` | Real names + retrospective source text |
+| `extracted.json` / `assignments.json` | Real names + verbatim quotations |
+| `taxonomy.json` / `aggregates.json` | **Category names/definitions = internal product code names, tech strategy** |
+| `workshop-input.md`, `interpretation/**` | Both of the above |
+| `calls/**`, `pipeline.ecs.jsonl` | Raw prompts and responses |
+| `$TD_OUT_DIR/**` | All of the above lives here |
 
-**카테고리 이름도 안 된다.** 개인정보는 아니지만 `D1b Yield·Test PGM 최적화` 같은 사내
-코드명이 그대로 들어간다 — 회사 기준으론 개인 회고보다 민감할 수 있다.
+**Category names are off limits too.** They are not personal data, but internal code names such
+as `D1b Yield·Test PGM Optimization` land there verbatim — by company standards that can be more
+sensitive than an individual's retrospective.
 
-`.claude/settings.json`에 `deny`가 걸려 있지만 그건 실수 방지용 그물이지 완전하지 않다.
-Bash로 우회할 수 있으니 **규칙으로 지켜라.**
+`.claude/settings.json` carries `deny` rules, but that is a safety net against mistakes, not a
+guarantee — it can be bypassed through Bash. **Honor this as a rule, not as a fence.**
 
-### 대신 이렇게 한다
+### Do this instead
 
-- **상태는 opencode가 준 `td_peek.py` 출력으로만 안다.** 네가 직접 돌려도 되지만
-  (`python3 scripts/td_peek.py $TD_OUT_DIR`) 그 출력 외의 것을 보지 마라.
-- **재현·디버깅은 합성 코퍼스로.** `td_sources.py`가 같은 스키마의 가짜 데이터를 만든다
-  (애초에 그러라고 있는 모듈이다). 테스트는 전부 가짜 `call` 주입식이다.
-- **원인 판단은 네 몫이다.** opencode는 "12번 배치, 응답 20.6kb에서 파싱 실패" 같은 사실만
-  넘긴다. 그게 왜 그런지는 네가 **코드를 읽고** 판단해라.
-- 실패한 콜의 원문이 꼭 필요하면 `$TD_OUT_DIR/task_discovery/calls/<stage>/ABNORMAL/`에
-  있다고 **사람이나 opencode에게 확인을 요청**해라. 직접 열지 마라.
+- **Learn state only from `td_peek.py` output** that opencode gives you. You may run it
+  yourself (`python3 scripts/td_peek.py $TD_OUT_DIR`), but do not look at anything beyond
+  its output.
+- **Reproduce and debug against the synthetic corpus.** `td_sources.py` generates fake data with
+  the same schema — that is exactly what it exists for. Every test injects a fake `call`.
+- **Root-cause analysis is your job.** opencode hands you facts like "batch 12, parse failed at
+  20.6kb response". Why that happens is for you to determine **by reading the code**.
+- If you truly need the raw text of a failed call, it is in
+  `$TD_OUT_DIR/task_discovery/calls/<stage>/ABNORMAL/` — **ask a human or opencode to check it.**
+  Do not open it yourself.
 
-### 콘솔 출력은 봐도 된다
+### Console output is safe to read
 
-로그·예외 메시지에서 원문을 뺐다 — 실명 대신 `seq=`/`id=`, 응답 원문 대신 바이트 수만 나온다.
-그러니 명령을 돌려 그 출력을 보는 건 안전하다. **다만 그 안전장치를 되돌리지 마라**:
-디버깅 편의로 로그에 원문을 다시 넣고 싶어질 때가 있는데, 그러면 이 구조가 무너진다.
+Source text has been stripped from logs and exception messages — `seq=`/`id=` instead of names,
+byte counts instead of response bodies. So running a command and reading its output is fine.
+**But do not undo those guards**: it is tempting to put raw text back into logs for easier
+debugging, and that collapses this whole structure.
 
-전체 설계는 `docs/task-discovery-coldstart.md`, 내부망 운영은
+Full design: `docs/task-discovery-coldstart.md`. Internal-network operations:
 `docs/task-discovery-internal-run-guide.md`.
 
 ---
 
-## 일반 코딩 가이드라인
+## General coding guidelines
 
 Behavioral guidelines to reduce common LLM coding mistakes.
 
@@ -113,8 +119,10 @@ For multi-step tasks, state a brief plan:
 3. [Step] → verify: [check]
 ```
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+Strong success criteria let you loop independently. Weak criteria ("make it work") require
+constant clarification.
 
 ---
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to
+overcomplication, and clarifying questions come before implementation rather than after mistakes.
