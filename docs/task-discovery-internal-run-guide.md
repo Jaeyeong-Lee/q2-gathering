@@ -106,6 +106,10 @@ cat data/task_discovery/assignments.progress.json
 
 `done == total`이면 완료다. 다르면 미완성이고, 다시 돌리면 이어간다.
 
+> **taxonomy의 `total_batches`는 facet 배치 수 + 1이다.** 마지막 1스텝이 관계(relations)
+> 도출 패스이기 때문. 예: facet 배치가 11개면 `total_batches`는 12. `11/12`에서 멈춰 있으면
+> 카테고리는 다 만들어졌고 관계만 남은 상태이고, 재실행하면 관계 콜 1번만 돈다.
+
 ### 상류가 바뀌면 자동으로 처음부터 다시 한다
 
 `extracted.json`(taxonomy·assign 둘 다) 또는 `taxonomy.json`(assign만)의 **mtime이
@@ -141,7 +145,26 @@ rm data/task_discovery/assignments.json data/task_discovery/assignments.progress
 성공 로그에 원문을 안 싣는 건 호출 수백 건에 로그가 부풀지 않게 하려는 것이다. 실패는
 진단이 목적이므로 전문을 남긴다.
 
-### 20kb 문제를 판명하는 방법 — 이게 이번 작업의 핵심 목적이다
+### 20kb 문제 — 원인 규명됨 (2026-08-06)
+
+> **결론: 응답 쪽 한도였고, 원인은 taxonomy의 `relations` 필드였다. 이미 고쳐졌다.**
+>
+> `td_taxonomy.py`의 `_INSTRUCT`가 **배치마다** `relations`(카테고리 간 관계)까지 요구해서,
+> 응답이 카테고리 25개 기준 7.8kb → 13kb+로 부풀었고 실제 사내망에서 20kb를 넘겨 JSON이
+> 잘렸다. `relations`는 taxonomy **전체 구조**에 대한 속성이라 배치 루프에 있을 이유가
+> 없었다 — 카테고리가 아직 다 안 만들어진 중간 배치에서 관계를 매기면 존재하지 않는
+> 카테고리를 가리켜 버려지고, 다음 배치에서 전부 다시 뱉는 낭비였다.
+>
+> **고친 방식**: 배치 루프는 `name`/`definition`/`inclusion_criteria`만 받고,
+> 관계는 배치가 다 끝난 뒤 **마지막 1콜**로 엣지 리스트(`{from, to, type}`)만 받는다.
+> 배치 응답이 7.9kb로 내려갔고(한도의 40%), 관계 패스 응답은 엣지뿐이라 더 작다.
+> `taxonomy.json` 스키마는 그대로라 downstream 영향 없고, 관계 품질은 오히려 좋아졌다
+> (완성된 taxonomy 전체를 보고 한 번에 매기므로).
+>
+> **그래도 아래 절차는 그대로 유효하다** — 다른 스테이지(assign·narrate·extract)에서
+> 같은 증상이 나거나, 카테고리 수가 예상보다 많아 다시 한도에 걸릴 때 쓴다.
+
+### 페이로드 한도를 판명하는 방법
 
 파이프라인을 한 번 돌린 뒤 이 명령을 실행해라:
 
@@ -162,14 +185,23 @@ PY
 - **요청 바이트가 어떤 값을 넘을 때만 실패한다** → **요청 쪽 한도**다.
   대응: `batch_size`를 줄이거나, taxonomy 프롬프트에 싣는 기존 카테고리 필드를 줄인다.
 - **요청은 통과했는데 파싱만 실패하고, 응답 바이트가 특정 값에서 멈춰 있다** → **응답이
-  잘리는 것**(출력 토큰 한도). 대응: 응답을 작게 만드는 프로토콜 변경을 검토한다.
+  잘리는 것**(출력 토큰 한도). ← `relations` 건이 이 경우였다.
 - 두 경우 모두, **정확한 임계 바이트 수를 사람에게 보고해라.** 그 수치가 나와야 다음 결정을
   할 수 있다.
 
-> **이 판명이 나오기 전엔 taxonomy 프롬프트 구조를 바꾸지 마라.** 배치마다 전체 taxonomy를
-> 주고받는 지금 방식은 모델이 카테고리를 병합·분할·정제할 수 있게 하는 의도된 설계다
-> (`td_taxonomy.py`의 `_prompt`). "신규분만 반환"으로 바꾸면 taxonomy가 append-only가 되어
-> 그 정제 능력을 잃는다. 원인을 모르는 상태에서 품질부터 깎을 이유가 없다.
+**응답 한도에 다시 걸리면 이 순서로 검토해라:**
+
+1. **모델이 매 호출마다 다시 뱉을 필요가 없는 필드가 있나?** `relations`가 그런 경우였다.
+   전체 구조에 대한 속성이면 루프에서 빼고 마지막에 한 번만 뽑아라 — 크기도 줄고 품질도 는다.
+2. 그래도 크면 `batch_size`를 줄인다(`td_pipeline.py`의 기본값 30). 단, 배치 응답은 누적
+   taxonomy 전체라서 batch_size를 줄여도 **응답은 거의 안 줄어든다** — 요청만 준다.
+   응답이 문제일 땐 효과가 작다는 걸 알고 써라.
+
+> **"신규분만 반환"으로 바꾸는 건 최후 수단이다.** 배치마다 전체 taxonomy를 주고받는 건
+> 모델이 카테고리를 병합·분할·정의 재작성·삭제할 수 있게 하는 의도된 설계다
+> (`td_taxonomy.py`의 `_prompt`). 신규분만 받으면 taxonomy가 append-only가 되어 배치 1에서
+> 얇은 근거로 만든 카테고리가 끝까지 그대로 남는다. 위 1·2번을 먼저 다 해보고, 그래도 안
+> 되면 그때 사람과 상의해라.
 
 ### 콜별 입출력 덤프: `data/task_discovery/calls/`
 
@@ -200,7 +232,7 @@ data/task_discovery/calls/
 | 스테이지 | `call_id` |
 |---|---|
 | extract | 사람 id |
-| taxonomy | 배치 번호 (1부터) |
+| taxonomy | 배치 번호 (1부터), 마지막 관계 도출 패스는 `"relations"` |
 | assign | facet 처리 순번 (1부터) |
 | narrate | `"team"`(총평) 또는 카테고리 인덱스 |
 
@@ -215,7 +247,7 @@ data/task_discovery/calls/
 | 스테이지 | 항목 하나가 최종 실패하면 |
 |---|---|
 | **extract** | 그 사람만 버리고 **계속 진행** (한 명 빠져도 나머지는 유효) |
-| **taxonomy** | **스테이지 전체를 중단** (예외 전파) |
+| **taxonomy** | **스테이지 전체를 중단** (예외 전파) — 관계 패스 실패도 마찬가지 |
 | **assign** | 그 facet만 `dropped`에 넣고 **계속 진행** |
 | **narrate** | 그 카테고리 페이지만 안 만들고 계속 |
 
@@ -248,7 +280,7 @@ data/task_discovery/calls/**                   # 콜별 입출력 덤프
 | 스테이지 | 호출 수 | 파일 수 |
 |---|---|---|
 | extract | ~200 | ~400 |
-| taxonomy | ~20-30 | ~50 |
+| taxonomy | ~20-30 (+ 관계 1) | ~60 |
 | assign | ~600-800 | ~1,600 |
 | narrate | ~16-26 | ~50 |
 | **합계** | ~850-1,050 | **~2,100** |
@@ -280,13 +312,16 @@ data/task_discovery/calls/**                   # 콜별 입출력 덤프
     import sys; sys.path.insert(0, "scripts")
     from td_common import iter_facets
     n = len(list(iter_facets(persons)))
-    total = math.ceil(n / 30)   # batch_size 기본값 30
+    total = math.ceil(n / 30) + 1   # batch_size 기본값 30, +1은 관계 도출 패스
     (d/"taxonomy.progress.json").write_text(json.dumps({
         "batches_done": total, "total_batches": total,
         "extracted_mtime": (d/"extracted.json").stat().st_mtime}, indent=1))
-    print("taxonomy를 완료 상태로 표시:", total, "배치")
+    print("taxonomy를 완료 상태로 표시:", total, "스텝")
     PY
     ```
+    ⚠️ 단, **기존 `taxonomy.json`이 `relations` 필드 없이 만들어진 것이면** 이렇게 완료로
+    표시했을 때 관계가 영영 안 뽑힌다. 온톨로지 뷰가 필요하면 그냥 재실행하거나,
+    `td_taxonomy.derive_relations(taxonomy, call)`만 따로 돌려서 관계를 채워라.
   - 이게 번거롭거나 확신이 없으면 **그냥 재실행하는 편이 안전하다.** 재실행해도 이제는
     중간에 죽어도 잃는 게 없다.
 
