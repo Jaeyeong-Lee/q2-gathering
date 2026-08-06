@@ -43,13 +43,15 @@
 
 ## 2. 실행 방법
 
-### 환경변수 (변경 없음)
+### 환경변수
 
 ```bash
 export TEXT_PROVIDER=internal
 export TEXT_API_KEY=<사내 키>
 export TEXT_API_BASE=<사내 OpenAI호환 URL>
 export TD_TEXT_MODEL=<사내 텍스트 모델 id>   # 필수 — 안 채우면 gemini 모델명이 넘어가 깨진다
+
+export TD_OUT_DIR=/secure/run                # 권장 — 로그·콜덤프를 리포 밖으로 (§8 참고)
 
 # S4(검색)까지 갈 때만
 export EMBED_PROVIDER=internal
@@ -353,25 +355,118 @@ SDK 재시도(`llm.py`의 `max_retries`)와 이미 두 겹이라 여기서 더 �
 
 ---
 
+## 8. 실데이터를 에이전트 컨텍스트에서 떼어놓기
+
+내부망에도 Claude Code가 있고, **파일을 읽을 수는 있지만 컨텍스트에 올리면 안 되는** 제약이
+있다. 파이프라인이 데이터를 *처리*하는 것과 에이전트가 그걸 *읽는* 것은 다른 문제다.
+
+### 무엇이 민감한가 — 4단계
+
+| 레벨 | 내용 | 에이전트에게 |
+|---|---|---|
+| 0 | 건수·진행률·바이트 수 | ✅ 안전 |
+| 1 | 카테고리별 인원·갭·준비도 (**인덱스로만**) | ✅ 안전 |
+| 2 | **카테고리 이름·정의** | ❌ 금지 — 사내 제품 코드명·기술 전략 |
+| 3 | 실명·회고 원문·인용 | ❌ 금지 |
+
+**레벨 2도 금지**라는 게 중요하다. 개인정보는 아니지만 `D1b Yield·Test PGM 최적화` 같은
+사내 코드명이 그대로 카테고리 이름이 되고, 회사 기준으론 개인 회고보다 민감할 수 있다.
+
+### 방어 3층
+
+**① 격리 — `TD_OUT_DIR` (제일 강함)**
+
+데이터가 에이전트 작업 디렉터리에 아예 없으면 읽을 방법이 없다.
+
+```bash
+export TD_OUT_DIR=/secure/run
+python3 scripts/td_pipeline.py /secure/run --sources /secure/persons.json
+```
+
+이러면 산출물·로그·콜덤프가 전부 `/secure/run` 아래로 간다. `TD_OUT_DIR` 미설정 시엔
+기존대로 리포의 `data/`를 쓴다(하위호환).
+
+> 이 env가 없던 시절엔 `data_dir`을 밖으로 빼도 **콜덤프와 ECS 로그는 리포 안에 남았다** —
+> 프롬프트 원문이 통째로 들어 있는 파일들이. 지금은 따라간다.
+
+**② 콘솔 — 원문은 절대 안 찍힌다**
+
+격리해도 stdout은 못 막는다(에이전트가 명령을 돌리면 출력을 본다). 그래서 예외·로그
+메시지에서 원문을 뺐다:
+
+```
+이전:  JSON 파싱 실패: JSON 없음: '...{"name": "D1b Yield·Test PGM 최적화", "quote": "임소율'
+지금:  JSON 파싱 실패: JSON 객체 없음 (응답 20,613자)
+```
+
+추출 실패 로그도 실명 대신 `id=`만 찍고, 코드북 검증 오류도 범주명 대신 인덱스로 가리킨다.
+원문이 필요하면 `TD_OUT_DIR` 안의 `ABNORMAL/` 덤프와 ECS 로그를 **사람이** 본다.
+
+**③ 강제 — `permissions.deny`**
+
+`.claude/settings.json`(커밋됨)에 `Read(./data/**)` 등이 걸려 있다. 단 Bash로 읽는 경로는
+두더지잡기라 완전하지 않다 — **①이 실질적 방어이고 이건 실수 방지용 그물**이다.
+
+### 에이전트는 이걸로 상태를 본다 — `td_peek.py`
+
+격리하면 에이전트가 산출물을 아예 못 보는데, 디버깅은 해야 한다. 그 창구가 이거다.
+
+```bash
+python3 scripts/td_peek.py /secure/run
+```
+```
+[산출물]
+extracted.json      144건  무신호 12건
+taxonomy.json        23건  relations 41엣지 / 17개 카테고리
+assignments.json    812건  Other 47건(5.8%)
+진행률 taxonomy      11/12  미완 — 재실행하면 이어감
+
+[집계]  ※ 카테고리는 인덱스로만
+      인원  pjt  cl   보유    갭  준비도
+#1      24    3    3   18   31  갭만 있음
+
+[LLM 호출]
+stage           성공    실패       요청최대       응답최대  에러
+taxonomy        11      1        1.2k       20.6k  ValueError×1
+              ⚠ 응답이 20kb 이상 — 출력 한도 의심
+
+[최종 실패]
+taxonomy: 1건 — call_id 12
+```
+
+레벨 0+1만 나온다. 이름·본문이 출력될 코드 경로 자체가 없고, 테스트가 그걸 고정한다
+(`tests/test_td_peek.py`). **여기에 이름을 출력하는 기능을 추가하지 마라.**
+
+이 출력만으로 되는 것: 완주했나 / 어디서 멈췄나 / 재개가 됐나 / 폐기·Other가 많나 /
+페이로드 한도에 걸렸나. 못 하는 것: taxonomy 품질 판정 — 그건 원래 사람 몫이다.
+
+### 운영 원칙
+
+- **실행은 사람이** 한다. 에이전트는 코드를 짜고, 합성 코퍼스(`td_sources.py`)로 재현한다.
+- 에이전트에게 상황을 전달할 땐 **`td_peek.py` 출력을 붙여넣는다.** 에러 메시지를 그대로
+  복사해도 이제 원문은 안 들어 있지만, peek 출력이 진단에 더 유용하다.
+- 산출물을 사람이 검수하다 이상한 걸 발견하면, 파일을 붙여넣지 말고 **무엇이 어떻게
+  이상한지 말로** 설명해라 — 지난번 `relations` 문제도 그렇게 해서 원문 없이 고쳤다.
+
+---
+
 ## 7. 빠른 참조
 
 ```bash
-# 실행
-make td SOURCES=data/persons.json
+# 실행 (내부망 — 산출물·로그·콜덤프 전부 리포 밖으로)
+export TD_OUT_DIR=/secure/run
+python3 scripts/td_pipeline.py /secure/run --sources /secure/persons.json
 
 # 중단됐으면 → 같은 명령 다시 (자동 재개)
 
-# 진행 상태
-cat data/task_discovery/taxonomy.progress.json
-cat data/task_discovery/assignments.progress.json
-
-# 실패 확인
-ls data/task_discovery/calls/*/ABNORMAL/
-
-# 20kb 진단
-grep -c . data/pipeline.ecs.jsonl
-python3 -c "import json;[print(json.loads(l).get('http.request.body.bytes'), json.loads(l).get('http.response.body.bytes'), json.loads(l).get('error.message','ok')) for l in open('data/pipeline.ecs.jsonl')]"
+# 상태 확인 — 이거 하나면 됨. 에이전트에게 붙여넣어도 안전
+python3 scripts/td_peek.py /secure/run
 
 # 처음부터 다시 (사이드카까지 같이 지울 것)
-rm data/task_discovery/{taxonomy,assignments}.json data/task_discovery/{taxonomy,assignments}.progress.json
+rm /secure/run/{taxonomy,assignments}.json /secure/run/{taxonomy,assignments}.progress.json
+
+# 실패 원문 확인 — 사람만
+ls /secure/run/task_discovery/calls/*/ABNORMAL/
 ```
+
+로컬(합성 데이터)에서 개발할 땐 `TD_OUT_DIR` 없이 `make td` 그대로 쓰면 된다.

@@ -7,11 +7,15 @@ ECS 로그는 extra={"ecs": {...}}로 실은 필드를 그대로 머지한다 �
 """
 import json
 import logging
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-LOG_PATH = Path(__file__).parent.parent / "data" / "pipeline.log"
-ECS_LOG_PATH = Path(__file__).parent.parent / "data" / "pipeline.ecs.jsonl"
+# 실행 산출물 루트. 내부망에선 리포 밖(예: /secure/run)을 가리켜 실데이터가 밴 로그가
+# 작업 디렉터리에 남지 않게 한다 — 에이전트가 읽을 수 있는 위치에 원문을 두지 않기 위함.
+OUT_DIR = Path(os.getenv("TD_OUT_DIR") or Path(__file__).parent.parent / "data")
+LOG_PATH = OUT_DIR / "pipeline.log"
+ECS_LOG_PATH = OUT_DIR / "pipeline.ecs.jsonl"
 ECS_VERSION = "8.11"
 
 

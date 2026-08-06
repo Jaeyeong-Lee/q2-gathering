@@ -111,7 +111,9 @@ def run_extract(sources, out_path, call, *, tries=2, attempts=4, sleep=None):
             for d in dropped:
                 dropped_all.append({"person_id": doc["id"], "item": d})
         except (Nonretryable, Exception) as e:
-            log.warning(f"추출 폐기 [{doc.get('name', '?')}] id={doc.get('id')}: {e}")
+            # 콘솔엔 id만 — 실명은 ECS 로그(TD_OUT_DIR 안)에만 남긴다.
+            log.warning(f"추출 폐기 id={doc.get('id')}: {e}",
+                        extra={"ecs": {"user.name": doc.get("name")}})
             failed.append(doc["id"])
         out_path.write_text(json.dumps(persons, ensure_ascii=False, indent=1), encoding="utf-8")
     return {"persons": persons, "failed": failed, "dropped": dropped_all}

@@ -106,6 +106,32 @@ def test_retry_json_per_attempt_failure_logs_bytes_only(caplog):
     assert "http.request.body" not in ecs  # 시도별 실패는 바이트 수만, 원문 없음
 
 
+def test_parse_json_error_does_not_leak_response_text():
+    """예외 메시지는 콘솔로 나가고 사람이 그대로 복사해 옮긴다 — 실명·인용·카테고리명이
+    거기 실리면 안 된다(응답 길이만)."""
+    response = '죄송합니다:\n{"name": "D1b Yield·Test PGM 최적화", "quote": "임소율: HFT DPPM"'
+    with pytest.raises(ValueError) as exc:
+        c.parse_json(response)
+    msg = str(exc.value)
+    assert "임소율" not in msg and "D1b" not in msg and "죄송" not in msg
+    assert str(len(response)) in msg          # 길이는 알려준다(진단용)
+
+
+def test_retry_json_failure_logs_keep_payload_out_of_console_message(caplog):
+    """ECS extras엔 원문이 있어도(파일 전용), 콘솔에 찍히는 message엔 없어야 한다."""
+    def bad(prompt):
+        return '{"name": "D1b Yield·Test PGM 최적화", "quote": "임소율"'
+
+    with caplog.at_level(logging.WARNING, logger="leak-check"):
+        with pytest.raises(ValueError):
+            c.retry_json(bad, "프롬프트", stage="leak-check", call_id=1,
+                         attempts=1, base=0.0, sleep=lambda _: None)
+
+    for record in caplog.records:
+        assert "임소율" not in record.getMessage()
+        assert "D1b" not in record.getMessage()
+
+
 def test_retry_json_dumps_successful_call(tmp_path, monkeypatch):
     monkeypatch.setattr(c, "CALLS_DIR", tmp_path)
 

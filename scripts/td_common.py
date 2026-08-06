@@ -8,12 +8,14 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from pipeline_log import get_logger
+from pipeline_log import OUT_DIR, get_logger
 
 # facet 4축 (consumer 공용). 추출은 direction을 단수로 별도 처리하므로 td_extract는 자체 상수 사용.
 AXES = ("future_task", "capability_gap", "capability_have", "direction")
 
-CALLS_DIR = Path(__file__).parent.parent / "data" / "task_discovery" / "calls"
+# 콜 덤프엔 프롬프트 원문이 통째로 들어간다 — TD_OUT_DIR로 리포 밖에 두면 에이전트
+# 작업 디렉터리에 실데이터가 남지 않는다(pipeline_log.OUT_DIR과 같은 뿌리를 쓴다).
+CALLS_DIR = OUT_DIR / "task_discovery" / "calls"
 
 
 class Nonretryable(Exception):
@@ -26,10 +28,15 @@ def load_json(x):
 
 
 def parse_json(response):
-    """LLM 응답에서 첫 { ~ 마지막 } 슬라이스 후 파싱. strict=False로 quote 내 raw 개행 허용."""
+    """LLM 응답에서 첫 { ~ 마지막 } 슬라이스 후 파싱. strict=False로 quote 내 raw 개행 허용.
+
+    예외 메시지에 응답 원문을 넣지 않는다 — 이 메시지는 콘솔로 나가고 사람이 그대로
+    복사해 옮기기 쉬운데, 응답엔 실명·인용·카테고리명이 들어 있다. 원문이 필요하면
+    콜 덤프(calls/<stage>/ABNORMAL/)와 ECS 로그를 봐라(둘 다 TD_OUT_DIR 안).
+    """
     start, end = response.find("{"), response.rfind("}")
     if start == -1 or end <= start:
-        raise ValueError(f"JSON 없음: {response[:80]!r}")
+        raise ValueError(f"JSON 객체 없음 (응답 {len(response)}자)")
     return json.loads(response[start:end + 1], strict=False)
 
 

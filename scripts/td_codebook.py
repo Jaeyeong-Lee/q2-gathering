@@ -15,15 +15,19 @@ REQUIRED = ("name", "definition", "inclusion")
 
 
 def load(path):
-    """코드북 로드 + 검증. 필수 필드 누락·범주명 중복이면 ValueError."""
+    """코드북 로드 + 검증. 필수 필드 누락·범주명 중복이면 ValueError.
+
+    예외 메시지는 범주명 대신 **인덱스**로 가리킨다 — 범주명이 사내 제품 코드명일 수 있고
+    이 메시지는 콘솔로 나가 그대로 옮겨지기 쉽다. 어느 범주인지는 파일에서 확인해라.
+    """
     cats = json.loads(Path(path).read_text(encoding="utf-8"))
     names = set()
-    for c in cats:
+    for i, c in enumerate(cats):
         missing = [f for f in REQUIRED if not (c.get(f) or "").strip()]
         if missing:
-            raise ValueError(f"코드북 범주 필수 필드 누락 {missing}: {c.get('name', '?')!r}")
+            raise ValueError(f"코드북 {i}번 범주 필수 필드 누락: {missing}")
         if c["name"] in names:
-            raise ValueError(f"코드북 범주명 중복: {c['name']!r}")
+            raise ValueError(f"코드북 {i}번 범주명이 앞과 중복")
         names.add(c["name"])
     return cats
 
