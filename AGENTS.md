@@ -1,94 +1,107 @@
-# AGENTS.md
+# AGENTS.md — opencode 전용
 
-이 저장소엔 프로젝트가 두 개 있다. 헷갈리면 이 표부터 봐라.
+> **이 문서는 opencode(내부 Qwen) 전용이다.**
+> 네가 Claude Code라면 여기 적힌 권한 규정은 **너에게 적용되지 않는다** — `CLAUDE.md`를 따라라.
+> 특히 "실데이터를 봐도 된다"는 부분은 opencode에만 해당한다.
 
-| | Heritage Archive (유사도 네트워크) | task-discovery |
+## 네 역할: 실행하고 관찰한다
+
+이 프로젝트엔 에이전트가 셋이고, 실데이터를 볼 수 있는 건 **너뿐이다.**
+
+| 주체 | 실데이터 | 역할 |
 |---|---|---|
-| 상태 | **완료·배포됨 — 건드릴 필요 없음** | **진행 중 — 지금 할 일** |
-| 산출물 | `dist/heritage-archive.html` (단일 정적 파일) | `data/task_discovery/*.json` + `workshop-input.md` |
-| 문서 | `README.md`, `docs/PRD-heritage-archive.md` | `docs/task-discovery-coldstart.md` |
-| 스크립트 | `scripts/embed.py` `similarity.py` `freq.py` `build.py` | `scripts/td_*.py` |
+| **너 (opencode · 내부 Qwen)** | **볼 수 있음** | 실행 · 관찰 · 사실 보고 |
+| Claude Code (내부) | ❌ 금지 | 코드 수정 |
+| Claude Code (외부) | ❌ 접근 불가 | 설계 · 계획 |
 
-**지금 작업은 task-discovery다.** Heritage Archive 쪽 파일은 이 작업과 무관하니 손대지 마라.
+모델이 사내에 있어서 네 컨텍스트는 밖으로 안 나간다. 그래서 `persons.json`도, `taxonomy.json`도,
+실패한 콜의 프롬프트 원문도 마음껏 열어봐도 된다. **그게 네가 여기 있는 이유다.**
 
-## task-discovery 5줄 요약
+## 지켜야 할 것 두 개
 
-부서원 ~200명 회고(`data/persons.json`) → LLM이 facet 추출 → taxonomy(역량 카테고리) 유도
-→ 배정 → 집계 → 워크숍 입력 문서. 전체 설계·근거·용어는 **`docs/task-discovery-coldstart.md`
-하나에 다 있다 — 다른 데서 찾지 말고 그거부터 읽어라.**
+### 1. CC에 넘길 땐 `td_peek.py` 출력으로만
 
-## 지금 실행할 것
+CC(내부/외부)는 실데이터를 컨텍스트에 넣으면 안 된다. 네가 본 걸 그대로 옮기면 그 제약이
+깨진다. **네가 "알아서 민감정보를 빼고 요약"하지 마라** — 실수 한 번이면 뚫린다.
 
-**내부망에서 돌리기 전에 `docs/task-discovery-internal-run-guide.md`를 읽어라.** 재개·로그·
-콜 덤프·20kb 진단 방법이 전부 거기 있다(S1-8, 이슈 #30 반영).
+```bash
+python3 scripts/td_peek.py $TD_OUT_DIR     # 이 출력만 넘긴다
+```
 
-`extracted.json`은 이미 만들어져 있고 검증됐다. **다시 추출하지 마라.** 재실행 범위는
-taxonomy부터다:
+이 스크립트는 건수·진행률·바이트 통계만 내고 이름·본문·**카테고리명**이 나올 코드 경로 자체가
+없다(테스트로 고정돼 있다). 기계적으로 안전하다.
+
+`td_peek`에 없는 걸 넘겨야겠다 싶으면 **사람에게 물어라.** 직접 판단해서 넘기지 마라.
+
+특히 이것들은 절대 CC에 넘기지 마라:
+- 실명, 회고 원문, 인용문
+- **카테고리 이름·정의** — 개인정보는 아니지만 `D1b Yield·Test PGM 최적화` 같은 사내 제품
+  코드명이 그대로 들어간다. 회사 기준으론 개인 회고보다 민감할 수 있다
+- 프롬프트·응답 원문 (`calls/**`, `pipeline.ecs.jsonl`의 실패 레코드)
+
+### 2. "왜"는 추측하지 말고 사실만 넘겨라
+
+원인 판단은 CC가 코드를 보고 한다. 네가 원인을 단정해서 넘기면, 틀렸을 때 CC가 그 틀린 전제
+위에서 코드를 고친다.
+
+**넘길 것 (관찰):**
+- `td_peek.py` 출력
+- 어떤 명령을 어떤 env로 돌렸는지
+- 몇 번째 콜/배치에서 멈췄는지, 요청·응답 몇 바이트였는지
+- 스택트레이스 (원문은 이제 안 실린다 — 아래 참고)
+- 응답이 중간에 끊겼는지, 아니면 형식이 틀렸는지 같은 **구조적 사실**
+
+**넘기지 말 것 (판단):**
+- "이건 X 때문인 것 같다"
+- "Y를 고치면 될 것 같다"
+
+지난번 예: `"taxonomy 12번 배치, 요청 12.4kb, 응답 20.6kb에서 JSON 파싱 실패"`까지가 네 몫이고,
+`"_INSTRUCT가 배치마다 relations를 요구해서다"`는 CC가 코드를 보고 낸 판단이다.
+
+## 실행
+
+전체 설계·용어는 **`docs/task-discovery-coldstart.md`**, 내부망 실행 상세는
+**`docs/task-discovery-internal-run-guide.md`**. 여기 없는 건 거기 있다.
 
 ```bash
 export TEXT_PROVIDER=internal
 export TEXT_API_KEY=<사내 키>
 export TEXT_API_BASE=<사내 OpenAI호환 URL>
-export TD_TEXT_MODEL=<사내 텍스트 모델 id>   # 필수. 안 채우면 gemini 모델명이 그대로 넘어가서 깨진다
-make td SOURCES=data/persons.json
+export TD_TEXT_MODEL=<사내 텍스트 모델 id>   # 필수. 안 채우면 gemini 모델명이 넘어가 깨진다
+export TD_OUT_DIR=/secure/run                # 산출물·로그·콜덤프 루트 (리포 밖 권장)
+
+python3 scripts/td_pipeline.py $TD_OUT_DIR --sources <실데이터 persons.json 경로>
 ```
 
-중간 산출물(`data/task_discovery/*.json`)이 있으면 자동 skip한다. taxonomy를 다시 만들고
-싶으면 `taxonomy.json`과 `taxonomy.progress.json`을 **같이** 지우고 돌려라 —
-`extracted.json`은 지우지 말고 `touch`도 하지 마라(mtime이 바뀌면 taxonomy·assign이 전부
-처음부터 다시 돈다).
+**중단되면 같은 명령을 다시 쳐라.** taxonomy는 배치 단위로, assign은 항목 단위로 저장되므로
+죽은 지점부터 이어간다. 임시 py 스크립트를 만들지 마라 — 예전엔 재개가 안 돼서 그래야
+했지만 이제는 진행 사이드카와 어긋나서 상태만 꼬인다.
 
-**중단되면 임시 스크립트를 만들지 말고 같은 명령을 다시 쳐라.** taxonomy·assign은 배치/항목
-단위로 저장되므로 죽은 지점부터 자동으로 이어간다(예전엔 안 됐지만 이제 된다).
-
-## 실데이터를 네 컨텍스트에 올리지 마라 (제일 중요)
-
-파이프라인이 실데이터를 **처리**하는 것과, 네가 그걸 **읽는** 것은 다른 문제다. 처리는 해야
-하지만, 네 컨텍스트에 들어간 내용은 네가 어디서 돌든 밖으로 나간다. 그러니:
-
-**절대 열지 마라** — `Read`든 `cat`/`head`/`grep`/`python -c open(...)`이든:
-
-| 파일 | 왜 |
-|---|---|
-| `data/persons.json` | 실명 + 회고 원문 |
-| `extracted.json` / `assignments.json` | 실명 + 원문 인용 |
-| `taxonomy.json` / `aggregates.json` | 카테고리명·정의 = **사내 제품 코드명·기술 전략** |
-| `workshop-input.md`, `interpretation/**` | 위 둘 다 |
-| `calls/**`, `pipeline.ecs.jsonl` | 프롬프트·응답 원문 |
-
-**카테고리 이름도 안 된다.** 개인정보는 아니지만 `D1b Yield·Test PGM 최적화` 같은 사내
-코드명이 그대로 들어간다 — 회사 기준으론 개인 회고보다 민감할 수 있다.
-
-**파이프라인 실행은 네가 한다.** 그게 네가 여기 있는 이유다 — 돌리고, 막히면 고치고, 다시
-돌린다. 금지되는 건 실행이 아니라 **산출물을 직접 열어보는 것**이다.
-
+특정 단계만 다시 하려면 산출물과 **사이드카를 같이** 지워라:
 ```bash
-python3 scripts/td_pipeline.py $TD_OUT_DIR --sources <실데이터 경로>   # 실행: OK
-python3 scripts/td_peek.py $TD_OUT_DIR                                 # 결과 확인: 이걸로만
-cat $TD_OUT_DIR/taxonomy.json                                          # 금지
+rm $TD_OUT_DIR/{taxonomy,assignments}.json $TD_OUT_DIR/{taxonomy,assignments}.progress.json
 ```
 
-콘솔 출력은 안전하게 만들어놨다 — 로그·예외 메시지에 원문·실명·범주명이 안 실리고
-`seq=`/`id=`/바이트 수만 나온다. 그러니 **실행 중 출력은 그대로 봐도 된다.** 다만 그 이상이
-필요하면 파일을 여는 게 아니라 `td_peek.py`를 써라.
+`extracted.json`은 지우지 말고 `touch`도 하지 마라 — mtime이 바뀌면 taxonomy·assign이 전부
+처음부터 다시 돈다(상류 변경으로 판정).
 
-**그 외:**
-- 코드 개발·디버깅은 **합성 코퍼스로** — `td_sources.py`가 같은 스키마의 가짜 데이터를
-  만든다(애초에 그러라고 있는 모듈이다). 테스트도 전부 가짜 `call` 주입식이다.
-- 실패한 콜의 원문이 꼭 필요하면 `calls/<stage>/ABNORMAL/`에 있다고 **사람에게 알려주고
-  확인을 요청**해라. 직접 열지 마라.
-- 산출물이 이상하다는 보고를 받으면, 파일을 열지 말고 `td_peek.py` 숫자와 코드 로직으로
-  원인을 좁혀라.
+## 알아둘 것
 
-내부망 실행 시엔 `TD_OUT_DIR`을 리포 밖(예: `/secure/run`)으로 잡아 로그·콜덤프가 작업
-디렉터리에 아예 안 남게 한다 — 자세한 건 `docs/task-discovery-internal-run-guide.md`.
+- **콘솔엔 원문이 안 찍힌다.** 로그·예외 메시지가 실명 대신 `seq=`/`id=`, 응답 원문 대신
+  바이트 수만 낸다. 누가 문제인지는 네가 DB로 조회하면 된다:
+  `sqlite3 data/roster.db "SELECT name FROM roster WHERE seq IN (12, 45)"`
+- **실패한 콜의 원문**은 `$TD_OUT_DIR/task_discovery/calls/<stage>/ABNORMAL/`에 있다.
+  너는 열어봐도 된다. CC에 넘기지만 마라.
+- 재시도 계층은 `td_common.retry_call` **하나뿐**이다(SDK 재시도 위에 얹혀 이미 두 겹).
+  더 늘리거나 langchain 같은 프레임워크를 넣지 마라 — 실패 한 건이 수십 콜로 증폭된다.
+- 산출물은 `data/`나 `$TD_OUT_DIR`에만 쓴다. **`dist/`는 GitHub Pages 배포 대상**이라 뭘 넣으면
+  바로 공개된다.
+- 실명·실데이터를 **사내망 밖** LLM/서비스로 보내지 마라. 사내 엔드포인트만 쓴다.
 
-## 지켜야 할 것
+## 이 저장소엔 프로젝트가 둘이다
 
-- 실명·실데이터는 절대 외부(비-사내) LLM/서비스로 안 보낸다. 사내망 엔드포인트만 쓴다.
-- 산출물은 `data/`(gitignore)에만 쓴다. `dist/`는 GitHub Pages 배포 대상이라 여기 뭘 넣으면
-  바로 공개된다 — task-discovery 산출물은 절대 넣지 마라.
-- 코드 스타일·테스트 패턴은 `scripts/td_*.py`에 이미 있는 걸 그대로 따라라(순수함수 + 주입된
-  `call`, `tests/test_td_*.py` 패턴). 새 프레임워크·라이브러리 들이지 마라.
-- 막히면 지어내지 말고 `docs/task-discovery-coldstart.md` §6("아직 열려 있는 것")부터 확인하고,
-  그래도 안 풀리면 사람한테 물어라.
+| | Heritage Archive | task-discovery |
+|---|---|---|
+| 상태 | **완료·배포됨 — 건드리지 마라** | **진행 중 — 지금 할 일** |
+| 스크립트 | `embed.py` `similarity.py` `freq.py` `build.py` | `scripts/td_*.py` |
+| 산출물 | `dist/heritage-archive.html` | `$TD_OUT_DIR/*.json` + `workshop-input.md` |
