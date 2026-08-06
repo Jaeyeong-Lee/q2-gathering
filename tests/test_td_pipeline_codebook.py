@@ -22,6 +22,8 @@ def _fakes():
 
     def taxo(prompt):
         calls["taxo"] += 1
+        if "relations" in prompt:          # 마지막 관계 도출 패스
+            return json.dumps({"relations": []}, ensure_ascii=False)
         return json.dumps({"taxonomy": [{"name": "합성역량", "definition": "d",
                                          "inclusion_criteria": "i"}]}, ensure_ascii=False)
 

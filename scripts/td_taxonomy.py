@@ -4,6 +4,11 @@ extracted.json의 facet들을 LLM이 배치 반복으로 읽어 역량/방향 ta
 **임베딩 클러스터링을 카테고리화에 쓰지 않는다** — 도메인 용어 무지를 구조적으로 우회.
 각 카테고리는 name·definition·inclusion_criteria. 카테고리 개수는 고정하지 않는다.
 
+**relations(온톨로지)는 배치 루프가 아니라 마지막에 한 번만 도출한다.** 관계는 전체 구조에
+대한 속성이라, 카테고리가 아직 다 안 만들어진 배치 중간에 매기면 (a) 존재하지 않는
+카테고리를 가리켜 버려지고 (b) 매 배치마다 전부 다시 뱉느라 응답이 1.5~1.7배로 부푼다.
+사내망에서 응답이 20kb를 넘겨 JSON이 잘리던 원인이 이것이었다(#30).
+
 이 스테이지는 사내 LLM 생성 품질의 go/no-go 게이트다. 가짜 call 테스트는 코드가
 병합·정제 응답을 잘 처리함만 증명 — 실제 생성 품질은 실 LLM 실행에서 사람이 판정한다.
 LLM은 call(prompt)->str 주입, td_common.retry_call 재사용.
@@ -23,12 +28,15 @@ _REL_TYPES = {"broader", "related"}
 _INSTRUCT = """너는 반도체 후공정 테스트 팀의 근원경쟁력 회고에서 뽑은 항목들을 읽고,
 팀의 역량/방향 카테고리 taxonomy를 만든다. 카테고리 개수는 고정하지 말고 데이터가
 자연스럽게 요구하는 만큼(대략 15~25개) 만든다. 각 카테고리는 name(짧은 명사구),
-definition(1문장), inclusion_criteria(어떤 항목이 여기 들어오는지), relations(다른
-카테고리와의 관계, 없으면 빈 배열)를 갖는다. relations의 각 항목은
-{"to": "다른 카테고리 name", "type": "broader"|"related"} — broader는 이 카테고리가 to의
-상위 개념일 때, related는 단순 연관일 때 쓴다. 확실하지 않으면 relations를 비워둬라.
+definition(1문장), inclusion_criteria(어떤 항목이 여기 들어오는지)를 갖는다.
 JSON 객체로만 답하라: {"taxonomy": [{"name": "...", "definition": "...",
-"inclusion_criteria": "...", "relations": [{"to": "...", "type": "broader"}]}]}"""
+"inclusion_criteria": "..."}]}"""
+
+_RELATIONS_INSTRUCT = """아래는 확정된 역량/방향 카테고리 목록이다. 카테고리 사이의 관계만
+뽑아라. 새 카테고리를 만들거나 이름을 바꾸지 말고, 목록에 있는 name만 쓴다.
+type은 두 가지뿐이다 — broader는 from이 to의 상위 개념일 때, related는 단순 연관일 때.
+확실하지 않은 관계는 넣지 마라(적게 넣는 편이 낫다). 관계가 없으면 빈 배열.
+JSON 객체로만 답하라: {"relations": [{"from": "...", "to": "...", "type": "broader"}]}"""
 
 
 def _facet_texts(persons):
@@ -63,11 +71,43 @@ def _normalize(taxo):
 def _prompt(facets, existing):
     lines = "\n".join(f"- {t}" for t in facets)
     if existing:
+        # relations는 이 루프의 관심사가 아니므로 프롬프트에서도 뺀다(요청 크기 감소 +
+        # 모델이 안 물어본 필드를 따라 뱉지 않게).
+        carried = [{k: c[k] for k in ("name", "definition", "inclusion_criteria")} for c in existing]
         return (_INSTRUCT + "\n\n기존 taxonomy(병합·분할·정제 대상):\n"
-                + json.dumps(existing, ensure_ascii=False)
+                + json.dumps(carried, ensure_ascii=False)
                 + "\n\n새 항목들:\n" + lines
                 + "\n\n기존을 갱신한 전체 taxonomy를 반환하라(중복 카테고리 만들지 말 것).")
     return _INSTRUCT + "\n\n항목들:\n" + lines
+
+
+def _relations_prompt(taxonomy):
+    """관계 도출용 — name·definition만 싣는다(inclusion_criteria는 관계 판단에 불필요)."""
+    view = [{"name": c["name"], "definition": c["definition"]} for c in taxonomy]
+    return _RELATIONS_INSTRUCT + "\n\n카테고리:\n" + json.dumps(view, ensure_ascii=False)
+
+
+def derive_relations(taxonomy, call, *, attempts=4, sleep=None):
+    """완성된 taxonomy에 relations를 붙여 반환. LLM 1콜(엣지 리스트만 받음).
+
+    배치 루프와 분리한 이유는 모듈 docstring 참고. 검증(댕글링·자기참조·잘못된 type 제거)은
+    _normalize를 그대로 재사용하므로 여기선 엣지를 카테고리에 얹기만 한다.
+    """
+    if not taxonomy:
+        return taxonomy
+    kw = {"attempts": attempts} | ({"sleep": sleep} if sleep else {})
+    parsed = retry_json(call, _relations_prompt(taxonomy), stage="taxonomy",
+                        call_id="relations", **kw)
+    by_name = {c["name"]: c for c in taxonomy}
+    for c in taxonomy:
+        c["relations"] = []
+    for e in parsed.get("relations") or []:
+        if not isinstance(e, dict):
+            continue
+        src = by_name.get((e.get("from") or "").strip() if isinstance(e.get("from"), str) else "")
+        if src is not None:
+            src["relations"].append({"to": e.get("to"), "type": e.get("type")})
+    return _normalize(taxonomy)
 
 
 def _progress_path(out_path):
@@ -89,6 +129,10 @@ def is_complete(out_path):
 def induce(extracted, out_path, call, *, batch_size=30, attempts=4, sleep=None):
     """facet들을 배치 반복으로 LLM에 넣어 taxonomy 생성·정제. 반환: taxonomy(list).
 
+    facet 배치를 다 돈 뒤 relations를 도출하는 **마지막 1스텝**이 붙는다. 그래서
+    total_batches = facet 배치 수 + 1이고, 관계 패스도 재개 대상이다(배치가 다 끝난 뒤
+    관계 콜에서 죽어도 카테고리는 남고, 재실행하면 관계만 다시 뽑는다).
+
     out_path가 있으면 배치마다 즉시 저장 + taxonomy.progress.json에 진행 상태를 남겨 중단된
     지점부터 재개한다. extracted가 경로로 주어지면 그 mtime을 사이드카와 비교 — 다르면
     (상류가 바뀜) 처음부터 다시 시작한다. 배치 하나가 재시도 끝에 실패하면 건너뛰지 않고
@@ -104,7 +148,7 @@ def induce(extracted, out_path, call, *, batch_size=30, attempts=4, sleep=None):
     extracted_mtime = Path(extracted).stat().st_mtime if isinstance(extracted, (str, Path)) else None
 
     batch_starts = list(range(0, len(facets), batch_size))
-    total_batches = len(batch_starts)
+    total_batches = len(batch_starts) + 1   # 마지막 1스텝 = relations 도출 패스
 
     taxonomy, batches_done = [], 0
     if progress_path is not None and progress_path.exists() and out_path.exists():
@@ -131,6 +175,10 @@ def induce(extracted, out_path, call, *, batch_size=30, attempts=4, sleep=None):
         taxonomy = _normalize(parsed.get("taxonomy"))
         batches_done = batch_no
         save()
+
+    if batches_done < total_batches:                       # 마지막 스텝: 관계 도출
+        taxonomy = derive_relations(taxonomy, call, attempts=attempts, sleep=sleep)
+        batches_done = total_batches
 
     save()  # 무신호(배치 0개)거나 이미 완료 상태로 진입해도 항상 한 번은 저장 보장
     return taxonomy

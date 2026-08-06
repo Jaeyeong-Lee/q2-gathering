@@ -23,6 +23,9 @@ def _fakes():
 
     def taxo(prompt):
         calls["taxo"] += 1
+        if "relations" in prompt:          # 마지막 관계 도출 패스
+            calls["taxo_relations"] += 1
+            return json.dumps({"relations": []}, ensure_ascii=False)
         return json.dumps({"taxonomy": [{"name": "합성역량", "definition": "d",
                                          "inclusion_criteria": "i"}]}, ensure_ascii=False)
 
@@ -98,7 +101,8 @@ def test_partial_taxonomy_resumes_via_run_all_instead_of_being_skipped(tmp_path)
     calls.clear()
     td_pipeline.run_all(tmp_path, extract_call=ex, taxo_call=tx, assign_call=asg, narrate_call=nr,
                         n=12, seed=0, batch_size=6, sleep=NOOP)
-    assert calls["taxo"] == 1  # 배치 1은 스킵(이미 완료), 배치 2만 재호출 — 게이트가 완료율 기반
+    # 배치 1은 스킵(이미 완료), 배치 2 + 관계 패스만 재호출 — 게이트가 완료율 기반
+    assert calls["taxo"] == 2 and calls["taxo_relations"] == 1
     md = (tmp_path / "workshop-input.md").read_text(encoding="utf-8")
     assert "합성역량" in md
 
