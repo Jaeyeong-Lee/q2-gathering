@@ -29,6 +29,12 @@ _INSTRUCT = """너는 반도체 후공정 테스트 팀의 근원경쟁력 회�
 팀의 역량/방향 카테고리 taxonomy를 만든다. 카테고리 개수는 고정하지 말고 데이터가
 자연스럽게 요구하는 만큼(대략 15~25개) 만든다. 각 카테고리는 name(짧은 명사구),
 definition(1문장), inclusion_criteria(어떤 항목이 여기 들어오는지)를 갖는다.
+
+name·definition·inclusion_criteria는 모두 한국어로 쓴다. 단 기술 용어·약어·제품명은
+원문 표기를 그대로 두고 번역하지 마라 — 예: Burn-in, STDF, ATE, Yield, DPPM, FA, D1b, AX.
+name은 이런 형태다: "STDF 기반 고장분석 자동화", "Burn-in 신뢰성 강화",
+"AX 기반 테스트 지능화", "설비 운영·예방보전 자동화", "D1b Yield 조기 안정화"
+
 JSON 객체로만 답하라: {"taxonomy": [{"name": "...", "definition": "...",
 "inclusion_criteria": "..."}]}"""
 
