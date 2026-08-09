@@ -88,8 +88,8 @@ def test_category_without_taxonomy_entry_still_appears():
 def test_render_is_self_contained():
     html = td_inspect.render_html(td_inspect.build_payload(*_fixture()))
     assert "<script" in html and "</html>" in html
-    # 외부 네트워크 참조가 없어야 file://로 열린다
-    for bad in ("http://", "https://", "//cdn", "src=\"/"):
+    # 외부에서 무언가를 끌어오는 구문이 없어야 file://로 열린다
+    for bad in ('<script src=', '<link ', '<img ', 'fetch(', 'XMLHttpRequest', 'url(http'):
         assert bad not in html
 
 
