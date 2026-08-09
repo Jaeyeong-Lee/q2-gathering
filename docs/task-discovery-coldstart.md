@@ -184,6 +184,7 @@ no-signal 격리, 항목단위 폐기, 단일 재시도, confidence 스키마 �
 
 ## 9. 포인터
 
+- **스테이지별 산출물 포맷(무엇이 어떤 JSON으로 나오나): [[task-discovery-pipeline-reference]]**
 - PRD: 이슈 #13(S1) / #14(S2) / #15(S4)
 - 티켓: #16~#22(S1) / #23~#25(S2) / #26~#29(S4) — 각 acceptance criteria
 - 입력·제약·인프라: `docs/task-discovery-requirements.md`

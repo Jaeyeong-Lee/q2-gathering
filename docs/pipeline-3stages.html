@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회고 원문에서 워크숍 자료까지 — 여섯 단계가 실제로 하는 일</title>
+<style>
+  :root{
+    --bg:#fcfcfb; --panel:#fff; --ink:#1b1d20; --dim:#6b7280; --line:#e2e4e8;
+    --accent:#b45309;        /* LLM 호출 = 비용이 드는 지점 */
+    --drop:#c2410c;          /* 폐기·거부 */
+    --ok:#0e7490;
+    --soft:#f4f5f6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#16181b; --panel:#1c1f23; --ink:#e8eaed; --dim:#9aa1ab; --line:#2f343a;
+           --accent:#f0b45e; --drop:#f08a5d; --ok:#5fc4d8; --soft:#22262b; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.75 -apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo",
+            "Malgun Gothic",sans-serif;}
+  .wrap{max-width:820px;margin:0 auto;padding:56px 24px 96px}
+
+  h1{font-size:29px;line-height:1.3;margin:0 0 8px;letter-spacing:-.01em}
+  .lede{color:var(--dim);font-size:15.5px;margin:0 0 8px}
+  .note{font-size:13px;color:var(--drop);border:1px solid var(--line);background:var(--panel);
+        border-radius:8px;padding:10px 14px;margin:22px 0 0}
+
+  h2{font-size:22px;margin:60px 0 4px;letter-spacing:-.01em;
+     padding-top:22px;border-top:1px solid var(--line)}
+  h2 .n{color:var(--dim);font-weight:400;margin-right:10px}
+  h3{font-size:16px;margin:34px 0 6px}
+  p{margin:14px 0}
+  strong{font-weight:650}
+  code{font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+       background:var(--soft);padding:1px 5px;border-radius:4px}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;
+      margin:16px 0}
+  pre code{background:none;padding:0;font-size:inherit}
+
+  figure{margin:30px 0;padding:0}
+  figure svg{display:block;width:100%;max-width:100%;height:auto;color:var(--ink)}
+  figcaption{font-size:13px;color:var(--dim);margin-top:10px;line-height:1.6;
+             padding-left:12px;border-left:2px solid var(--line)}
+
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12.5px;color:var(--dim);font-weight:650;letter-spacing:.02em;
+     text-transform:uppercase;border-bottom-width:1.5px}
+  td code{font-size:12.5px}
+
+  .why{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+       border-radius:0 9px 9px 0;padding:14px 18px;margin:22px 0}
+  .why b{display:block;font-size:12.5px;color:var(--accent);letter-spacing:.04em;
+         text-transform:uppercase;margin-bottom:4px}
+  .why p{margin:6px 0 0;font-size:15px}
+
+  ul{padding-left:20px} li{margin:7px 0}
+  .foot{margin-top:70px;padding-top:20px;border-top:1px solid var(--line);
+        font-size:13px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>회고 원문에서 워크숍 자료까지 — 여섯 단계가 실제로 하는 일</h1>
+<p class="lede">회고 200장이 카테고리별로 분류된 항목 800여 개가 되고, 다시 한 장의 워크숍
+자료가 되기까지. LLM이 언제 몇 번 불리고, 무엇을 근거로 결과를 믿는가.</p>
+<p class="note">이 문서의 모든 예시는 <strong>합성 데이터</strong>다. 실제 이름·회고 원문·
+카테고리명이 아니다.</p>
+
+<!-- ───────────────────────────── 0 ───────────────────────────── -->
+<h2><span class="n">0</span>한눈에</h2>
+
+<p>앞의 세 단계는 각각 다른 <strong>입자 크기</strong>에서 LLM을 부른다. 추출은 사람 한 명씩,
+taxonomy는 항목 30개씩, 배정은 항목 한 개씩. 이 차이가 비용의 차이를 그대로 만든다.
+뒤의 세 단계는 성격이 다르다 — 둘은 <strong>계산일 뿐이라 공짜</strong>고, 마지막 하나만
+다시 LLM을 쓴다.</p>
+
+<figure>
+<svg viewBox="0 0 640 812" role="img"
+     aria-label="파이프라인 여섯 단계의 흐름. persons.json이 추출·taxonomy 유도·배정을 거쳐
+     assignments.json이 되고, 집계를 거친 뒤 렌더와 해석 두 갈래로 갈라져
+     workshop-input.md와 interpretation 디렉터리를 만든다.">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <!-- 파일 박스 -->
+  <g font-size="13" text-anchor="middle">
+    <rect x="60" y="14"  width="230" height="44" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="175" y="41">persons.json <tspan font-size="11" fill="#8b929c">200명 원문</tspan></text>
+
+    <rect x="60" y="146" width="230" height="44" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="175" y="173">extracted.json <tspan font-size="11" fill="#8b929c">4축 항목</tspan></text>
+
+    <rect x="60" y="278" width="230" height="44" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="175" y="305">taxonomy.json <tspan font-size="11" fill="#8b929c">카테고리 ~25</tspan></text>
+
+    <rect x="60" y="410" width="230" height="44" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="175" y="437">assignments.json</text>
+
+    <rect x="60" y="542" width="230" height="44" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="175" y="569">aggregates.json</text>
+  </g>
+
+  <!-- LLM 단계 -->
+  <g font-size="13.5" text-anchor="middle">
+    <rect x="85" y="80"  width="180" height="40" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="175" y="105" fill="var(--accent)" font-weight="650">① 추출</text>
+
+    <rect x="85" y="212" width="180" height="40" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="175" y="237" fill="var(--accent)" font-weight="650">② taxonomy 유도</text>
+
+    <rect x="85" y="344" width="180" height="40" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="175" y="369" fill="var(--accent)" font-weight="650">③ 배정</text>
+  </g>
+
+  <!-- 무료 단계 -->
+  <g font-size="13.5" text-anchor="middle">
+    <rect x="85" y="476" width="180" height="40" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3" stroke-dasharray="5 3"/>
+    <text x="175" y="501" font-weight="650">④ 집계</text>
+  </g>
+
+  <!-- 화살표 (직선 구간) -->
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a1)">
+    <line x1="175" y1="58"  x2="175" y2="74"/>
+    <line x1="175" y1="120" x2="175" y2="140"/>
+    <line x1="175" y1="190" x2="175" y2="206"/>
+    <line x1="175" y1="252" x2="175" y2="272"/>
+    <line x1="175" y1="322" x2="175" y2="338"/>
+    <line x1="175" y1="384" x2="175" y2="404"/>
+    <line x1="175" y1="454" x2="175" y2="470"/>
+    <line x1="175" y1="516" x2="175" y2="536"/>
+  </g>
+
+  <!-- 우측 콜 수 주석 -->
+  <g font-size="12" fill="var(--dim)">
+    <text x="306" y="96">사람 1명 = 1콜</text>
+    <text x="306" y="114" font-size="11.5">약 200콜</text>
+
+    <text x="306" y="228">항목 30개 = 1콜</text>
+    <text x="306" y="246" font-size="11.5">+ 맨 끝에 관계 1콜</text>
+
+    <text x="306" y="360">항목 1개 = 1콜</text>
+    <text x="306" y="378" font-size="11.5" fill="var(--drop)">약 800콜 — 가장 비쌈</text>
+
+    <text x="306" y="492">LLM 없음</text>
+    <text x="306" y="510" font-size="11.5" fill="var(--ok)">순수 계산 — 공짜</text>
+  </g>
+
+  <!-- 갈래 -->
+  <g stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a1)">
+    <path d="M175,586 L175,606 L112,606 L112,634"/>
+    <path d="M175,586 L175,606 L448,606 L448,634"/>
+  </g>
+
+  <g font-size="13.5" text-anchor="middle">
+    <rect x="22" y="640" width="180" height="40" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3" stroke-dasharray="5 3"/>
+    <text x="112" y="665" font-weight="650">⑤ 렌더</text>
+
+    <rect x="358" y="640" width="180" height="40" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="448" y="665" fill="var(--accent)" font-weight="650">⑥ 해석</text>
+  </g>
+
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a1)">
+    <line x1="112" y1="680" x2="112" y2="700"/>
+    <line x1="448" y1="680" x2="448" y2="700"/>
+  </g>
+
+  <g font-size="13" text-anchor="middle">
+    <rect x="22" y="706" width="180" height="52" rx="7" fill="none"
+          stroke="var(--ok)" stroke-width="1.5"/>
+    <text x="112" y="728" fill="var(--ok)">workshop-input.md</text>
+    <text x="112" y="746" font-size="11" fill="var(--dim)">근거층 · Layer 1</text>
+
+    <rect x="358" y="706" width="180" height="52" rx="7" fill="none"
+          stroke="var(--accent)" stroke-width="1.5"/>
+    <text x="448" y="728" fill="var(--accent)">interpretation/</text>
+    <text x="448" y="746" font-size="11" fill="var(--dim)">해석층 · Layer 2</text>
+  </g>
+
+  <g font-size="11.5" fill="var(--dim)" text-anchor="middle">
+    <text x="112" y="784">LLM 없음 · 공짜</text>
+    <text x="448" y="784">1 + 카테고리 수 ≈ 26콜</text>
+  </g>
+
+  <!-- 비용 경계선 -->
+  <g stroke="var(--ok)" stroke-width="1" stroke-dasharray="3 4" opacity=".7">
+    <line x1="16" y1="466" x2="620" y2="466"/>
+  </g>
+  <text x="16" y="461" font-size="11" fill="var(--ok)">↑ 여기까지가 비싸고 되돌리기 어려운 구간</text>
+</svg>
+<figcaption>점선 테두리는 <strong>LLM을 쓰지 않는 단계</strong>다. 집계와 렌더는 몇 번이고
+공짜로 다시 돌릴 수 있고, 마지막에 갈래가 나뉘어 근거층과 해석층이 <strong>서로 다른
+파일로</strong> 나온다. 비용과 위험은 전부 가로 점선 위쪽에 있다.</figcaption>
+</figure>
+
+<!-- ───────────────────────────── 1 ───────────────────────────── -->
+<h2><span class="n">1</span>추출 — 원문에서 네 가지를 뽑는다</h2>
+
+<p>회고 한 장을 LLM에 통째로 넣고 네 축으로 나눠 받는다.</p>
+
+<table>
+  <tr><th>축</th><th>무엇</th><th>개수</th></tr>
+  <tr><td><code>future_task</code></td><td>앞으로 하고 싶은 / 해야 할 과제</td><td>여러 개</td></tr>
+  <tr><td><code>capability_have</code></td><td>"이미 갖고 있다"고 말한 역량</td><td>여러 개</td></tr>
+  <tr><td><code>capability_gap</code></td><td>"없어서 필요하다"고 말한 역량</td><td>여러 개</td></tr>
+  <tr><td><code>direction</code></td><td>지향하는 방향 한 문장</td><td>하나 또는 없음</td></tr>
+</table>
+
+<p><code>future_task</code>에만 <code>horizon</code>(단기·장기·불명)이 붙는다.
+시간은 과제의 속성이지 역량의 속성이 아니기 때문이다.</p>
+
+<h3>결과를 믿을 수 있게 만드는 장치</h3>
+
+<p>LLM은 그럴듯한 문장을 지어낼 수 있다. 그래서 <strong>항목마다 원문 발췌를 함께 요구하고,
+그 발췌가 실제로 원문에 있는지 글자로 대조한다.</strong> 없으면 그 항목을 버린다.</p>
+
+<figure>
+<svg viewBox="0 0 620 340" role="img"
+     aria-label="추출 단계의 인용 대조 절차. LLM이 뽑은 각 항목의 인용을 원문과 대조해
+     통과하면 채택하고, 실패하면 항목을 폐기하며 다시 시도한다.">
+  <defs>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+    <marker id="a2r" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--drop)"/>
+    </marker>
+  </defs>
+
+  <g font-size="13" text-anchor="middle">
+    <rect x="18" y="120" width="120" height="52" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="78" y="143">회고 원문</text>
+    <text x="78" y="160" font-size="11" fill="var(--dim)">1인분</text>
+
+    <rect x="186" y="120" width="104" height="52" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="238" y="150" fill="var(--accent)" font-weight="650">LLM</text>
+
+    <rect x="338" y="112" width="118" height="68" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="397" y="136">항목 + 인용</text>
+    <text x="397" y="154" font-size="11" fill="var(--dim)">text</text>
+    <text x="397" y="170" font-size="11" fill="var(--dim)">quotes[]</text>
+  </g>
+
+  <!-- 대조 마름모 -->
+  <g>
+    <polygon points="540,146 578,182 540,218 502,182" fill="none"
+             stroke="currentColor" stroke-width="1.3"/>
+    <text x="540" y="178" font-size="11.5" text-anchor="middle">인용이</text>
+    <text x="540" y="193" font-size="11.5" text-anchor="middle">원문에?</text>
+  </g>
+
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a2)" fill="none">
+    <line x1="138" y1="146" x2="180" y2="146"/>
+    <line x1="290" y1="146" x2="332" y2="146"/>
+    <path d="M456,146 L540,146"/>
+  </g>
+
+  <!-- 통과 -->
+  <g stroke="var(--ok)" stroke-width="1.5" marker-end="url(#a2)" fill="none" color="var(--ok)">
+    <path d="M540,218 L540,268 L430,268"/>
+  </g>
+  <text x="552" y="246" font-size="11.5" fill="var(--ok)">통과</text>
+  <g font-size="13" text-anchor="middle">
+    <rect x="300" y="246" width="128" height="44" rx="7" fill="none"
+          stroke="var(--ok)" stroke-width="1.4"/>
+    <text x="364" y="273" fill="var(--ok)">채택</text>
+  </g>
+
+  <!-- 실패 -->
+  <g stroke="var(--drop)" stroke-width="1.5" marker-end="url(#a2r)" fill="none">
+    <path d="M540,146 L540,74 L430,74"/>
+  </g>
+  <text x="552" y="106" font-size="11.5" fill="var(--drop)">실패</text>
+  <g font-size="13" text-anchor="middle">
+    <rect x="300" y="52" width="128" height="44" rx="7" fill="none"
+          stroke="var(--drop)" stroke-width="1.4"/>
+    <text x="364" y="79" fill="var(--drop)">그 항목만 폐기</text>
+  </g>
+  <!-- 재시도 루프 -->
+  <g stroke="var(--drop)" stroke-width="1.3" stroke-dasharray="4 3"
+     marker-end="url(#a2r)" fill="none">
+    <path d="M300,74 L238,74 L238,114"/>
+  </g>
+  <text x="246" y="66" font-size="11" fill="var(--drop)">다시 시도</text>
+
+  <text x="18" y="318" font-size="11.5" fill="var(--dim)">
+    공백·줄바꿈은 지우고 대조한다 — 원문의 줄바꿈 차이 때문에 진짜 인용이 떨어지지 않도록.</text>
+</svg>
+<figcaption>버리는 단위는 <strong>사람이 아니라 항목</strong>이다. 한 사람의 회고에서 세
+항목 중 하나가 실패해도 나머지 둘은 남는다. 실패한 것만 다시 시도하고, 그래도 안 되면
+그 항목만 없는 채로 넘어간다.</figcaption>
+</figure>
+
+<div class="why">
+  <b>왜 이렇게까지 하나</b>
+  <p>이 데이터의 최종 용도가 리더십 워크숍이기 때문이다. "이런 의견이 있었다"는 주장에
+  <strong>"누가 원문에서 이렇게 썼다"</strong>가 따라붙지 않으면 회의에서 방어할 수 없다.
+  인용 대조는 정확도를 위한 장치가 아니라 <strong>추적 가능성</strong>을 위한 장치다.</p>
+</div>
+
+<p>내용이 없는 회고 — 선언적인 문장만 있고 뽑을 게 없는 문서 — 는 억지로 분류하지 않고
+<code>signal_present: false</code>로 격리한다. 그 비율은 마지막에 커버리지 리포트로 보고된다.</p>
+
+<pre><code>{
+  "person_id": 0, "name": "홍길동", "cl_level": "CL3", "pjt": "양산기술",
+  "signal_present": true,
+  "future_task": [
+    { "text": "테스트 결과 자동 취합 체계를 만들어 분석 시간을 확보한다",
+      "horizon": "단기",
+      "quotes": ["매번 손으로 취합하다 보니 분석할 시간이 없다"] }
+  ],
+  "capability_gap": [
+    { "text": "대용량 로그를 다루는 데이터 처리 역량이 부족하다",
+      "quotes": ["데이터를 다룰 줄 아는 사람이 팀에 없다"] }
+  ]
+}</code></pre>
+
+<!-- ───────────────────────────── 2 ───────────────────────────── -->
+<h2><span class="n">2</span>facet — 사람 단위에서 항목 단위로</h2>
+
+<p>추출까지는 "사람 한 명"이 단위였다. 이후 단계는 <strong>항목 한 개</strong>가 단위다.
+그래서 사람 안에 접혀 있던 항목들을 하나의 평평한 목록으로 펼친다. 이 펼친 항목 하나를
+<strong>facet</strong>이라고 부른다.</p>
+
+<figure>
+<svg viewBox="0 0 620 300" role="img"
+     aria-label="사람 단위 구조를 항목 단위 평면 목록으로 펼치는 과정.
+     무신호 인원과 빈 항목은 제외된다.">
+  <defs>
+    <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <!-- 좌: 사람 단위 -->
+  <text x="16" y="24" font-size="12" fill="var(--dim)">사람 단위 (extracted.json)</text>
+  <g font-size="11.5">
+    <rect x="16" y="36" width="184" height="74" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="28" y="54" font-weight="650">홍길동</text>
+    <text x="28" y="72" fill="var(--dim)">과제 2 · 보유 1 · 갭 2 · 방향 1</text>
+    <text x="28" y="92" fill="var(--ok)">→ facet 6개</text>
+
+    <rect x="16" y="122" width="184" height="74" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="28" y="140" font-weight="650">김영희</text>
+    <text x="28" y="158" fill="var(--dim)">과제 1 · 보유 2 · 갭 1 · 방향 0</text>
+    <text x="28" y="178" fill="var(--ok)">→ facet 4개</text>
+
+    <rect x="16" y="208" width="184" height="60" rx="7" fill="none"
+          stroke="var(--drop)" stroke-width="1.3" stroke-dasharray="4 3"/>
+    <text x="28" y="228" font-weight="650" fill="var(--drop)">박철수</text>
+    <text x="28" y="246" fill="var(--drop)">signal_present: false</text>
+    <text x="28" y="262" fill="var(--drop)">→ 제외</text>
+  </g>
+
+  <!-- 화살표 -->
+  <line x1="212" y1="150" x2="286" y2="150" stroke="currentColor"
+        stroke-width="1.3" marker-end="url(#a3)"/>
+  <text x="249" y="140" font-size="11" fill="var(--dim)" text-anchor="middle">펼침</text>
+
+  <!-- 우: 평면 목록 -->
+  <text x="300" y="24" font-size="12" fill="var(--dim)">항목 단위 (facet 목록)</text>
+  <g font-size="11.5">
+    <rect x="300" y="36" width="304" height="232" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <g fill="var(--dim)">
+      <text x="314" y="60"><tspan fill="var(--ink)">1</tspan>  홍길동 · 과제 · "자동 취합 체계를…"</text>
+      <text x="314" y="82"><tspan fill="var(--ink)">2</tspan>  홍길동 · 과제 · "표준 포맷을…"</text>
+      <text x="314" y="104"><tspan fill="var(--ink)">3</tspan>  홍길동 · 갭  · "데이터 처리 역량이…"</text>
+      <text x="314" y="126"><tspan fill="var(--ink)">4</tspan>  홍길동 · 갭  · "통계적 분석 경험이…"</text>
+      <text x="314" y="148"><tspan fill="var(--ink)">5</tspan>  홍길동 · 보유 · "설비 운영 경험을…"</text>
+      <text x="314" y="170"><tspan fill="var(--ink)">6</tspan>  홍길동 · 방향 · "판단을 자동화하는…"</text>
+      <text x="314" y="192"><tspan fill="var(--ink)">7</tspan>  김영희 · 과제 · "초기 평가 기준을…"</text>
+      <text x="314" y="214" font-style="italic">⋮</text>
+      <text x="314" y="248" fill="var(--ink)">합계 약 800개</text>
+    </g>
+  </g>
+</svg>
+<figcaption>내용이 없는 사람과 비어 있는 항목은 여기서 빠진다. 이후 taxonomy와 배정은
+사람이 몇 명인지 모르고, <strong>항목이 몇 개인지만 안다</strong>.</figcaption>
+</figure>
+
+<!-- ───────────────────────────── 3 ───────────────────────────── -->
+<h2><span class="n">3</span>taxonomy — 카테고리를 만든다</h2>
+
+<p>이 단계가 가장 직관에 어긋난다. 흔한 오해는 "항목들을 비슷한 것끼리 묶는다"인데,
+<strong>그렇게 하지 않는다.</strong></p>
+
+<p>대신 항목 30개씩 끊어서 LLM에게 주되, <strong>매번 지금까지 만들어진 카테고리 전체를
+함께 주고 갱신된 전체를 다시 받는다.</strong> 새 카테고리를 덧붙이기만 하는 게 아니라,
+매 배치에서 병합·분할·정의 재작성·삭제가 일어난다.</p>
+
+<figure>
+<svg viewBox="0 0 660 470" role="img"
+     aria-label="taxonomy 배치 누적 재작성 절차. 각 배치는 새 항목 30개와 직전 taxonomy 전체를
+     함께 받아 갱신된 taxonomy 전체를 반환하고, 모든 배치가 끝난 뒤 관계 도출 호출이 한 번 있다.">
+  <defs>
+    <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+    <marker id="a4a" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+
+  <g font-size="12" text-anchor="middle">
+    <!-- 배치 1 -->
+    <rect x="16" y="36" width="128" height="40" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.2"/>
+    <text x="80" y="61">항목 1–30</text>
+    <rect x="248" y="30" width="88" height="52" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="292" y="61" fill="var(--accent)" font-weight="650">LLM</text>
+    <rect x="440" y="30" width="176" height="52" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="528" y="51">taxonomy v1</text>
+    <text x="528" y="70" font-size="11" fill="var(--dim)">카테고리 9개</text>
+
+    <!-- 배치 2 -->
+    <rect x="16" y="166" width="128" height="40" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.2"/>
+    <text x="80" y="191">항목 31–60</text>
+    <rect x="248" y="160" width="88" height="52" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="292" y="191" fill="var(--accent)" font-weight="650">LLM</text>
+    <rect x="440" y="160" width="176" height="52" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="528" y="181">taxonomy v2</text>
+    <text x="528" y="200" font-size="11" fill="var(--dim)">14개 — 2개는 병합됨</text>
+
+    <!-- 생략 -->
+    <text x="292" y="252" font-size="15" fill="var(--dim)">⋮</text>
+    <text x="528" y="252" font-size="11.5" fill="var(--dim)">배치가 끝날 때마다 파일에 저장</text>
+
+    <!-- 배치 N -->
+    <rect x="16" y="290" width="128" height="40" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.2"/>
+    <text x="80" y="315">항목 771–800</text>
+    <rect x="248" y="284" width="88" height="52" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="292" y="315" fill="var(--accent)" font-weight="650">LLM</text>
+    <rect x="440" y="284" width="176" height="52" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="528" y="305">taxonomy vN</text>
+    <text x="528" y="324" font-size="11" fill="var(--dim)">25개 — 카테고리 확정</text>
+
+    <!-- 관계 패스 -->
+    <rect x="248" y="392" width="88" height="52" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"
+          stroke-dasharray="5 3"/>
+    <text x="292" y="416" fill="var(--accent)" font-weight="650" font-size="11.5">LLM</text>
+    <text x="292" y="432" fill="var(--accent)" font-size="11">관계 전용</text>
+    <rect x="440" y="392" width="176" height="52" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="528" y="413">+ relations</text>
+    <text x="528" y="432" font-size="11" fill="var(--dim)">카테고리 사이의 선</text>
+  </g>
+
+  <!-- 가로 화살표 -->
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a4)">
+    <line x1="144" y1="56"  x2="242" y2="56"/>
+    <line x1="336" y1="56"  x2="434" y2="56"/>
+    <line x1="144" y1="186" x2="242" y2="186"/>
+    <line x1="336" y1="186" x2="434" y2="186"/>
+    <line x1="144" y1="310" x2="242" y2="310"/>
+    <line x1="336" y1="310" x2="434" y2="310"/>
+    <line x1="336" y1="418" x2="434" y2="418"/>
+  </g>
+
+  <!-- 되먹임: 직전 taxonomy 전체가 다음 LLM 입력으로 -->
+  <g stroke="var(--accent)" stroke-width="1.6" fill="none" marker-end="url(#a4a)">
+    <path d="M440,66 L400,66 L400,150 L292,150 L292,154"/>
+    <path d="M440,196 L400,196 L400,240 L360,240"/>
+    <path d="M440,320 L400,320 L400,382 L292,382 L292,386"/>
+  </g>
+  <text x="404" y="112" font-size="11.5" fill="var(--accent)">직전 taxonomy 전체</text>
+  <text x="404" y="376" font-size="11.5" fill="var(--accent)">확정된 목록만</text>
+</svg>
+<figcaption>주황 선이 이 단계의 핵심이다 — 매 호출이 <strong>직전 결과 전체를 다시 입력으로
+받는다</strong>. 그래서 배치 50에서 만들어진 카테고리가 배치 80에서 다른 것과 합쳐지거나
+사라질 수 있다. 마지막 한 번은 항목을 보지 않고 <strong>확정된 카테고리 목록만</strong>
+받아 관계를 뽑는다.</figcaption>
+</figure>
+
+<div class="why">
+  <b>왜 비슷한 것끼리 묶지 않나</b>
+  <p>수치로 문장을 묶는 방식(임베딩 군집)을 실제로 시험했더니, 쓸 만한 개수의 주제가 나올 때
+  <strong>28%가 "어디에도 안 속함"으로 버려졌다.</strong> 모든 사람의 응답이 중요한 이 작업에
+  그건 못 쓴다. 게다가 그렇게 만든 묶음에는 이름이 없어서 결국 사람이 붙여야 하는데,
+  도메인 용어를 모르면 그 이름이 엉뚱해진다. LLM이 읽고 이름을 짓게 하면 두 문제가 같이 사라진다.</p>
+</div>
+
+<h3>관계를 왜 맨 마지막에 한 번만 뽑나</h3>
+
+<p>원래는 매 배치에서 카테고리와 관계를 함께 받았다. 두 가지가 깨졌다.</p>
+<ul>
+  <li><strong>가리킬 대상이 아직 없다.</strong> 배치 10에서 뽑은 관계가 배치 40에서 생길
+  카테고리를 가리킬 수는 없다. 매번 다시 뽑느라 앞의 작업이 그대로 버려졌다.</li>
+  <li><strong>응답이 잘렸다.</strong> 관계까지 얹으니 응답이 1.5~1.7배로 부풀어 한계를 넘겼고,
+  JSON이 중간에서 끊겨 그 배치가 통째로 실패했다.</li>
+</ul>
+<p>떼어내니 응답 크기가 13.1kb에서 7.9kb로 줄었다. 관계는 <strong>전체 구조에 대한
+속성</strong>이라 전체가 확정된 뒤에 묻는 게 맞다.</p>
+
+<h3>중단되면</h3>
+<p>배치가 끝날 때마다 파일에 저장하고 몇 번째까지 했는지 따로 기록한다. 같은 명령을 다시
+실행하면 <strong>끊긴 배치부터</strong> 이어간다. 단, 상류인 <code>extracted.json</code>이
+바뀌었으면 처음부터 다시 시작한다 — 옛 데이터로 만든 카테고리에 새 데이터를 이어붙이면
+결과가 무의미해지기 때문이다.</p>
+
+<!-- ───────────────────────────── 4 ───────────────────────────── -->
+<h2><span class="n">4</span>배정 — 항목을 카테고리에 넣는다</h2>
+
+<p>이제 카테고리가 확정됐으니, 항목 800개를 하나씩 어디에 속하는지 묻는다.
+<strong>매 질문마다 카테고리 목록 전체를 다시 보낸다.</strong> LLM은 앞의 대화를 기억하지
+않으므로 선택지를 매번 새로 제시해야 한다.</p>
+
+<figure>
+<svg viewBox="0 0 640 320" role="img"
+     aria-label="배정 단계의 한 번의 호출. 항목 하나와 카테고리 전체 목록을 함께 보내
+     카테고리 하나와 근거 인용을 받는다. 목록에 없는 이름이 오면 거부하고 다시 시도한다.">
+  <defs>
+    <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+    <marker id="a5r" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--drop)"/>
+    </marker>
+  </defs>
+
+  <g font-size="12.5">
+    <rect x="16" y="30" width="200" height="46" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="30" y="50" font-size="12">항목 하나</text>
+    <text x="30" y="67" font-size="11" fill="var(--dim)">"데이터 처리 역량이 부족하다"</text>
+
+    <rect x="16" y="102" width="200" height="76" rx="7" fill="none"
+          stroke="var(--accent)" stroke-width="1.3"/>
+    <text x="30" y="122" font-size="12" fill="var(--accent)">카테고리 목록 전체</text>
+    <text x="30" y="140" font-size="11" fill="var(--dim)">이름 + 정의 + 포함 기준</text>
+    <text x="30" y="158" font-size="11" fill="var(--dim)">25개 — 매 호출마다 재전송</text>
+    <text x="30" y="172" font-size="10.5" fill="var(--drop)">요청 크기의 약 98%</text>
+  </g>
+
+  <rect x="272" y="76" width="90" height="56" rx="6"
+        fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="317" y="110" font-size="13.5" fill="var(--accent)" font-weight="650"
+        text-anchor="middle">LLM</text>
+
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a5)" fill="none">
+    <path d="M216,53 L244,53 L244,96 L266,96"/>
+    <path d="M216,140 L244,140 L244,112 L266,112"/>
+    <line x1="362" y1="104" x2="410" y2="104"/>
+  </g>
+
+  <g font-size="12.5">
+    <rect x="416" y="76" width="208" height="56" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="430" y="97" font-size="12">카테고리 하나</text>
+    <text x="430" y="115" font-size="11" fill="var(--dim)">+ 근거 인용</text>
+  </g>
+
+  <!-- 거부 경로 -->
+  <g stroke="var(--drop)" stroke-width="1.4" fill="none" marker-end="url(#a5r)"
+     stroke-dasharray="4 3">
+    <path d="M520,132 L520,190 L317,190 L317,138"/>
+  </g>
+  <g font-size="11.5" fill="var(--drop)">
+    <text x="330" y="212">목록에 없는 이름을 지어냈거나</text>
+    <text x="330" y="230">인용이 원문에 없으면 → 거부하고 다시</text>
+    <text x="330" y="248">두 번 실패하면 그 항목은 폐기</text>
+  </g>
+
+  <!-- Other -->
+  <g font-size="11.5" fill="var(--dim)">
+    <text x="16" y="212">맞는 카테고리가 없으면</text>
+    <text x="16" y="230"><tspan fill="var(--ink)" font-weight="650">Other</tspan>로 보낸다.</text>
+    <text x="16" y="252">Other 비율이 높으면 그건</text>
+    <text x="16" y="270">카테고리가 부실하다는 신호다.</text>
+  </g>
+
+  <text x="16" y="304" font-size="11.5" fill="var(--dim)">
+    항목마다 즉시 저장한다 — 700번째에서 멈춰도 앞의 699개는 남고, 다시 실행하면 700번부터 이어간다.</text>
+</svg>
+<figcaption>한 항목당 한 번. 800개면 800번이다. 요청의 98%가 매번 똑같은 카테고리 목록이라
+낭비가 크지만, 지금은 <strong>빨리 끝내는 것보다 한 번 완주하는 것</strong>이 우선이라
+묶어 보내는 최적화는 미뤄뒀다.</figcaption>
+</figure>
+
+<h3>배정이 끝나면 무엇이 남나</h3>
+<p>항목 하나가 한 줄이 된다. 추출 결과를 덮어쓰는 게 아니라 <strong>옆에 붙는 색인</strong>이다.</p>
+
+<pre><code>[
+  { "person_id": 0, "axis": "capability_gap",
+    "text": "대용량 로그를 다루는 데이터 처리 역량이 부족하다",
+    "category": "테스트 데이터 파이프라인",
+    "quote": "데이터를 다룰 줄 아는 사람이 팀에 없다" }
+]</code></pre>
+
+<p>이후 집계 단계가 이것과 추출 결과를 이어 붙여 카테고리별 인원·확산도·보유 대 갭을 센다.
+<strong>"어느 카테고리가 중요한가"는 이 집계에서 처음 생긴다</strong> — 추출에도 배정에도
+중요도라는 개념이 없다.</p>
+
+<!-- ───────────────────────────── 5 ───────────────────────────── -->
+<h2><span class="n">5</span>집계 — 숫자가 처음 생기는 곳</h2>
+
+<p>여기부터 LLM이 없다. 순수한 계산이라 몇 번을 다시 돌려도 공짜고, 결과가 항상 같다.</p>
+
+<p>배정 결과만으로는 부족하다. <code>assignments.json</code>에는 <strong>누가 어느 조직인지가
+없기 때문에</strong>, 추출 결과에서 그 사람의 <code>pjt</code>·<code>cl_level</code>을 가져와
+이어 붙인다.</p>
+
+<figure>
+<svg viewBox="0 0 640 350" role="img"
+     aria-label="집계 단계. assignments.json과 extracted.json을 person_id로 이어 붙여
+     카테고리별 인원, 확산도, 보유 대 갭, 준비도를 계산한다.">
+  <defs>
+    <marker id="a6" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g font-size="11.5">
+    <!-- 좌상: assignments -->
+    <rect x="16" y="24" width="230" height="94" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="30" y="44" font-size="12.5" font-weight="650">assignments.json</text>
+    <text x="30" y="66" fill="var(--dim)">person_id · axis · category · quote</text>
+    <text x="30" y="88" fill="var(--drop)">조직 정보가 없다</text>
+    <text x="30" y="108" fill="var(--dim)">"누가"는 번호로만 남아 있음</text>
+
+    <!-- 좌하: extracted -->
+    <rect x="16" y="152" width="230" height="94" rx="7" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="30" y="172" font-size="12.5" font-weight="650">extracted.json</text>
+    <text x="30" y="194" fill="var(--dim)">person_id · name · pjt · cl_level</text>
+    <text x="30" y="216" fill="var(--ok)">조직 정보가 여기 있다</text>
+    <text x="30" y="236" fill="var(--dim)">signal_present 여부도</text>
+  </g>
+
+  <!-- 조인 -->
+  <circle cx="322" cy="135" r="34" fill="none" stroke="currentColor" stroke-width="1.3"/>
+  <text x="322" y="131" font-size="11.5" text-anchor="middle">이어 붙임</text>
+  <text x="322" y="147" font-size="10.5" text-anchor="middle" fill="var(--dim)">person_id</text>
+
+  <g stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a6)">
+    <path d="M246,71 L274,71 L274,120"/>
+    <path d="M246,199 L274,199 L274,150"/>
+    <line x1="356" y1="135" x2="404" y2="135"/>
+  </g>
+
+  <!-- 결과 카드 -->
+  <g font-size="11.5">
+    <rect x="410" y="46" width="214" height="178" rx="7" fill="none"
+          stroke="var(--ok)" stroke-width="1.4"/>
+    <text x="424" y="68" font-size="12.5" font-weight="650">카테고리 하나당</text>
+    <line x1="424" y1="80" x2="610" y2="80" stroke="var(--line)" stroke-width="1"/>
+    <text x="424" y="102"><tspan fill="var(--dim)">기여 인원</tspan>  17명</text>
+    <text x="424" y="124"><tspan fill="var(--dim)">확산도</tspan>  pjt 3 / cl 2</text>
+    <text x="424" y="146"><tspan fill="var(--dim)">보유 대 갭</tspan>  9 대 14</text>
+    <text x="424" y="168"><tspan fill="var(--dim)">준비도</tspan>  갭만 있음</text>
+    <text x="424" y="196" fill="var(--dim)">소수 의견이면 별도 트랙에도</text>
+    <text x="424" y="212" fill="var(--dim)">한 번 더 담긴다</text>
+  </g>
+
+  <text x="16" y="284" font-size="12" fill="var(--ink)" font-weight="650">
+    중요도는 여기서 처음 생긴다.</text>
+  <text x="16" y="306" font-size="11.5" fill="var(--dim)">
+    추출에도 배정에도 "중요하다"는 개념이 없다. LLM은 한 번도 순위를 매기지 않았다.</text>
+  <text x="16" y="326" font-size="11.5" fill="var(--dim)">
+    카테고리 순서는 오직 <tspan font-family="ui-monospace,Menlo,monospace">몇 명이 말했나</tspan>로만 정해진다.</text>
+</svg>
+<figcaption>확산도는 인원과 다른 것을 잰다. 17명이 전부 한 조직 사람이면 <code>pjt 1</code>이고,
+5명이 세 조직에 흩어져 있으면 <code>pjt 3</code>이다. <strong>여러 조직이 같은 얘기를
+했다</strong>는 게 인원 수보다 강한 신호일 수 있어서 따로 센다.</figcaption>
+</figure>
+
+<h3>준비도 세 구간 — 판정 순서에 함정이 있다</h3>
+
+<p>보유와 갭 중 어느 쪽이 많은지로 카테고리의 상태를 세 가지로 나눈다. 그런데
+<strong>위에서부터 순서대로</strong> 판정하므로, 첫 조건에 걸리면 아래는 보지 않는다.</p>
+
+<figure>
+<svg viewBox="0 0 620 230" role="img"
+     aria-label="준비도 판정 순서. 기여 인원이 2명 이하면 선행 신호, 그렇지 않고 갭이 보유보다
+     많으면 갭만 있음, 나머지는 이미 함으로 판정한다.">
+  <defs>
+    <marker id="a7" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g font-size="12">
+    <!-- 조건 1 -->
+    <rect x="16" y="24" width="176" height="44" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="30" y="52">기여 인원이 2명 이하?</text>
+    <rect x="264" y="24" width="150" height="44" rx="6" fill="none"
+          stroke="var(--accent)" stroke-width="1.4"/>
+    <text x="278" y="52" fill="var(--accent)" font-weight="650">선행 신호</text>
+    <text x="430" y="46" font-size="11" fill="var(--dim)">표본이 적으면</text>
+    <text x="430" y="62" font-size="11" fill="var(--dim)">갭 판정 자체를 안 믿는다</text>
+
+    <!-- 조건 2 -->
+    <rect x="16" y="102" width="176" height="44" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.3"/>
+    <text x="30" y="130">갭이 보유보다 많은가?</text>
+    <rect x="264" y="102" width="150" height="44" rx="6" fill="none"
+          stroke="var(--drop)" stroke-width="1.4"/>
+    <text x="278" y="130" fill="var(--drop)" font-weight="650">갭만 있음</text>
+    <text x="430" y="124" font-size="11" fill="var(--dim)">필요는 다수, 보유는 희박</text>
+    <text x="430" y="140" font-size="11" fill="var(--dim)">= 조직 리스크</text>
+
+    <!-- 나머지 -->
+    <rect x="16" y="180" width="176" height="34" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
+    <text x="30" y="202" fill="var(--dim)">나머지 전부</text>
+    <rect x="264" y="175" width="150" height="44" rx="6" fill="none"
+          stroke="var(--ok)" stroke-width="1.4"/>
+    <text x="278" y="203" fill="var(--ok)" font-weight="650">이미 함</text>
+    <text x="430" y="203" font-size="11" fill="var(--dim)">보유가 우세</text>
+  </g>
+
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a7)">
+    <line x1="192" y1="46"  x2="258" y2="46"/>
+    <line x1="192" y1="124" x2="258" y2="124"/>
+    <line x1="192" y1="197" x2="258" y2="197"/>
+  </g>
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a7)" fill="none">
+    <path d="M104,68 L104,96"/>
+    <path d="M104,146 L104,174"/>
+  </g>
+  <text x="112" y="88" font-size="11" fill="var(--dim)">아니오</text>
+  <text x="112" y="166" font-size="11" fill="var(--dim)">아니오</text>
+</svg>
+<figcaption>함정은 여기다 — <strong>2명이 전부 "없다"고만 말한 카테고리는 「갭만 있음」이
+아니라 「선행 신호」로 잡힌다.</strong> 두 사람 말로 조직의 역량 부족을 단정하지 않기
+위해서다. 표본이 늘어나면 자동으로 다른 구간으로 옮겨간다.</figcaption>
+</figure>
+
+<p>소수 의견(2명 이하)은 별도 목록으로 <strong>한 번 더</strong> 담긴다. 다수 요약에 묻히면
+팀의 미래 씨앗이 될 수 있는 신호가 사라지기 때문이다. 그래서 같은 카테고리가 전체 목록과
+소수 목록 양쪽에 나타난다 — 중복이 아니라 의도된 것이다.</p>
+
+<!-- ───────────────────────────── 6 ───────────────────────────── -->
+<h2><span class="n">6</span>렌더 — 워크숍 자료 한 장</h2>
+
+<p>집계 결과를 문서로 옮긴다. 이것도 LLM이 없다. <strong>새로운 판단이 하나도 들어가지
+않는다</strong>는 뜻이다 — 앞에서 계산된 숫자와 이미 검증된 인용을 배치만 바꿔 늘어놓는다.</p>
+
+<table>
+  <tr><th>섹션</th><th>무엇</th></tr>
+  <tr><td>역량 테마 카드</td>
+      <td>카테고리마다 준비도·인원·확산도·보유 대 갭 + <strong>실명 인용 3개</strong></td></tr>
+  <tr><td>조직 교차표</td><td>pjt × cl_level 인원 분포 — 어디에 응답이 몰렸나</td></tr>
+  <tr><td>소수 의견</td><td>별도 트랙. 다수 요약에 흡수되지 않게</td></tr>
+  <tr><td>커버리지 리포트</td>
+      <td>무신호 몇 명, Other 몇 건, 폐기 몇 건 — <strong>결과를 얼마나 믿을지의 근거</strong></td></tr>
+  <tr><td>미결 질문</td><td>데이터가 답하지 못한 것. 「갭만 있음」 카테고리마다 자동 생성</td></tr>
+</table>
+
+<div class="why">
+  <b>커버리지 리포트를 왜 산출물에 넣나</b>
+  <p>보통은 숨기고 싶은 숫자다. 하지만 회의에서 "이거 얼마나 믿을 수 있어?"라는 질문은
+  반드시 나오고, 그때 <strong>답을 준비해두지 않으면 자료 전체의 신뢰가 흔들린다.</strong>
+  무신호 5%·Other 6%를 먼저 밝히는 쪽이 방어에 유리하다.</p>
+</div>
+
+<p>인용은 카테고리마다 앞에서 세 개만 싣는다. 대표성 있는 셋이 아니라 <strong>순서상
+앞의 셋</strong>이므로, 근거를 전부 보려면 배정 결과를 직접 봐야 한다.</p>
+
+<!-- ───────────────────────────── 7 ───────────────────────────── -->
+<h2><span class="n">7</span>해석 — LLM이 산문으로 정리한다</h2>
+
+<p>마지막 단계에서 다시 LLM이 등장한다. 카테고리 요약과 인용을 재료로 <strong>큰 흐름</strong>과
+<strong>카테고리별 서사</strong>를 산문으로 쓴다.</p>
+
+<p>이것은 앞 단계들과 성격이 다르다. 지금까지는 원문에 있는 것을 옮기기만 했지만,
+여기서는 LLM이 <strong>여러 항목을 종합해 없던 문장을 만든다.</strong> 그래서 두 가지
+안전장치를 건다.</p>
+
+<h3>안전장치 1 — 파일을 아예 분리한다</h3>
+<p>해석 결과는 워크숍 자료와 <strong>다른 디렉터리</strong>에 나오고, 모든 제목에
+「AI 해석」 라벨이 붙는다. 근거층과 해석층을 한 문서에 섞으면 어디까지가 사실이고 어디부터가
+추론인지 읽는 사람이 구분할 수 없게 된다.</p>
+
+<h3>안전장치 2 — 인용을 다시 타이핑하게 두지 않는다</h3>
+
+<p>추출·배정에서는 LLM이 뱉은 인용 문자열을 원문과 대조했다. 여기서는 방식을 바꾼다.</p>
+
+<figure>
+<svg viewBox="0 0 640 330" role="img"
+     aria-label="인용 검증 두 방식의 비교. 추출과 배정은 LLM이 인용 문자열을 직접 뱉어
+     원문과 대조하지만, 해석 단계는 미리 번호를 붙인 근거 목록을 주고 LLM은 번호만 답하며
+     문장은 원본을 그대로 렌더링한다.">
+  <defs>
+    <marker id="a8" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <line x1="320" y1="16" x2="320" y2="314" stroke="var(--line)" stroke-width="1"/>
+
+  <!-- 좌: 추출·배정 -->
+  <text x="16" y="30" font-size="12.5" font-weight="650">추출 · 배정</text>
+  <text x="16" y="48" font-size="11" fill="var(--dim)">LLM이 인용을 직접 쓴다</text>
+
+  <g font-size="11.5" text-anchor="middle">
+    <rect x="16" y="66" width="278" height="38" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.2"/>
+    <text x="155" y="90" fill="var(--accent)">LLM이 인용 문자열을 타이핑</text>
+
+    <rect x="16" y="142" width="278" height="38" rx="6" fill="none"
+          stroke="var(--drop)" stroke-width="1.3"/>
+    <text x="155" y="166" fill="var(--drop)">원문과 글자 대조</text>
+
+    <rect x="16" y="218" width="278" height="38" rx="6" fill="none"
+          stroke="currentColor" stroke-width="1.2"/>
+    <text x="155" y="242">통과한 것만 채택</text>
+  </g>
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a8)">
+    <line x1="155" y1="104" x2="155" y2="136"/>
+    <line x1="155" y1="180" x2="155" y2="212"/>
+  </g>
+  <text x="16" y="288" font-size="11" fill="var(--drop)">살짝 바꿔 쓰면 걸러야 한다</text>
+  <text x="16" y="306" font-size="11" fill="var(--dim)">→ 검사 단계가 반드시 필요</text>
+
+  <!-- 우: 해석 -->
+  <text x="346" y="30" font-size="12.5" font-weight="650">해석</text>
+  <text x="346" y="48" font-size="11" fill="var(--dim)">LLM은 번호만 답한다</text>
+
+  <g font-size="11.5" text-anchor="middle">
+    <rect x="346" y="66" width="278" height="38" rx="6" fill="none"
+          stroke="var(--ok)" stroke-width="1.3"/>
+    <text x="485" y="90" fill="var(--ok)">우리가 번호 붙인 근거를 제시</text>
+
+    <rect x="346" y="142" width="278" height="38" rx="6"
+          fill="var(--accent)" fill-opacity=".13" stroke="var(--accent)" stroke-width="1.2"/>
+    <text x="485" y="160" fill="var(--accent)">LLM은 서술 + 번호 배열만</text>
+    <text x="485" y="175" fill="var(--accent)" font-size="10.5">"근거: 0번, 2번"</text>
+
+    <rect x="346" y="218" width="278" height="38" rx="6" fill="none"
+          stroke="var(--ok)" stroke-width="1.3"/>
+    <text x="485" y="242" fill="var(--ok)">원본 문장을 그대로 출력</text>
+  </g>
+  <g stroke="currentColor" stroke-width="1.3" marker-end="url(#a8)">
+    <line x1="485" y1="104" x2="485" y2="136"/>
+    <line x1="485" y1="180" x2="485" y2="212"/>
+  </g>
+  <text x="346" y="288" font-size="11" fill="var(--ok)">인용을 바꿔 쓸 방법이 없다</text>
+  <text x="346" y="306" font-size="11" fill="var(--dim)">→ 대조가 필요 없어진다</text>
+</svg>
+<figcaption>오른쪽에는 <strong>LLM이 인용 문장을 만지는 단계가 아예 없다.</strong>
+번호를 받아 우리가 들고 있던 원본을 렌더링하므로 변형될 여지가 구조적으로 사라진다.
+번호가 범위를 벗어나면 그 인용을 버리고, <strong>근거가 하나도 안 남는 문장은 통째로
+버린다</strong> — 근거 없는 주장은 출력하지 않는다.</figcaption>
+</figure>
+
+<p>이 규칙 때문에 결과물에 「근거 부족으로 생성 안 됨」이 찍힐 수 있다. 고장이 아니라
+설계대로 동작한 것이다. 마찬가지로 근거가 없는 카테고리는 아예 페이지를 만들지 않으므로
+파일 번호가 중간에 비어 있을 수 있다.</p>
+
+<p class="note">해석 단계는 아직 실제 LLM으로 한 번도 실행된 적이 없다. 가짜 응답을 넣은
+테스트만 통과한 상태다.</p>
+
+<!-- ───────────────────────────── 8 ───────────────────────────── -->
+<h2><span class="n">8</span>여섯 단계 비교</h2>
+
+<table>
+  <tr>
+    <th>단계</th><th>단위</th><th>LLM 호출</th><th>한 번 실패하면</th><th>재개 단위</th>
+  </tr>
+  <tr>
+    <td>① 추출</td><td>사람 1명</td><td>약 200</td>
+    <td>그 항목만 버리고 계속</td><td>사람</td>
+  </tr>
+  <tr>
+    <td>② taxonomy</td><td>항목 30개</td><td>약 27 + 1</td>
+    <td><strong>멈춘다</strong></td><td>배치</td>
+  </tr>
+  <tr>
+    <td>③ 배정</td><td>항목 1개</td><td>약 800</td>
+    <td>그 항목만 버리고 계속</td><td>항목</td>
+  </tr>
+  <tr>
+    <td>④ 집계</td><td>전체</td><td><strong>없음</strong></td>
+    <td>—</td><td>통째로 다시</td>
+  </tr>
+  <tr>
+    <td>⑤ 렌더</td><td>전체</td><td><strong>없음</strong></td>
+    <td>—</td><td>통째로 다시</td>
+  </tr>
+  <tr>
+    <td>⑥ 해석</td><td>카테고리 1개</td><td>약 26</td>
+    <td>그 페이지만 안 만듦</td><td>통째로 다시</td>
+  </tr>
+</table>
+
+<p>앞의 세 단계는 <strong>순서가 있고 되돌리기 어렵다.</strong> 뒤의 세 단계는 앞의 결과만
+그대로면 언제든 다시 만들 수 있다 — 표현을 바꾸거나 실명을 익명으로 돌리는 것 같은 결정은
+<strong>전부 뒷단 교체만으로 되므로</strong> 나중에 정해도 앞의 작업이 버려지지 않는다.</p>
+
+<h3>taxonomy만 왜 실패 시 멈추나</h3>
+<p>이 단계는 <strong>전체를 봐야 의미가 있기</strong> 때문이다. 배치 하나를 조용히 건너뛰면
+그 항목 30개가 카테고리 체계에 반영되지 않은 채 정상 완료처럼 보인다. 추출·배정·해석은
+항목끼리 독립이라 하나가 빠져도 나머지가 그대로 유효하지만, taxonomy는 빠진 만큼 결과가
+조용히 틀려진다. <strong>틀린 채로 완료되는 것보다 멈추는 게 낫다</strong>는 판단이다.</p>
+
+<h3>여기까지가 파이프라인의 몫</h3>
+<p>워크숍 자료와 해석 문서가 나오면 끝이다. <strong>시간축·시퀀싱·전략은 데이터에 없다.</strong>
+회고는 개인이 자기 관점에서 가까운 미래를 쓴 글이라, 조직의 10년이나 우선순위가 그 안에
+들어 있을 수 없다. 그건 워크숍에서 사람이 채운다.</p>
+
+<div class="foot">
+  더 자세한 산출물 포맷은 <code>docs/task-discovery-pipeline-reference.md</code>,
+  설계 근거는 <code>docs/task-discovery-coldstart.md</code>,
+  실행 방법은 <code>docs/task-discovery-internal-run-guide.md</code>.
+</div>
+
+</div>
+</body>
+</html>
