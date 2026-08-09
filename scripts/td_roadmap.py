@@ -91,6 +91,42 @@ def violations(voted, placed=None):
             and band(c) > earliest_task[c["category"]]]
 
 
+def _band(card, placed):
+    return placed.get(card["text"], card["draft_band"])
+
+
+def category_bands(voted, placed=None):
+    """카테고리 -> 밴드. **카드 배치를 집계해서 얻는다** — 카테고리를 직접 찍지 않는다.
+    매트릭스는 입력이 아니라 산출이다. 동률이면 이른 쪽 — 늦게 잡는 것보다 이르게 잡는
+    편이 계획에서 안전하다."""
+    placed = placed or {}
+    tally = {}
+    for c in voted:
+        tally.setdefault(c["category"], [0, 0, 0])[BANDS.index(_band(c, placed))] += 1
+    return {cat: BANDS[counts.index(max(counts))] for cat, counts in tally.items()}
+
+
+def moved(voted, placed=None):
+    """초안과 달라진 카드들. 워크숍이 무엇을 바꿨는지가 산출물의 절반이다."""
+    placed = placed or {}
+    return [{**c, "from": c["draft_band"], "to": _band(c, placed)}
+            for c in voted if _band(c, placed) != c["draft_band"]]
+
+
+def export(voted, placed=None):
+    """워크숍 결과. 초안과 확정을 **둘 다** 남긴다 — 무엇을 바꿨는지 없으면 나중에
+    그 결정을 방어할 수 없다."""
+    placed = placed or {}
+    return {
+        "cards": [{"category": c["category"], "axis": c["axis"], "text": c["text"],
+                   "person_id": c["person_id"], "name": c.get("name"), "pjt": c.get("pjt"),
+                   "draft_band": c["draft_band"], "band": _band(c, placed),
+                   "moved": _band(c, placed) != c["draft_band"]} for c in voted],
+        "categories": category_bands(voted, placed),
+        "violations": [c["text"] for c in violations(voted, placed)],
+    }
+
+
 def build_nodes(cards, categories):
     """카테고리 버블. 세로축(준비도)은 aggregates가 말한 것을 그대로 쓴다.
 
@@ -190,6 +226,8 @@ _TEMPLATE = r"""<!doctype html>
          border-bottom:1px solid var(--line);background:var(--panel)}
   header h1{font-size:15px;margin:0;font-weight:650;white-space:nowrap}
   header .sub{font-size:12px;color:var(--dim)}
+  select{font:inherit;font-size:12.5px;padding:4px 8px;border:1px solid var(--line);
+         border-radius:6px;background:var(--bg);color:var(--ink);max-width:200px}
   .warn{margin-left:auto;font-size:11.5px;color:var(--warn);border:1px solid var(--line);
         background:var(--panel);padding:3px 10px;border-radius:99px;font-weight:600}
   .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 20px;
@@ -222,6 +260,33 @@ _TEMPLATE = r"""<!doctype html>
   .rel b{color:var(--ink)}
   .empty{color:var(--dim);text-align:center;padding:50px 0;font-size:13px}
   .note{font-size:11.5px;color:var(--warn);margin-top:8px}
+  /* 카드 배치 보드 */
+  #board{flex:1;min-width:0;padding:12px 16px;display:none}
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:start}
+  .col{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px;
+       min-height:220px}
+  .col.over{border-color:var(--ink);background:var(--panel)}
+  .col h3{margin:0 0 8px;font-size:12.5px;color:var(--dim);font-weight:650;
+          display:flex;align-items:baseline;gap:6px}
+  .col h3 .n{margin-left:auto;font-weight:400}
+  .kard{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+        padding:9px 11px;margin:7px 0;cursor:grab}
+  .kard:active{cursor:grabbing}
+  .kard.drag{opacity:.4}
+  .kard .ax{font-size:10.5px;font-weight:650}
+  .kard .tx{margin:4px 0 0;font-size:13px;line-height:1.5}
+  .kard .who{font-size:11px;color:var(--dim);margin-top:5px}
+  .kard details{margin-top:6px}
+  .kard summary{cursor:pointer;font-size:11px;color:var(--dim);list-style:none}
+  .kard summary::-webkit-details-marker{display:none}
+  .kard summary::before{content:"▸ 원문"}
+  .kard details[open] summary::before{content:"▾ 원문"}
+  .kard blockquote{margin:6px 0 0;padding:4px 0 4px 10px;border-left:2px solid var(--line);
+                   font-size:12px;color:var(--dim)}
+  .kard.moved{border-left:3px solid var(--seed)}
+  .kard.moved .mv{font-size:10.5px;color:var(--seed);font-weight:600;margin-top:5px}
+  .kard.bad{border-color:var(--warn)}
+  .kard.bad .flag{font-size:10.5px;color:var(--warn);font-weight:600;margin-top:5px}
   .node{cursor:pointer}
   .node text{pointer-events:none;user-select:none}
   .node.sel circle{stroke:var(--ink);stroke-width:2.5}
@@ -236,14 +301,25 @@ _TEMPLATE = r"""<!doctype html>
 </header>
 
 <div class="bar">
+  <button id="mMatrix" class="on">매트릭스</button>
+  <button id="mBoard">카드 배치</button>
+  <span style="width:8px"></span>
+  <select id="cat"></select>
+  <select id="fpjt"><option value="">전체 pjt</option></select>
+  <select id="fcl"><option value="">전체 cl</option></select>
+  <span style="width:8px"></span>
   <button id="bRel" class="on">관계선</button>
   <button id="bQuad" class="on">사분면</button>
   <button id="bBad" class="on">선후 위반</button>
   <span style="color:var(--dim)" id="stat"></span>
+  <span style="margin-left:auto"></span>
+  <button id="bReset">초안으로</button>
+  <button id="bExport">로드맵 내보내기</button>
 </div>
 
 <main>
   <div id="plot"><svg id="svg" viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet"></svg></div>
+  <div id="board"></div>
   <aside id="side"><div class="empty">버블을 클릭하면<br>근거가 여기 나옵니다</div></aside>
 </main>
 
@@ -267,18 +343,55 @@ const cyOf = r => M.t + PH - ((R_BAND[r] ?? 1) + 0.5)*bandH;
 const rad = p => 9 + Math.sqrt(Math.max(p,1))*3.2;
 const alpha = n => 0.32 + 0.5*((n.pjt_spread/3) + (n.cl_spread/3))/2;
 
-const BAD = new Set(DATA.violations);
 const BY_CAT = {};
 for (const c of DATA.cards) (BY_CAT[c.category] = BY_CAT[c.category] || []).push(c);
 
 document.getElementById("src").textContent =
   `${DATA.nodes.length}개 카테고리 · 카드 ${DATA.cards.length}장 · 초안 상태`;
-document.getElementById("stat").textContent =
-  BAD.size ? `선후 위반 ${BAD.size}건` : "선후 위반 없음";
+
 
 let show = {rel:true, quad:true, bad:true}, sel = null;
+let mode = "matrix", curCat = null;
+const F = {pjt:"", cl:""};
+// placed: 카드 text -> 밴드. 초안과 다른 것만 담는다(비어 있으면 전부 초안 상태).
+const placed = {};
 const state = DATA.nodes.map(n => ({...n, x:n.draft_band, y:cyOf(n.readiness), r:rad(n.people)}));
 const byName = Object.fromEntries(state.map(s => [s.name, s]));
+
+const bandOf = c => placed[c.text] || c.draft_band;
+const orgOK = c => (!F.pjt || c.pjt === F.pjt) && (!F.cl || c.cl_level === F.cl);
+
+// 아래 셋은 td_roadmap.py의 category_bands / violations / moved를 그대로 옮긴 것이다.
+// 서버가 없는 A단계라 브라우저가 직접 계산해야 한다 — 규칙이 바뀌면 양쪽을 같이 고칠 것.
+// 파이썬 쪽이 정본이고 테스트가 그쪽을 고정한다.
+function categoryBands(){
+  const tally = {};
+  for (const c of DATA.cards) {
+    const t = tally[c.category] = tally[c.category] || [0,0,0];
+    t[BANDS.indexOf(bandOf(c))]++;
+  }
+  const out = {};
+  for (const [cat,t] of Object.entries(tally)) out[cat] = BANDS[t.indexOf(Math.max(...t))];
+  return out;   // 동률이면 indexOf가 이른 밴드를 집는다
+}
+function currentViolations(){
+  const earliest = {};
+  for (const c of DATA.cards) if (c.axis === "future_task") {
+    const b = BANDS.indexOf(bandOf(c));
+    if (!(c.category in earliest) || b < earliest[c.category]) earliest[c.category] = b;
+  }
+  return new Set(DATA.cards.filter(c => c.axis === "capability_gap"
+    && c.category in earliest && BANDS.indexOf(bandOf(c)) > earliest[c.category])
+    .map(c => c.text));
+}
+function movedCount(){ return DATA.cards.filter(c => bandOf(c) !== c.draft_band).length; }
+
+function applyPlacement(){
+  const bands = categoryBands();
+  for (const s of state) s.x = bands[s.name] || s.draft_band;
+  BADNOW = currentViolations();
+}
+let BADNOW = new Set(DATA.violations);
 
 // 같은 칸에 겹친 버블을 세로로만 밀어낸다 — 가로는 시간축이라 건드리면 뜻이 바뀐다.
 function relax(){
@@ -351,7 +464,7 @@ function draw(){
   }
 
   for (const s of state) {
-    const bad = show.bad && (BY_CAT[s.name] || []).some(c => BAD.has(c.text));
+    const bad = show.bad && (BY_CAT[s.name] || []).some(c => BADNOW.has(c.text));
     const g = el("g",{class:"node" + (sel === s.name ? " sel" : "")});
     g.appendChild(el("circle",{cx:cx(s.x), cy:s.y, r:s.r,
       fill:css(READINESS[s.readiness] || "--dim"), "fill-opacity":alpha(s),
@@ -391,10 +504,10 @@ function side(s){
     ${s.horizon_known ? `` : `<div class="note">미래과제가 없어 시간축 초안을 계산할 근거가 없다 —
       가운데에 놓았다.</div>`}
     ${groups.map(([a,g]) => g.length ? `<div class="lbl">${AX_LABEL[a]} ${g.length}건</div>
-      ${g.map(k => { const bad = BAD.has(k.text); return `
+      ${g.map(k => { const bad = BADNOW.has(k.text); return `
         <div class="item ${bad?"bad":""}">
-          <div class="ax ax-${a}">${AX_LABEL[a]} · ${esc(k.draft_band)}${
-            k.horizon ? " (원 horizon " + esc(k.horizon) + ")" : ""}</div>
+          <div class="ax ax-${a}">${AX_LABEL[a]} · ${esc(bandOf(k))}${
+            bandOf(k) !== k.draft_band ? " (초안 " + esc(k.draft_band) + ")" : ""}</div>
           <p>${esc(k.text)}</p>
           <div class="who">${esc(k.name || "?")}${k.pjt ? " · " + esc(k.pjt) : ""}</div>
           ${bad ? `<div class="flag">이 역량이 그것을 쓰는 첫 과제보다 뒤에 있다</div>` : ``}
@@ -412,7 +525,129 @@ for (const [id,k] of [["bRel","rel"], ["bQuad","quad"], ["bBad","bad"]])
     show[k] = !show[k]; e.target.classList.toggle("on", show[k]); draw();
   });
 
-draw();
+// ── 카드 배치 보드 ────────────────────────────────────────────────────
+function kardHTML(c){
+  const bad = BADNOW.has(c.text), mv = bandOf(c) !== c.draft_band;
+  return `<div class="kard ${mv?"moved":""} ${bad?"bad":""}" draggable="true" data-t="${esc(c.text)}">
+    <div class="ax ax-${c.axis}">${AX_LABEL[c.axis]}</div>
+    <p class="tx">${esc(c.text)}</p>
+    <div class="who">${esc(c.name || "?")}${c.pjt ? " · " + esc(c.pjt) : ""}${
+      c.cl_level ? " · " + esc(c.cl_level) : ""}</div>
+    ${c.quote ? `<details><summary></summary><blockquote>${esc(c.quote)}</blockquote></details>` : ``}
+    ${mv ? `<div class="mv">초안 ${esc(c.draft_band)} → ${esc(bandOf(c))}</div>` : ``}
+    ${bad ? `<div class="flag">이 역량이 그것을 쓰는 첫 과제보다 뒤에 있다</div>` : ``}
+  </div>`;
+}
+
+function renderBoard(){
+  const mine = DATA.cards.filter(c => c.category === curCat && orgOK(c));
+  const board = document.getElementById("board");
+  board.innerHTML = `
+    <div style="font-size:13px;margin:0 0 10px">
+      <b>${esc(curCat || "")}</b>
+      <span style="color:var(--dim)"> · 카드 ${mine.length}장 ·
+        옮긴 카드 ${mine.filter(c => bandOf(c) !== c.draft_band).length}장</span>
+    </div>
+    <div class="cols">${BANDS.map(b => {
+      const ks = mine.filter(c => bandOf(c) === b);
+      return `<div class="col" data-b="${b}">
+        <h3>${b}<span class="n">${ks.length}</span></h3>
+        ${ks.map(kardHTML).join("")}
+      </div>`; }).join("")}</div>
+    ${mine.length ? `` : `<div class="empty">조건에 맞는 카드가 없습니다</div>`}`;
+  wireDrag();
+}
+
+let dragging = null;
+function wireDrag(){
+  for (const k of document.querySelectorAll(".kard")) {
+    k.addEventListener("dragstart", e => {
+      dragging = k.dataset.t; k.classList.add("drag");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", dragging);   // Firefox는 이게 있어야 드래그가 시작된다
+    });
+    k.addEventListener("dragend", () => { dragging = null; k.classList.remove("drag"); });
+  }
+  for (const col of document.querySelectorAll(".col")) {
+    col.addEventListener("dragover", e => { e.preventDefault(); col.classList.add("over"); });
+    col.addEventListener("dragleave", () => col.classList.remove("over"));
+    col.addEventListener("drop", e => {
+      e.preventDefault(); col.classList.remove("over");
+      const t = dragging || e.dataTransfer.getData("text/plain");
+      if (t) place(t, col.dataset.b);
+    });
+  }
+}
+
+function place(text, band){
+  const c = DATA.cards.find(x => x.text === text);
+  if (!c) return;
+  if (band === c.draft_band) delete placed[text]; else placed[text] = band;
+  refresh();
+}
+
+function refresh(){
+  applyPlacement();
+  document.getElementById("stat").textContent =
+    (BADNOW.size ? `선후 위반 ${BADNOW.size}건 · ` : "선후 위반 없음 · ") + `옮긴 카드 ${movedCount()}장`;
+  draw();
+  if (mode === "board") renderBoard();
+  if (sel && byName[sel]) side(byName[sel]);
+}
+
+// ── 모드 · 필터 · 내보내기 ────────────────────────────────────────────
+function setMode(m){
+  mode = m;
+  // CSS가 #board를 none으로 두므로 켤 땐 명시해야 한다 — ""로 되돌리면 CSS 규칙이 다시 먹는다.
+  document.getElementById("plot").style.display = m === "matrix" ? "block" : "none";
+  document.getElementById("board").style.display = m === "board" ? "block" : "none";
+  document.querySelector("aside").style.display = m === "matrix" ? "block" : "none";
+  document.getElementById("mMatrix").classList.toggle("on", m === "matrix");
+  document.getElementById("mBoard").classList.toggle("on", m === "board");
+  for (const id of ["bRel","bQuad","bBad"])
+    document.getElementById(id).style.display = m === "matrix" ? "inline-block" : "none";
+  document.getElementById("cat").style.display = m === "board" ? "inline-block" : "none";
+  refresh();
+}
+
+const catSel = document.getElementById("cat");
+for (const n of DATA.nodes)
+  catSel.insertAdjacentHTML("beforeend", `<option value="${esc(n.name)}">${esc(n.name)}</option>`);
+curCat = DATA.nodes.length ? DATA.nodes[0].name : null;
+catSel.addEventListener("change", () => { curCat = catSel.value; renderBoard(); });
+
+for (const [id,key] of [["fpjt","pjt"], ["fcl","cl_level"]]) {
+  const el2 = document.getElementById(id);
+  for (const v of [...new Set(DATA.cards.map(c => c[key]).filter(Boolean))].sort())
+    el2.insertAdjacentHTML("beforeend", `<option value="${esc(v)}">${esc(v)}</option>`);
+  el2.addEventListener("change", () => {
+    F[key === "pjt" ? "pjt" : "cl"] = el2.value; refresh();
+  });
+}
+
+document.getElementById("mMatrix").addEventListener("click", () => setMode("matrix"));
+document.getElementById("mBoard").addEventListener("click", () => setMode("board"));
+document.getElementById("bReset").addEventListener("click", () => {
+  for (const k of Object.keys(placed)) delete placed[k];
+  refresh();
+});
+document.getElementById("bExport").addEventListener("click", () => {
+  // td_roadmap.export와 같은 모양 — 초안과 확정을 둘 다 남긴다.
+  const out = {
+    generated_at: new Date().toISOString(),
+    note: "워크숍 배치 결과. band는 사람이 정한 값, readiness는 데이터에서 온 값.",
+    categories: categoryBands(),
+    violations: [...BADNOW],
+    cards: DATA.cards.map(c => ({category:c.category, axis:c.axis, text:c.text,
+      person_id:c.person_id, name:c.name, pjt:c.pjt,
+      draft_band:c.draft_band, band:bandOf(c), moved:bandOf(c) !== c.draft_band})),
+  };
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], {type:"application/json"}));
+  a.download = "roadmap.json"; a.click(); URL.revokeObjectURL(a.href);
+});
+
+setMode("matrix");
 </script>
 </body>
 </html>

@@ -143,3 +143,51 @@ def test_write_refuses_dist_path(tmp_path):
     with pytest.raises(ValueError):
         td_roadmap.write([_card("A", "future_task", "t", "단기")], [_cat("A")], out_path=out)
     assert not out.exists()
+
+
+# ── 배치 집계 (#44) ────────────────────────────────────────────────────
+
+def test_category_band_is_the_majority_of_its_placed_cards():
+    """매트릭스는 입력이 아니라 산출이다 — 카테고리 위치는 카드 배치에서 나온다."""
+    cards = [_card("A", "future_task", "1", "단기"), _card("A", "future_task", "2", "단기"),
+             _card("A", "future_task", "3", "장기")]
+    voted = td_roadmap.votable(cards)
+    assert td_roadmap.category_bands(voted, {"1": "장기", "3": "장기"})["A"] == "장기"
+
+
+def test_category_band_ties_go_to_the_earlier_band():
+    """동률이면 이른 쪽 — 늦게 잡는 것보다 이르게 잡는 편이 계획에서 안전하다."""
+    cards = [_card("A", "future_task", "1", "단기"), _card("A", "future_task", "2", "장기")]
+    assert td_roadmap.category_bands(td_roadmap.votable(cards), {})["A"] == "단기"
+
+
+def test_category_band_counts_both_kinds_of_card():
+    cards = [_card("A", "future_task", "t", "장기"), _card("A", "capability_gap", "g")]
+    # 과제=장기, 갭 초안=중기 → 동률이므로 이른 쪽
+    assert td_roadmap.category_bands(td_roadmap.votable(cards), {})["A"] == "중기"
+
+
+def test_moved_cards_are_the_ones_that_differ_from_draft():
+    cards = [_card("A", "future_task", "그대로", "단기"),
+             _card("A", "future_task", "옮김", "단기")]
+    voted = td_roadmap.votable(cards)
+    moved = td_roadmap.moved(voted, {"옮김": "장기", "그대로": "단기"})
+    assert [m["text"] for m in moved] == ["옮김"]
+    assert moved[0]["from"] == "단기" and moved[0]["to"] == "장기"
+
+
+def test_export_records_draft_and_placed_for_every_card():
+    """워크숍이 무엇을 바꿨는지 남지 않으면 결과를 나중에 방어할 수 없다."""
+    cards = [_card("A", "future_task", "t", "단기"), _card("A", "capability_gap", "g")]
+    out = td_roadmap.export(td_roadmap.votable(cards), {"t": "장기"})
+    rows = {r["text"]: r for r in out["cards"]}
+    assert rows["t"]["draft_band"] == "단기" and rows["t"]["band"] == "장기"
+    assert rows["t"]["moved"] is True and rows["g"]["moved"] is False
+    assert out["categories"]["A"] == td_roadmap.category_bands(
+        td_roadmap.votable(cards), {"t": "장기"})["A"]
+
+
+def test_export_flags_violations_under_the_placement():
+    cards = [_card("A", "future_task", "t", "단기"), _card("A", "capability_gap", "g")]
+    out = td_roadmap.export(td_roadmap.votable(cards), {"g": "장기"})
+    assert out["violations"] == ["g"]
