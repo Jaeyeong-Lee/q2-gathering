@@ -4,12 +4,12 @@
 목적은 파일을 예쁘게 보여주는 게 아니라 **파일 사이를 건너뛰는 것**이다 — 회의에서 나오는
 질문("17명이 누구야", "그 사람 원문 띄워봐")은 대부분 파일 하나 안에서 답이 안 나온다.
 
-조인은 td_cards가 한다. 여기는 그 위에 카테고리 정의(taxonomy)와 회고 원문(extracted)을
-얹어 화면 데이터를 만들고 렌더할 뿐이다.
+조인은 td_cards가 한다. 여기는 그 위에 카테고리 정의(taxonomy)를 얹어 화면 데이터를
+만들고 렌더할 뿐이다. 회고 원문은 아직 안 싣는다 — 원문 펼치기는 #40.
 
-**생성물은 지금까지 만든 것 중 가장 민감하다** — 카테고리명(레벨 2) + 실명 + 회고 원문
-전체(레벨 3)가 한 파일에 인라인된다. workshop-input.md는 인용 조각만 담지만 여기는 원문이
-통째로 들어간다. 출력은 TD_OUT_DIR 아래로만, dist/·docs/·git 추적 경로엔 절대 쓰지 않는다.
+**생성물은 민감하다** — 카테고리명(레벨 2)과 실명·인용(레벨 3)이 한 파일에 인라인된다.
+출력은 TD_OUT_DIR 아래로만. dist/는 GitHub Pages로 공개되므로 _reject_public_path가
+그쪽 경로를 아예 거부한다(docstring만으로는 지켜지지 않아서).
 """
 import json
 import sys
@@ -20,9 +20,6 @@ import td_render
 from pipeline_log import OUT_DIR
 from td_common import load_json
 
-ROOT = Path(__file__).parent.parent
-
-READINESS_ORDER = ("이미 함", "갭만 있음", "선행 신호")
 
 
 def build_payload(aggregates, persons, assignments, taxonomy=None, *, anonymize=False):
@@ -60,7 +57,6 @@ def build_payload(aggregates, persons, assignments, taxonomy=None, *, anonymize=
         "persons": people,
         "horizon": td_cards.horizon_distribution(cards),
         "coverage": td_render.coverage(persons, assignments),
-        "minority": [m["name"] for m in aggregates.get("minority") or []],
         "anonymized": anonymize,
     }
 
@@ -76,7 +72,15 @@ def render_html(payload):
     return _TEMPLATE.replace("__PAYLOAD__", _embed(payload))
 
 
+def _reject_public_path(out_path):
+    """dist/ 아래로는 쓰지 못하게 막는다 — 그 디렉터리는 GitHub Pages로 배포 추적되므로
+    실명·인용이 박힌 파일이 들어가면 공개된다. 규칙을 주석으로만 두면 오타 한 번에 깨진다."""
+    if "dist" in Path(out_path).resolve().parts:
+        raise ValueError("dist/ 아래에는 쓸 수 없다 — 배포 추적 경로다. TD_OUT_DIR을 써라")
+
+
 def write(aggregates, persons, assignments, taxonomy=None, *, out_path, anonymize=False):
+    _reject_public_path(out_path)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     payload = build_payload(aggregates, persons, assignments, taxonomy, anonymize=anonymize)
@@ -84,6 +88,10 @@ def write(aggregates, persons, assignments, taxonomy=None, *, out_path, anonymiz
     return out_path
 
 
+# ponytail: HTML을 파이썬 문자열 상수로 들고 있다. build.py는 archive/template.html을
+# 읽어 토큰 치환하는데, 여기선 파일 하나로 끝나는 쪽을 택했다(스테이지 스크립트가
+# 별도 asset 디렉터리에 의존하지 않게). 화면이 두 번째로 늘거나 이 상수가 400줄을
+# 넘으면 build.py 방식으로 옮길 것.
 _TEMPLATE = """<!doctype html>
 <html lang="ko">
 <head>
@@ -142,7 +150,6 @@ _TEMPLATE = """<!doctype html>
   .card blockquote{margin:8px 0 0;padding:5px 0 5px 11px;border-left:2px solid var(--line);
                    font-size:12.5px;color:var(--dim)}
   .card .who{font-size:11.5px;color:var(--dim);margin-top:7px}
-  .card .who a{color:var(--ink);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 
   .ax-future_task{color:var(--gapc)} .ax-capability_gap{color:var(--warn)}
   .ax-capability_have{color:var(--ready)} .ax-direction{color:var(--seed)}
@@ -170,8 +177,9 @@ _TEMPLATE = """<!doctype html>
 const DATA = __PAYLOAD__;
 
 const AX_LABEL = {future_task:"과제", capability_gap:"갭", capability_have:"보유", direction:"방향"};
-const R_CLASS = {"이미 함":"r0", "갭만 있음":"r1", "선행 신호":"r2"};
-const R_COLOR = {"이미 함":"--ready", "갭만 있음":"--gapc", "선행 신호":"--seed"};
+const READINESS = {"이미 함":{cls:"r0", color:"--ready"},
+                   "갭만 있음":{cls:"r1", color:"--gapc"},
+                   "선행 신호":{cls:"r2", color:"--seed"}};
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -197,7 +205,7 @@ function renderList(){
   document.getElementById("list").innerHTML = DATA.categories.map((c,i) => `
     <div class="row ${sel===c.name?"on":""}" data-i="${i}">
       <div class="nm">
-        <span class="dot ${R_CLASS[c.readiness]||""}"></span>
+        <span class="dot ${(READINESS[c.readiness]||{}).cls||""}"></span>
         <span>${esc(c.name)}</span>
         <span class="cnt">${c.people}명</span>
       </div>
@@ -218,7 +226,7 @@ function select(name){
     .filter(([,ks]) => ks.length);
 
   document.getElementById("detail").innerHTML = `
-    <h2>${esc(c.name)}<span class="badge" style="background:${css(R_COLOR[c.readiness]||"--dim")}"
+    <h2>${esc(c.name)}<span class="badge" style="background:${css((READINESS[c.readiness]||{}).color||"--dim")}"
       >${esc(c.readiness)}</span></h2>
     ${c.definition ? `<p class="def">${esc(c.definition)}</p>` : ``}
     ${c.inclusion_criteria ? `<p class="def">포함 기준 — ${esc(c.inclusion_criteria)}</p>` : ``}
@@ -257,13 +265,18 @@ renderList();
 """
 
 
-def main(data_dir=None, out_path=None):
-    """산출물 디렉터리 → 탐색기 HTML. 출력 기본값은 TD_OUT_DIR 안 — 리포에 쓰지 않는다."""
-    d = Path(data_dir) if data_dir else OUT_DIR / "task_discovery"
-    out = Path(out_path) if out_path else d / "inspect.html"
+def main(*argv):
+    """산출물 디렉터리 → 탐색기 HTML. 출력 기본값은 TD_OUT_DIR 안 — 리포에 쓰지 않는다.
+
+      td_inspect.py [데이터디렉터리] [출력경로] [--anonymize]
+    """
+    args = [a for a in argv if a != "--anonymize"]
+    anonymize = "--anonymize" in argv
+    d = Path(args[0]) if len(args) > 0 else OUT_DIR / "task_discovery"
+    out = Path(args[1]) if len(args) > 1 else d / "inspect.html"
     taxonomy = d / "taxonomy.json"
     res = write(d / "aggregates.json", d / "extracted.json", d / "assignments.json",
-                taxonomy if taxonomy.exists() else None, out_path=out)
+                taxonomy if taxonomy.exists() else None, out_path=out, anonymize=anonymize)
     # 카테고리명·실명은 찍지 않는다 — 건수만.
     print(f"탐색기 → {res} ({res.stat().st_size // 1024}kb)", file=sys.stderr)
 

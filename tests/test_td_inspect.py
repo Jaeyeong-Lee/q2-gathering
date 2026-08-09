@@ -99,3 +99,12 @@ def test_write_creates_file(tmp_path):
     out = tmp_path / "inspect.html"
     td_inspect.write(*_fixture(), out_path=out)
     assert out.exists() and out.read_text(encoding="utf-8").startswith("<!doctype html>")
+
+
+def test_write_refuses_dist_path(tmp_path):
+    """dist/는 GitHub Pages로 배포 추적된다 — 실명이 박힌 파일이 들어가면 공개된다."""
+    import pytest
+    out = tmp_path / "dist" / "inspect.html"
+    with pytest.raises(ValueError):
+        td_inspect.write(*_fixture(), out_path=out)
+    assert not out.exists()

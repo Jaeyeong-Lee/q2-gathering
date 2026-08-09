@@ -47,6 +47,15 @@ def test_duplicate_text_in_same_person_and_axis_stays_two_cards():
     assert len(cards) == 2
 
 
+def test_more_assignments_than_origin_items_leaves_horizon_empty():
+    """원 항목이 동나면 앞 항목의 horizon을 물려주지 않는다 — 근거 없는 시간축을 만드는 것은
+    '대응 항목이 없다'는 사실을 지우는 조작이다. pool이 빈 경우와 답이 같아야 한다."""
+    persons = [_person(1, future_task=[_task("겹침", "단기"), _task("겹침", "장기")])]
+    assigns = [_a(1, "future_task", "겹침")] * 3
+    cards = td_cards.build(assigns, persons)
+    assert [c["horizon"] for c in cards] == ["단기", "장기", None]
+
+
 def test_assignment_without_matching_extracted_item_still_becomes_card():
     """상류가 어긋나도 예외로 죽지 않는다 — horizon만 비고 배정 정보는 살린다."""
     persons = [_person(1, future_task=[_task("있는것")])]

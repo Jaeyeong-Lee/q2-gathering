@@ -9,7 +9,6 @@ horizon이 붙어 있으므로 같이 들고 오면 된다. aggregates.json에 �
 (render·narrate 둘 다 안 씀) 같은 값을 두 곳에서 계산할 이유가 없다 — td_aggregate는
 건드리지 않는다.
 """
-import json
 import sys
 from pathlib import Path
 
@@ -36,6 +35,7 @@ def build(assignments, persons, *, anonymize=False):
     무신호 인원의 항목은 카드가 되지 않는다 — 배정 자체가 없어야 정상이지만, 상류가
     어긋나도 여기서 막힌다. 반대로 extracted에 대응 항목이 없는 배정은 **버리지 않고**
     horizon만 빈 채로 남긴다 — 배정 정보(카테고리·인용)는 그 자체로 유효하다.
+    원 항목이 아예 없든 앞서 다 소진됐든 답은 같다(둘 다 "대응 항목 없음"이다).
     """
     assignments, persons = load_json(assignments), load_json(persons)
     meta = {p["person_id"]: p for p in persons}
@@ -44,16 +44,18 @@ def build(assignments, persons, *, anonymize=False):
     no_signal = {p["person_id"] for p in persons if not p.get("signal_present")}
 
     cards = []
-    used = {}   # 같은 키의 원 항목을 순서대로 하나씩 소진 — 중복 텍스트를 접지 않기 위해
+    consumed = {}   # 키별로 원 항목을 순서대로 하나씩 소진 — 중복 텍스트를 접지 않기 위해
     for a in assignments:
         pid = a["person_id"]
         if pid in no_signal:
             continue
         key = (pid, a["axis"], a["text"])
         pool = origins.get(key, ())
-        i = used.get(key, 0)
-        origin = pool[i] if i < len(pool) else (pool[-1] if pool else None)
-        used[key] = i + 1
+        i = consumed.get(key, 0)
+        # 원 항목이 동나면 horizon은 비운다. 앞 항목 것을 물려주면 근거 없는 시간축이
+        # 생기는데, 그건 "대응 항목이 없다"는 사실을 지우는 조작이다.
+        origin = pool[i] if i < len(pool) else None
+        consumed[key] = i + 1
 
         person = meta.get(pid)
         cards.append({
@@ -88,14 +90,6 @@ def by_category(cards):
     out = {}
     for c in cards:
         out.setdefault(c["category"], []).append(c)
-    return out
-
-
-def by_person(cards):
-    """person_id -> [카드, ...]."""
-    out = {}
-    for c in cards:
-        out.setdefault(c["person_id"], []).append(c)
     return out
 
 
