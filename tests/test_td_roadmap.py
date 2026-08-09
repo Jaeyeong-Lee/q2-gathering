@@ -2,7 +2,9 @@ import td_roadmap
 
 
 def _card(cat, axis, text, horizon=None, pid=1, name="홍길동"):
-    return {"person_id": pid, "name": name, "pjt": "양산기술", "cl_level": "CL3",
+    # id는 카드 식별자다. 테스트에선 text와 같게 둬 읽기 쉽게 하되, 코드가 id를 쓴다는
+    # 사실은 test_placement_keys_on_id_not_text가 지킨다.
+    return {"id": text, "person_id": pid, "name": name, "pjt": "양산기술", "cl_level": "CL3",
             "category": cat, "axis": axis, "text": text, "quote": "근거", "horizon": horizon}
 
 
@@ -131,10 +133,19 @@ def test_render_is_self_contained_and_escapes_script():
     html = td_roadmap.render_html(td_roadmap.build_payload(cards, [_cat("A")]))
     assert html.startswith("<!doctype html>")
     # SVG 네임스페이스(http://www.w3.org/2000/svg)는 가져오는 주소가 아니라 XML 식별자다.
-    # 실제로 막아야 하는 건 외부에서 무언가를 끌어오는 구문이다.
-    for bad in ('<script src=', '<link ', '<img ', 'fetch(', 'XMLHttpRequest', 'url(http'):
+    # 실제로 막아야 하는 건 외부 호스트에서 무언가를 끌어오는 구문이다.
+    for bad in ('<script src=', '<link ', '<img ', 'XMLHttpRequest', 'url(http',
+                'fetch("http', "fetch('http"):
         assert bad not in html
     assert "</script> 가" not in html
+
+
+def test_static_render_is_not_live():
+    """정적 파일은 서버와 이야기하지 않는다 — fetch 코드는 있지만 LIVE가 false라 죽어 있다."""
+    html = td_roadmap.render_html(td_roadmap.build_payload([], [_cat("A")]))
+    assert "const LIVE = false;" in html
+    live = td_roadmap.render_html(td_roadmap.build_payload([], [_cat("A")]), live=True)
+    assert "const LIVE = true;" in live
 
 
 def test_write_refuses_dist_path(tmp_path):
@@ -191,3 +202,14 @@ def test_export_flags_violations_under_the_placement():
     cards = [_card("A", "future_task", "t", "단기"), _card("A", "capability_gap", "g")]
     out = td_roadmap.export(td_roadmap.votable(cards), {"g": "장기"})
     assert out["violations"] == ["g"]
+
+
+def test_placement_keys_on_id_not_text():
+    """서로 다른 사람이 같은 문장을 써도 카드는 둘이고 표도 따로 간다."""
+    a = {**_card("A", "future_task", "같은말", "단기"), "id": "1:future_task:0"}
+    b = {**_card("A", "future_task", "같은말", "단기", pid=2), "id": "2:future_task:0"}
+    voted = td_roadmap.votable([a, b])
+    out = td_roadmap.export(voted, {"1:future_task:0": "장기"})
+    rows = {r["id"]: r for r in out["cards"]}
+    assert rows["1:future_task:0"]["band"] == "장기"
+    assert rows["2:future_task:0"]["band"] == "단기"

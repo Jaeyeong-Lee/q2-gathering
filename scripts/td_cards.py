@@ -44,6 +44,7 @@ def build(assignments, persons, *, anonymize=False):
     no_signal = {p["person_id"] for p in persons if not p.get("signal_present")}
 
     cards = []
+    seq = {}       # (사람, 축) -> 지금까지 발급한 카드 번호
     consumed = {}   # 키별로 원 항목을 순서대로 하나씩 소진 — 중복 텍스트를 접지 않기 위해
     for a in assignments:
         pid = a["person_id"]
@@ -58,7 +59,13 @@ def build(assignments, persons, *, anonymize=False):
         consumed[key] = i + 1
 
         person = meta.get(pid)
+        # id는 (사람, 축, 그 안에서 몇 번째)다. text를 키로 쓰면 서로 다른 사람이 같은
+        # 문장을 썼을 때 한 표가 여러 카드에 먹힌다. 위치 기반이라 extracted/assignments가
+        # 그대로면 재생성해도 같은 id가 나온다(td_assign의 재개 판정과 같은 근거).
+        # 원문을 넣지 않는다 — id는 로그·URL에 실릴 수 있다.
+        seq[(pid, a["axis"])] = seq.get((pid, a["axis"]), -1) + 1
         cards.append({
+            "id": f'{pid}:{a["axis"]}:{seq[(pid, a["axis"])]}',
             "person_id": pid,
             "name": (f"P{pid}" if anonymize else person.get("name")) if person else None,
             "pjt": person.get("pjt") if person else None,

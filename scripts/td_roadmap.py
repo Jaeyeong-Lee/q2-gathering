@@ -68,14 +68,14 @@ def votable(cards):
 
 
 def violations(voted, placed=None):
-    """선후 제약 위반 카드들. placed는 {카드 text -> 밴드} 덮어쓰기(미지정이면 초안).
+    """선후 제약 위반 카드들. placed는 {카드 id -> 밴드} 덮어쓰기(미지정이면 초안).
 
     역량갭이 **같은 카테고리에서 가장 이른 과제보다 뒤**에 있으면 위반이다 — 그 과제를
     시작할 때 역량이 아직 없다는 뜻이라 실행 불가능한 순서다. 같은 밴드는 위반이 아니다.
     한 종류만 있는 카테고리는 판정할 근거가 없어 건너뛴다.
     """
     placed = placed or {}
-    band = lambda c: BANDS.index(placed.get(c["text"], c["draft_band"]))
+    band = lambda c: BANDS.index(placed.get(c["id"], c["draft_band"]))
 
     earliest_task = {}
     for c in voted:
@@ -92,7 +92,9 @@ def violations(voted, placed=None):
 
 
 def _band(card, placed):
-    return placed.get(card["text"], card["draft_band"])
+    """카드 식별은 id로 한다 — text는 유일하지 않다(서로 다른 사람이 같은 문장을 쓸 수
+    있다). text를 키로 쓰면 한 표가 여러 카드에 먹힌다."""
+    return placed.get(card["id"], card["draft_band"])
 
 
 def category_bands(voted, placed=None):
@@ -118,12 +120,13 @@ def export(voted, placed=None):
     그 결정을 방어할 수 없다."""
     placed = placed or {}
     return {
-        "cards": [{"category": c["category"], "axis": c["axis"], "text": c["text"],
+        "cards": [{"id": c["id"], "category": c["category"], "axis": c["axis"],
+                   "text": c["text"],
                    "person_id": c["person_id"], "name": c.get("name"), "pjt": c.get("pjt"),
                    "draft_band": c["draft_band"], "band": _band(c, placed),
                    "moved": _band(c, placed) != c["draft_band"]} for c in voted],
         "categories": category_bands(voted, placed),
-        "violations": [c["text"] for c in violations(voted, placed)],
+        "violations": [c["id"] for c in violations(voted, placed)],
     }
 
 
@@ -174,7 +177,7 @@ def build_payload(cards, categories):
     return {"nodes": build_nodes(cards, categories),
             "edges": build_edges(categories),
             "cards": voted,
-            "violations": [c["text"] for c in violations(voted)],
+            "violations": [c["id"] for c in violations(voted)],
             "bands": list(BANDS)}
 
 
@@ -183,8 +186,11 @@ def _embed(payload):
             .replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
 
 
-def render_html(payload):
-    return _TEMPLATE.replace("__PAYLOAD__", _embed(payload))
+def render_html(payload, *, live=False):
+    """live=True면 화면이 서버(/state·/vote)와 이야기한다. 정적 파일은 False —
+    workshop_server가 같은 템플릿을 live로 렌더해 그대로 서빙한다."""
+    return (_TEMPLATE.replace("__PAYLOAD__", _embed(payload))
+            .replace("__LIVE__", "true" if live else "false"))
 
 
 def _reject_public_path(out_path):
@@ -313,6 +319,7 @@ _TEMPLATE = r"""<!doctype html>
   <button id="bBad" class="on">선후 위반</button>
   <span style="color:var(--dim)" id="stat"></span>
   <span style="margin-left:auto"></span>
+  <button id="bAgenda">이견 아젠다</button>
   <button id="bReset">초안으로</button>
   <button id="bExport">로드맵 내보내기</button>
 </div>
@@ -325,6 +332,10 @@ _TEMPLATE = r"""<!doctype html>
 
 <script>
 const DATA = __PAYLOAD__;
+// 서버가 붙으면 workshop_server가 true로 치환한다. 정적 파일은 false.
+const LIVE = __LIVE__;
+const VOTER = LIVE ? (localStorage.getItem("td_voter") ||
+  (v => (localStorage.setItem("td_voter", v), v))("v" + Math.random().toString(36).slice(2,9))) : null;
 const NS = "http://www.w3.org/2000/svg";
 const BANDS = DATA.bands;
 const READINESS = {"이미 함":"--ready", "갭만 있음":"--gapc", "선행 신호":"--seed"};
@@ -358,7 +369,7 @@ const placed = {};
 const state = DATA.nodes.map(n => ({...n, x:n.draft_band, y:cyOf(n.readiness), r:rad(n.people)}));
 const byName = Object.fromEntries(state.map(s => [s.name, s]));
 
-const bandOf = c => placed[c.text] || c.draft_band;
+const bandOf = c => placed[c.id] || c.draft_band;   // 식별은 id — text는 유일하지 않다
 const orgOK = c => (!F.pjt || c.pjt === F.pjt) && (!F.cl || c.cl_level === F.cl);
 
 // 아래 셋은 td_roadmap.py의 category_bands / violations / moved를 그대로 옮긴 것이다.
@@ -382,7 +393,7 @@ function currentViolations(){
   }
   return new Set(DATA.cards.filter(c => c.axis === "capability_gap"
     && c.category in earliest && BANDS.indexOf(bandOf(c)) > earliest[c.category])
-    .map(c => c.text));
+    .map(c => c.id));
 }
 function movedCount(){ return DATA.cards.filter(c => bandOf(c) !== c.draft_band).length; }
 
@@ -464,7 +475,7 @@ function draw(){
   }
 
   for (const s of state) {
-    const bad = show.bad && (BY_CAT[s.name] || []).some(c => BADNOW.has(c.text));
+    const bad = show.bad && (BY_CAT[s.name] || []).some(c => BADNOW.has(c.id));
     const g = el("g",{class:"node" + (sel === s.name ? " sel" : "")});
     g.appendChild(el("circle",{cx:cx(s.x), cy:s.y, r:s.r,
       fill:css(READINESS[s.readiness] || "--dim"), "fill-opacity":alpha(s),
@@ -504,7 +515,7 @@ function side(s){
     ${s.horizon_known ? `` : `<div class="note">미래과제가 없어 시간축 초안을 계산할 근거가 없다 —
       가운데에 놓았다.</div>`}
     ${groups.map(([a,g]) => g.length ? `<div class="lbl">${AX_LABEL[a]} ${g.length}건</div>
-      ${g.map(k => { const bad = BADNOW.has(k.text); return `
+      ${g.map(k => { const bad = BADNOW.has(k.id); return `
         <div class="item ${bad?"bad":""}">
           <div class="ax ax-${a}">${AX_LABEL[a]} · ${esc(bandOf(k))}${
             bandOf(k) !== k.draft_band ? " (초안 " + esc(k.draft_band) + ")" : ""}</div>
@@ -527,8 +538,8 @@ for (const [id,k] of [["bRel","rel"], ["bQuad","quad"], ["bBad","bad"]])
 
 // ── 카드 배치 보드 ────────────────────────────────────────────────────
 function kardHTML(c){
-  const bad = BADNOW.has(c.text), mv = bandOf(c) !== c.draft_band;
-  return `<div class="kard ${mv?"moved":""} ${bad?"bad":""}" draggable="true" data-t="${esc(c.text)}">
+  const bad = BADNOW.has(c.id), mv = bandOf(c) !== c.draft_band;
+  return `<div class="kard ${mv?"moved":""} ${bad?"bad":""}" draggable="true" data-t="${esc(c.id)}">
     <div class="ax ax-${c.axis}">${AX_LABEL[c.axis]}</div>
     <p class="tx">${esc(c.text)}</p>
     <div class="who">${esc(c.name || "?")}${c.pjt ? " · " + esc(c.pjt) : ""}${
@@ -579,17 +590,41 @@ function wireDrag(){
   }
 }
 
-function place(text, band){
-  const c = DATA.cards.find(x => x.text === text);
+function place(id, band){
+  const c = DATA.cards.find(x => x.id === id);
   if (!c) return;
-  if (band === c.draft_band) delete placed[text]; else placed[text] = band;
+  if (LIVE) {                       // 서버가 정본 — 낙관적으로 그려두고 응답으로 덮어쓴다
+    placed[id] = band; refresh();
+    fetch("/vote", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({voter:VOTER, id, band})})
+      .then(r => r.json()).then(applyState).catch(() => {});
+    return;
+  }
+  if (band === c.draft_band) delete placed[id]; else placed[id] = band;
   refresh();
 }
 
+// 서버 상태를 화면 상태로 — 정본은 서버다.
+let SERVER = null;
+function applyState(st){
+  SERVER = st;
+  for (const k of Object.keys(placed)) delete placed[k];
+  for (const [t,b] of Object.entries(st.placed || {})) placed[t] = b;
+  refresh();
+}
+function poll(){
+  fetch("/state").then(r => r.json()).then(applyState).catch(() => {});
+}
+if (LIVE) { poll(); setInterval(poll, 3000); }   // 갱신 빈도가 낮아 폴링으로 충분하다
+
 function refresh(){
   applyPlacement();
+  const p = SERVER && SERVER.progress;
   document.getElementById("stat").textContent =
-    (BADNOW.size ? `선후 위반 ${BADNOW.size}건 · ` : "선후 위반 없음 · ") + `옮긴 카드 ${movedCount()}장`;
+    (BADNOW.size ? `선후 위반 ${BADNOW.size}건 · ` : "선후 위반 없음 · ")
+    + `옮긴 카드 ${movedCount()}장`
+    + (p ? ` · 투표 ${p.voted}/${p.total}` : "")
+    + (SERVER && SERVER.disputed.length ? ` · 이견 ${SERVER.disputed.length}장` : "");
   draw();
   if (mode === "board") renderBoard();
   if (sel && byName[sel]) side(byName[sel]);
@@ -627,7 +662,27 @@ for (const [id,key] of [["fpjt","pjt"], ["fcl","cl_level"]]) {
 
 document.getElementById("mMatrix").addEventListener("click", () => setMode("matrix"));
 document.getElementById("mBoard").addEventListener("click", () => setMode("board"));
+document.getElementById("bAgenda").addEventListener("click", () => {
+  const d = SERVER && SERVER.disputed || [];
+  const byId = Object.fromEntries(DATA.cards.map(c => [c.id, c]));
+  const body = !LIVE
+    ? `<div class="empty">투표 서버가 붙어 있을 때만 나옵니다.<br>
+        지금은 혼자 배치하는 모드입니다.</div>`
+    : (d.length
+      ? `<div class="lbl">이견 카드 ${d.length}장 — 여기만 논의하면 된다</div>` +
+        d.map(id => { const c = byId[id] || {}; return `
+          <div class="item bad"><div class="ax ax-${c.axis}">${AX_LABEL[c.axis]||""} · ${
+            esc(c.category||"")}</div><p>${esc(c.text||"")}</p>
+          <div class="who">${esc(c.name||"?")}</div></div>`; }).join("")
+      : `<div class="empty">갈린 카드가 없습니다.<br>합의된 것은 자동으로 통과합니다.</div>`);
+  setMode("matrix");
+  document.getElementById("side").innerHTML =
+    `<h2>이견 아젠다</h2><p class="def">최빈값이 과반에 못 미친 카드만 모았다.
+      합의된 것에 시간을 쓰지 않기 위한 목록이다.</p>${body}`;
+});
+
 document.getElementById("bReset").addEventListener("click", () => {
+  if (LIVE) return;               // 서버 모드에선 남의 표를 지울 수 없다
   for (const k of Object.keys(placed)) delete placed[k];
   refresh();
 });
@@ -638,7 +693,7 @@ document.getElementById("bExport").addEventListener("click", () => {
     note: "워크숍 배치 결과. band는 사람이 정한 값, readiness는 데이터에서 온 값.",
     categories: categoryBands(),
     violations: [...BADNOW],
-    cards: DATA.cards.map(c => ({category:c.category, axis:c.axis, text:c.text,
+    cards: DATA.cards.map(c => ({id:c.id, category:c.category, axis:c.axis, text:c.text,
       person_id:c.person_id, name:c.name, pjt:c.pjt,
       draft_band:c.draft_band, band:bandOf(c), moved:bandOf(c) !== c.draft_band})),
   };
@@ -647,6 +702,7 @@ document.getElementById("bExport").addEventListener("click", () => {
   a.download = "roadmap.json"; a.click(); URL.revokeObjectURL(a.href);
 });
 
+if (LIVE) document.getElementById("bReset").style.display = "none";
 setMode("matrix");
 </script>
 </body>

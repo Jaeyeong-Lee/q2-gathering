@@ -151,3 +151,30 @@ def test_dropped_facets_carries_author():
     assert d["name"] == "홍길동" and d["pjt"] == "양산기술"
     d2 = td_cards.dropped_facets([], persons, anonymize=True)[0]
     assert d2["name"] == "P1"
+
+
+def test_cards_get_stable_unique_ids():
+    """카드 식별은 text로 하면 안 된다 — 서로 다른 사람이 같은 문장을 쓸 수 있고,
+    한 사람이 같은 축에 같은 텍스트를 둘 낼 수도 있다. 투표 키가 겹치면 한 표가
+    여러 카드에 먹힌다."""
+    persons = [_person(1, future_task=[_task("겹침"), _task("겹침")]),
+               _person(2, future_task=[_task("겹침")])]
+    assigns = [_a(1, "future_task", "겹침"), _a(1, "future_task", "겹침"),
+               _a(2, "future_task", "겹침")]
+    ids = [c["id"] for c in td_cards.build(assigns, persons)]
+    assert len(set(ids)) == 3
+
+
+def test_card_id_is_stable_across_rebuilds():
+    """재생성해도 같은 id여야 이전 세션의 표가 살아난다."""
+    persons = [_person(1, future_task=[_task("a"), _task("b")])]
+    assigns = [_a(1, "future_task", "a"), _a(1, "future_task", "b")]
+    first = [c["id"] for c in td_cards.build(assigns, persons)]
+    assert first == [c["id"] for c in td_cards.build(assigns, persons)]
+
+
+def test_card_id_does_not_leak_text():
+    """id는 로그·URL에 실릴 수 있다 — 회고 원문이 거기 묻어나면 안 된다."""
+    persons = [_person(1, future_task=[_task("민감한 내용")])]
+    cid = td_cards.build([_a(1, "future_task", "민감한 내용")], persons)[0]["id"]
+    assert "민감한" not in cid
