@@ -45,12 +45,19 @@ def test_payload_carries_relations():
     assert payload["categories"][0]["relations"] == [{"to": "다른것", "type": "related"}]
 
 
-def test_payload_omits_source_text():
-    """원문은 이 화면이 안 쓴다(#40의 원문 펼치기 몫). 미리 실으면 파일만 무거워지고,
-    원문 안의 실명은 익명화로 지울 수 없어 구멍이 된다."""
+def test_payload_carries_source_text_per_person():
+    """원문 펼치기(#40)의 재료. 화면은 펼칠 때만 DOM에 그린다."""
     payload = td_inspect.build_payload(*_fixture())
-    assert "회고 원문" not in json.dumps(payload, ensure_ascii=False)
-    assert all("text" not in p for p in payload["persons"])
+    by_id = {p["person_id"]: p for p in payload["persons"]}
+    assert by_id[1]["text"] == "홍길동의 회고 원문"
+
+
+def test_anonymize_drops_source_text_entirely():
+    """원문 안의 실명은 정규식으로 지울 수 없다 — 지우는 척하면 그게 더 위험하다.
+    익명화를 켜면 원문을 아예 싣지 않는 쪽이 정직하다."""
+    aggregates, persons, assigns, taxonomy = _fixture()
+    payload = td_inspect.build_payload(aggregates, persons, assigns, taxonomy, anonymize=True)
+    assert all(p["text"] == "" for p in payload["persons"])
 
 
 def test_payload_coverage_matches_td_render():
@@ -108,3 +115,39 @@ def test_write_refuses_dist_path(tmp_path):
     with pytest.raises(ValueError):
         td_inspect.write(*_fixture(), out_path=out)
     assert not out.exists()
+
+
+def test_payload_exceptions_split_three_ways():
+    """무신호 / Other / 배정 폐기 — 세 목록이 서로 겹치지 않아야 한다."""
+    aggregates, persons, assigns, taxonomy = _fixture()
+    persons.append(_person(3, "박무신", signal_present=False))
+    persons.append(_person(4, "최폐기", future_task=[_task("폐기될것")]))
+    persons.append(_person(5, "정기타", future_task=[_task("기타로감")]))
+    assigns.append(_a(5, "기타로감", "Other"))
+    aggregates["categories"].append({"name": "Other", "people": 1, "pjt_spread": 1,
+                                     "cl_spread": 1, "have": 0, "gap": 0,
+                                     "readiness": "선행 신호", "pjts": [], "cls": []})
+    ex = td_inspect.build_payload(aggregates, persons, assigns, taxonomy)["exceptions"]
+
+    assert [p["person_id"] for p in ex["no_signal"]] == [3]
+    assert [d["text"] for d in ex["dropped"]] == ["폐기될것"]
+    assert [o["text"] for o in ex["other"]] == ["기타로감"]
+
+    ids = lambda rows: {(r["person_id"], r.get("text")) for r in rows}
+    assert not (ids(ex["dropped"]) & ids(ex["other"]))
+
+
+def test_exception_counts_match_coverage():
+    """커버리지 숫자와 목록 길이가 어긋나면 회의에서 신뢰를 잃는다."""
+    aggregates, persons, assigns, taxonomy = _fixture()
+    persons.append(_person(3, "박무신", signal_present=False))
+    payload = td_inspect.build_payload(aggregates, persons, assigns, taxonomy)
+    assert len(payload["exceptions"]["no_signal"]) == payload["coverage"]["no_signal"]
+    assert len(payload["exceptions"]["other"]) == payload["coverage"]["other"]
+
+
+def test_extract_failed_count_surfaced_as_number_only():
+    """추출 단계에서 통째로 실패한 사람은 extracted.json에 없어 목록으로 못 잡는다.
+    숫자로만 표시하고 그 한계를 화면이 밝혀야 한다."""
+    payload = td_inspect.build_payload(*_fixture())
+    assert "failed_count" in payload["coverage"]

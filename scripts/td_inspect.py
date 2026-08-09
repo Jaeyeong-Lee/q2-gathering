@@ -4,8 +4,8 @@
 목적은 파일을 예쁘게 보여주는 게 아니라 **파일 사이를 건너뛰는 것**이다 — 회의에서 나오는
 질문("17명이 누구야", "그 사람 원문 띄워봐")은 대부분 파일 하나 안에서 답이 안 나온다.
 
-조인은 td_cards가 한다. 여기는 그 위에 카테고리 정의(taxonomy)를 얹어 화면 데이터를
-만들고 렌더할 뿐이다. 회고 원문은 아직 안 싣는다 — 원문 펼치기는 #40.
+조인은 td_cards가 한다. 여기는 그 위에 카테고리 정의(taxonomy)·회고 원문·예외 목록을
+얹어 화면 데이터를 만들고 렌더할 뿐이다.
 
 **생성물은 민감하다** — 카테고리명(레벨 2)과 실명·인용(레벨 3)이 한 파일에 인라인된다.
 출력은 TD_OUT_DIR 아래로만. dist/는 GitHub Pages로 공개되므로 _reject_public_path가
@@ -15,6 +15,7 @@ import json
 import sys
 from pathlib import Path
 
+import td_assign
 import td_cards
 import td_render
 from pipeline_log import OUT_DIR
@@ -44,12 +45,14 @@ def build_payload(aggregates, persons, assignments, taxonomy=None, *, anonymize=
 
     cards = td_cards.build(assignments, persons, anonymize=anonymize)
 
-    # 회고 원문은 싣지 않는다 — 이 화면이 쓰지 않고(원문 펼치기는 #40), 미리 넣으면
-    # 파일만 무거워지는데다 원문 안의 실명은 익명화로 지울 수 없어 구멍이 된다.
+    # 익명화 시 원문을 통째로 뺀다 — 원문 안의 실명은 정규식으로 지울 수 없고,
+    # 지우는 척하는 게 안 지우는 것보다 위험하다.
     people = [{"person_id": p["person_id"],
                "name": f"P{p['person_id']}" if anonymize else p.get("name"),
                "pjt": p.get("pjt"), "cl_level": p.get("cl_level"),
-               "signal_present": bool(p.get("signal_present"))} for p in persons]
+               "signal_present": bool(p.get("signal_present")),
+               "text": "" if anonymize else (p.get("text") or p.get("normalized_text") or "")}
+              for p in persons]
 
     return {
         "categories": categories,
@@ -57,6 +60,11 @@ def build_payload(aggregates, persons, assignments, taxonomy=None, *, anonymize=
         "persons": people,
         "horizon": td_cards.horizon_distribution(cards),
         "coverage": td_render.coverage(persons, assignments),
+        "exceptions": {
+            "no_signal": [p for p in people if not p["signal_present"]],
+            "other": [c for c in cards if c["category"] == td_assign.OTHER],
+            "dropped": td_cards.dropped_facets(assignments, persons, anonymize=anonymize),
+        },
         "anonymized": anonymize,
     }
 
@@ -92,7 +100,7 @@ def write(aggregates, persons, assignments, taxonomy=None, *, out_path, anonymiz
 # 읽어 토큰 치환하는데, 여기선 파일 하나로 끝나는 쪽을 택했다(스테이지 스크립트가
 # 별도 asset 디렉터리에 의존하지 않게). 화면이 두 번째로 늘거나 이 상수가 400줄을
 # 넘으면 build.py 방식으로 옮길 것.
-_TEMPLATE = """<!doctype html>
+_TEMPLATE = r"""<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -112,26 +120,44 @@ _TEMPLATE = """<!doctype html>
        font:14px/1.6 -apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo",
             "Malgun Gothic",sans-serif}
 
-  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
-         padding:12px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
-  header h1{font-size:15px;margin:0;font-weight:650}
-  .cov{margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--dim);flex-wrap:wrap}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+         padding:10px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{font-size:15px;margin:0;font-weight:650;white-space:nowrap}
+  #q{flex:1;min-width:190px;max-width:420px;font:inherit;font-size:13px;padding:5px 11px;
+     border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink)}
+  select{font:inherit;font-size:12.5px;padding:4px 8px;border:1px solid var(--line);
+         border-radius:6px;background:var(--bg);color:var(--ink)}
+  .cov{display:flex;gap:13px;font-size:12px;color:var(--dim);flex-wrap:wrap;margin-left:auto}
   .cov b{color:var(--ink);font-weight:650}
 
-  main{display:flex;align-items:stretch;min-height:calc(100vh - 46px)}
+  .tabs{display:flex;gap:2px;padding:0 20px;border-bottom:1px solid var(--line);
+        background:var(--panel)}
+  .tab{padding:7px 14px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;
+       color:var(--dim)}
+  .tab.on{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+  .tab .n{font-size:11.5px;color:var(--dim);margin-left:5px}
+
+  #crumb{padding:7px 20px;font-size:12px;color:var(--dim);background:var(--panel);
+         border-bottom:1px solid var(--line);display:none}
+  #crumb a{color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  #crumb span.sep{margin:0 7px;opacity:.5}
+
+  main{display:flex;align-items:stretch}
   #list{width:330px;flex:none;border-right:1px solid var(--line);background:var(--panel);
-        overflow-y:auto;max-height:calc(100vh - 46px)}
-  #detail{flex:1;min-width:0;padding:22px 26px;overflow-y:auto;max-height:calc(100vh - 46px)}
+        overflow-y:auto}
+  #detail{flex:1;min-width:0;padding:22px 26px;overflow-y:auto}
 
   .row{padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer}
   .row:hover{background:var(--soft)}
   .row.on{background:var(--soft);box-shadow:inset 3px 0 0 var(--ink)}
   .row .nm{font-weight:600;font-size:13.5px;display:flex;gap:8px;align-items:baseline}
-  .row .nm .cnt{margin-left:auto;color:var(--dim);font-weight:400;font-size:12px}
+  .row .nm .cnt{margin-left:auto;color:var(--dim);font-weight:400;font-size:12px;flex:none}
   .row .meta{font-size:11.5px;color:var(--dim);margin-top:3px}
+  .row.mute .nm{color:var(--dim);font-weight:500}
 
   .dot{width:7px;height:7px;border-radius:99px;flex:none;display:inline-block}
   .r0{background:var(--ready)} .r1{background:var(--gapc)} .r2{background:var(--seed)}
+  .rx{background:var(--dim);opacity:.5}
 
   h2{font-size:19px;margin:0 0 6px;letter-spacing:-.01em}
   .badge{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;
@@ -150,6 +176,8 @@ _TEMPLATE = """<!doctype html>
   .card blockquote{margin:8px 0 0;padding:5px 0 5px 11px;border-left:2px solid var(--line);
                    font-size:12.5px;color:var(--dim)}
   .card .who{font-size:11.5px;color:var(--dim);margin-top:7px}
+  a.link{color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  mark{background:#ffe9a8;color:#1b1d20;border-radius:2px;padding:0 1px}
 
   .ax-future_task{color:var(--gapc)} .ax-capability_gap{color:var(--warn)}
   .ax-capability_have{color:var(--ready)} .ax-direction{color:var(--seed)}
@@ -157,26 +185,48 @@ _TEMPLATE = """<!doctype html>
   .rel{font-size:13px;margin:4px 0;color:var(--dim)}
   .rel b{color:var(--ink);font-weight:600}
   .empty{color:var(--dim);padding:60px 0;text-align:center;font-size:13.5px}
-  .note{font-size:11.5px;color:var(--warn);margin-top:2px}
+  .note{font-size:11.5px;color:var(--warn);margin-top:6px}
+
+  details.src{margin-top:14px;border:1px solid var(--line);border-radius:9px;
+              background:var(--panel)}
+  details.src summary{cursor:pointer;padding:9px 14px;font-size:12.5px;color:var(--dim);
+                      font-weight:600;list-style:none}
+  details.src summary::-webkit-details-marker{display:none}
+  details.src summary::before{content:"▸ ";opacity:.6}
+  details.src[open] summary::before{content:"▾ "}
+  details.src pre{margin:0;padding:0 16px 14px;white-space:pre-wrap;word-break:break-word;
+                  font:13px/1.7 inherit;color:var(--ink)}
+
+  .subtabs{display:flex;gap:6px;margin-bottom:4px}
+  .subtab{font-size:12.5px;padding:4px 11px;border:1px solid var(--line);border-radius:99px;
+          cursor:pointer;color:var(--dim)}
+  .subtab.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
 </style>
 </head>
 <body>
 
 <header>
   <h1>산출물 탐색기</h1>
+  <input id="q" type="search" placeholder="서술·인용 전체 검색" autocomplete="off">
+  <select id="fpjt"><option value="">전체 pjt</option></select>
+  <select id="fcl"><option value="">전체 cl</option></select>
   <span id="anon" style="font-size:12px;color:var(--dim)"></span>
   <div class="cov" id="cov"></div>
 </header>
 
+<div class="tabs" id="tabs"></div>
+<div id="crumb"></div>
+
 <main>
   <div id="list"></div>
-  <div id="detail"><div class="empty">왼쪽에서 카테고리를 고르세요</div></div>
+  <div id="detail"><div class="empty">왼쪽에서 항목을 고르세요</div></div>
 </main>
 
 <script>
 const DATA = __PAYLOAD__;
 
 const AX_LABEL = {future_task:"과제", capability_gap:"갭", capability_have:"보유", direction:"방향"};
+const AX_ORDER = ["future_task","capability_gap","capability_have","direction"];
 const READINESS = {"이미 함":{cls:"r0", color:"--ready"},
                    "갭만 있음":{cls:"r1", color:"--gapc"},
                    "선행 신호":{cls:"r2", color:"--seed"}};
@@ -184,11 +234,61 @@ const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 
-// 카드를 카테고리별로 미리 묶어둔다
-const BY_CAT = {};
-for (const c of DATA.cards) (BY_CAT[c.category] = BY_CAT[c.category] || []).push(c);
+const PERSON = {};
+for (const p of DATA.persons) PERSON[p.person_id] = p;
 
-// 커버리지 배지
+// ── 상태 ────────────────────────────────────────────────────────────
+// tab: 어느 입구로 보고 있나 / sel: 그 안에서 무엇을 / trail: 왕복 경로
+let tab = "cat", sel = null, exTab = "no_signal", trail = [];
+const F = {q:"", pjt:"", cl:""};
+
+// ── 필터 ────────────────────────────────────────────────────────────
+// 검색은 인덱스를 안 만든다 — 수백~수천 건에선 매번 훑어도 체감 지연이 없다.
+const hit = (...fields) => {
+  if (!F.q) return true;
+  const q = F.q.toLowerCase();
+  return fields.some(f => f && String(f).toLowerCase().includes(q));
+};
+const orgOK = r => (!F.pjt || r.pjt === F.pjt) && (!F.cl || r.cl_level === F.cl);
+const cardOK = c => orgOK(c) && hit(c.text, c.quote, c.name, c.category);
+const cards = () => DATA.cards.filter(cardOK);
+const persons = () => DATA.persons.filter(p => orgOK(p) && hit(p.name, p.text));
+
+function mark(s){
+  const t = esc(s);
+  if (!F.q) return t;
+  const q = esc(F.q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return t.replace(new RegExp(q, "gi"), m => `<mark>${m}</mark>`);
+}
+
+// 카테고리는 필터가 걸리면 남은 카드 기준으로 다시 센다 — 화면의 숫자와 목록이
+// 어긋나면 어느 쪽을 믿을지 알 수 없다.
+function categories(){
+  const ks = cards(), by = {};
+  for (const c of ks) (by[c.category] = by[c.category] || []).push(c);
+  const filtering = F.q || F.pjt || F.cl;
+  return DATA.categories
+    .map(c => {
+      const mine = by[c.name] || [];
+      if (!filtering) return {...c, shown:mine.length, hidden:false};
+      const people = new Set(mine.map(k => k.person_id));
+      return {...c, people:people.size, shown:mine.length, hidden:!mine.length,
+              pjt_spread:new Set(mine.map(k=>k.pjt).filter(Boolean)).size,
+              cl_spread:new Set(mine.map(k=>k.cl_level).filter(Boolean)).size,
+              have:mine.filter(k=>k.axis==="capability_have").length,
+              gap:mine.filter(k=>k.axis==="capability_gap").length};
+    })
+    .filter(c => !c.hidden);
+}
+
+function exRows(kind){
+  const rows = DATA.exceptions[kind];
+  return kind === "no_signal"
+    ? rows.filter(p => orgOK(p) && hit(p.name, p.text))
+    : rows.filter(r => orgOK(r) && hit(r.text, r.quote, r.name));
+}
+
+// ── 헤더 ────────────────────────────────────────────────────────────
 const cv = DATA.coverage;
 // flex gap은 텍스트 노드엔 안 먹는다 — 항목마다 span으로 감싸야 간격이 생긴다
 document.getElementById("cov").innerHTML = [
@@ -199,66 +299,211 @@ document.getElementById("cov").innerHTML = [
 ].map(s => `<span>${s}</span>`).join("");
 if (DATA.anonymized) document.getElementById("anon").textContent = "익명 표기";
 
-let sel = null;
+for (const [id, key] of [["fpjt","pjt"], ["fcl","cl_level"]]) {
+  const el = document.getElementById(id);
+  for (const v of [...new Set(DATA.persons.map(p => p[key]).filter(Boolean))].sort())
+    el.insertAdjacentHTML("beforeend", `<option value="${esc(v)}">${esc(v)}</option>`);
+  el.addEventListener("change", () => {
+    F[key === "pjt" ? "pjt" : "cl"] = el.value; sel = null; render();
+  });
+}
+document.getElementById("q").addEventListener("input", e => {
+  F.q = e.target.value.trim(); sel = null; render();
+});
+
+// ── 탐색 이동 ────────────────────────────────────────────────────────
+function go(nextTab, nextSel, {push = true} = {}){
+  if (push && sel !== null) trail.push({tab, sel, label: crumbLabel()});
+  tab = nextTab; sel = nextSel; render();
+}
+function crumbLabel(){
+  if (tab === "cat") return sel;
+  if (tab === "person") return (PERSON[sel] || {}).name || `P${sel}`;
+  return "예외";
+}
+function back(i){ const t = trail[i]; trail = trail.slice(0, i); tab = t.tab; sel = t.sel; render(); }
+
+// ── 렌더 ────────────────────────────────────────────────────────────
+function renderTabs(){
+  const counts = {cat: categories().length, person: persons().length,
+                  ex: exRows("no_signal").length + exRows("other").length + exRows("dropped").length};
+  document.getElementById("tabs").innerHTML = [
+    ["cat","카테고리",counts.cat], ["person","사람",counts.person], ["ex","예외",counts.ex],
+  ].map(([k,label,n]) =>
+    `<div class="tab ${tab===k?"on":""}" data-t="${k}">${label}<span class="n">${n}</span></div>`
+  ).join("");
+  for (const el of document.querySelectorAll(".tab"))
+    el.addEventListener("click", () => { trail = []; tab = el.dataset.t; sel = null; render(); });
+}
+
+function renderCrumb(){
+  const el = document.getElementById("crumb");
+  if (!trail.length) { el.style.display = "none"; return; }
+  el.style.display = "block";
+  el.innerHTML = trail.map((t,i) => `<a data-back="${i}">${esc(t.label)}</a>`)
+    .join('<span class="sep">›</span>') + `<span class="sep">›</span>${esc(crumbLabel())}`;
+  for (const a of el.querySelectorAll("[data-back]"))
+    a.addEventListener("click", () => back(+a.dataset.back));
+}
 
 function renderList(){
-  document.getElementById("list").innerHTML = DATA.categories.map((c,i) => `
-    <div class="row ${sel===c.name?"on":""}" data-i="${i}">
-      <div class="nm">
-        <span class="dot ${(READINESS[c.readiness]||{}).cls||""}"></span>
-        <span>${esc(c.name)}</span>
-        <span class="cnt">${c.people}명</span>
-      </div>
-      <div class="meta">pjt ${c.pjt_spread} · cl ${c.cl_spread} · 보유 ${c.have} / 갭 ${c.gap}</div>
-    </div>`).join("");
-  for (const el of document.querySelectorAll(".row"))
-    el.addEventListener("click", () => select(DATA.categories[+el.dataset.i].name));
+  const el = document.getElementById("list");
+  if (tab === "cat") {
+    const cs = categories();
+    el.innerHTML = cs.length ? cs.map(c => `
+      <div class="row ${sel===c.name?"on":""}" data-k="${esc(c.name)}">
+        <div class="nm"><span class="dot ${(READINESS[c.readiness]||{}).cls||""}"></span>
+          <span>${mark(c.name)}</span><span class="cnt">${c.people}명</span></div>
+        <div class="meta">항목 ${c.shown} · pjt ${c.pjt_spread} · cl ${c.cl_spread}
+          · 보유 ${c.have} / 갭 ${c.gap}</div>
+      </div>`).join("") : `<div class="empty">조건에 맞는 카테고리가 없습니다</div>`;
+  } else if (tab === "person") {
+    const ps = persons();
+    el.innerHTML = ps.length ? ps.map(p => {
+      const mine = DATA.cards.filter(c => c.person_id === p.person_id);
+      const ncat = new Set(mine.map(c => c.category)).size;
+      return `
+      <div class="row ${p.signal_present?"":"mute"} ${sel===p.person_id?"on":""}"
+           data-k="${p.person_id}">
+        <div class="nm"><span class="dot ${p.signal_present?"r0":"rx"}"></span>
+          <span>${mark(p.name || "(이름 없음)")}</span>
+          <span class="cnt">${p.signal_present ? ncat + "개 카테고리" : "무신호"}</span></div>
+        <div class="meta">${esc(p.pjt || "")} ${esc(p.cl_level || "")} · 항목 ${mine.length}</div>
+      </div>`; }).join("") : `<div class="empty">조건에 맞는 사람이 없습니다</div>`;
+  } else {
+    const kinds = [["no_signal","무신호"], ["other","Other"], ["dropped","배정 폐기"]];
+    el.innerHTML = `<div style="padding:12px 16px">
+      <div class="subtabs">${kinds.map(([k,label]) =>
+        `<span class="subtab ${exTab===k?"on":""}" data-x="${k}">${label} ${exRows(k).length}</span>`
+      ).join("")}</div>
+      <div class="note">추출 단계에서 통째로 실패한 인원 ${cv.failed_count}명은
+        extracted.json에 없어 목록으로 잡히지 않는다 — 숫자로만 보인다.</div>
+    </div>` + renderExList();
+    for (const el2 of document.querySelectorAll(".subtab"))
+      el2.addEventListener("click", () => { exTab = el2.dataset.x; sel = null; render(); });
+  }
+  for (const row of document.querySelectorAll(".row"))
+    row.addEventListener("click", () => {
+      const k = row.dataset.k;
+      go(tab, tab === "person" ? +k : k, {push:false});
+    });
 }
 
-function select(name){
-  sel = name;
-  const c = DATA.categories.find(x => x.name === name);
-  const cards = BY_CAT[name] || [];
-  const h = DATA.horizon[name];
+function renderExList(){
+  const rows = exRows(exTab);
+  if (!rows.length) return `<div class="empty">없습니다</div>`;
+  if (exTab === "no_signal")
+    return rows.map(p => `
+      <div class="row mute ${sel===p.person_id?"on":""}" data-k="${p.person_id}">
+        <div class="nm"><span class="dot rx"></span><span>${mark(p.name || "(이름 없음)")}</span></div>
+        <div class="meta">${esc(p.pjt || "")} ${esc(p.cl_level || "")} · 원문 ${(p.text||"").length}자</div>
+      </div>`).join("");
+  return rows.map((r,i) => `
+    <div class="row" data-k="${i}">
+      <div class="nm"><span class="dot rx"></span>
+        <span class="ax ax-${r.axis}">${AX_LABEL[r.axis]}</span></div>
+      <div class="meta">${mark((r.text||"").slice(0,70))}</div>
+      <div class="meta">${esc(r.name || "")} ${esc(r.pjt || "")}</div>
+    </div>`).join("");
+}
 
-  const groups = ["future_task","capability_gap","capability_have","direction"]
-    .map(ax => [ax, cards.filter(k => k.axis === ax)])
-    .filter(([,ks]) => ks.length);
+function cardHTML(k){
+  return `<div class="card">
+    <div class="ax ax-${k.axis}">${AX_LABEL[k.axis]}${k.horizon ? " · " + esc(k.horizon) : ""}</div>
+    <p class="tx">${mark(k.text)}</p>
+    ${k.quote ? `<blockquote>${mark(k.quote)}</blockquote>` : ``}
+    <div class="who">${k.person_id != null && PERSON[k.person_id]
+      ? `<a class="link" data-person="${k.person_id}">${mark(k.name || "?")}</a>`
+      : esc(k.name || "(알 수 없음)")}${k.pjt ? " · " + esc(k.pjt) : ""}${
+      k.cl_level ? " · " + esc(k.cl_level) : ""}</div>
+  </div>`;
+}
 
-  document.getElementById("detail").innerHTML = `
-    <h2>${esc(c.name)}<span class="badge" style="background:${css((READINESS[c.readiness]||{}).color||"--dim")}"
-      >${esc(c.readiness)}</span></h2>
-    ${c.definition ? `<p class="def">${esc(c.definition)}</p>` : ``}
-    ${c.inclusion_criteria ? `<p class="def">포함 기준 — ${esc(c.inclusion_criteria)}</p>` : ``}
-    <div class="nums">
-      <div><b>${c.people}</b>기여 인원</div>
-      <div><b>${c.pjt_spread} / ${c.cl_spread}</b>확산도 pjt / cl</div>
-      <div><b>${c.have}</b>보유 언급</div>
-      <div><b>${c.gap}</b>갭 언급</div>
-      ${h ? `<div><b>${h["단기"]} / ${h["장기"]} / ${h["불명"]}</b>과제 시간 단기 / 장기 / 불명</div>` : ``}
-    </div>
-    ${(c.pjts||[]).length ? `<div class="def">${esc((c.pjts||[]).join(" · "))} — ${esc((c.cls||[]).join(" · "))}</div>` : ``}
-    ${groups.map(([ax,ks]) => `
-      <div class="lbl">${AX_LABEL[ax]} ${ks.length}건</div>
-      ${ks.map(k => `
-        <div class="card">
-          <div class="ax ax-${ax}">${AX_LABEL[ax]}${k.horizon ? " · " + esc(k.horizon) : ""}</div>
-          <p class="tx">${esc(k.text)}</p>
-          ${k.quote ? `<blockquote>${esc(k.quote)}</blockquote>` : ``}
-          <div class="who">${esc(k.name || "(알 수 없음)")}${
-            k.pjt ? " · " + esc(k.pjt) : ""}${k.cl_level ? " · " + esc(k.cl_level) : ""}</div>
-        </div>`).join("")}`).join("")}
-    ${(c.relations||[]).length ? `
-      <div class="lbl">관련 카테고리</div>
-      ${c.relations.map(r => `<div class="rel"><b>${esc(r.type)}</b> ${esc(r.to)}</div>`).join("")}
-      <div class="note">taxonomy에서 그대로 — LLM 재검증 없음</div>` : ``}
-    ${cards.length ? `` : `<div class="empty">이 카테고리에 배정된 항목이 없습니다</div>`}
-  `;
-  renderList();
+// 링크는 data 속성 + 리스너로 단다. onclick에 이름을 문자열로 끼워 넣으면 카테고리명에
+// 따옴표가 하나만 있어도 깨진다 — 사내 코드명엔 뭐가 들어갈지 모른다.
+function wireLinks(root){
+  for (const a of root.querySelectorAll("[data-person]"))
+    a.addEventListener("click", () => go("person", +a.dataset.person));
+  for (const a of root.querySelectorAll("[data-cat]"))
+    a.addEventListener("click", () => go("cat", a.dataset.cat));
+}
+
+function renderDetail(){
+  const el = document.getElementById("detail");
+  if (sel === null) { el.innerHTML = `<div class="empty">왼쪽에서 항목을 고르세요</div>`; return; }
+
+  if (tab === "cat") {
+    const c = categories().find(x => x.name === sel) || DATA.categories.find(x => x.name === sel);
+    if (!c) { el.innerHTML = `<div class="empty">조건에서 벗어났습니다</div>`; return; }
+    const ks = cards().filter(k => k.category === sel);
+    const h = DATA.horizon[sel];
+    const groups = AX_ORDER.map(ax => [ax, ks.filter(k => k.axis === ax)]).filter(([,g]) => g.length);
+    el.innerHTML = `
+      <h2>${esc(c.name)}<span class="badge" style="background:${
+        css((READINESS[c.readiness]||{}).color||"--dim")}">${esc(c.readiness)}</span></h2>
+      ${c.definition ? `<p class="def">${mark(c.definition)}</p>` : ``}
+      ${c.inclusion_criteria ? `<p class="def">포함 기준 — ${mark(c.inclusion_criteria)}</p>` : ``}
+      <div class="nums">
+        <div><b>${c.people}</b>기여 인원</div>
+        <div><b>${c.pjt_spread} / ${c.cl_spread}</b>확산도 pjt / cl</div>
+        <div><b>${c.have}</b>보유 언급</div>
+        <div><b>${c.gap}</b>갭 언급</div>
+        ${h ? `<div><b>${h["단기"]} / ${h["장기"]} / ${h["불명"]}</b>과제 시간 단기 / 장기 / 불명</div>` : ``}
+      </div>
+      ${groups.map(([ax,g]) => `<div class="lbl">${AX_LABEL[ax]} ${g.length}건</div>
+        ${g.map(cardHTML).join("")}`).join("")}
+      ${(c.relations||[]).length ? `<div class="lbl">관련 카테고리</div>
+        ${c.relations.map(r => `<div class="rel"><b>${esc(r.type)}</b>
+          <a class="link" data-cat="${esc(r.to)}">${esc(r.to)}</a></div>`).join("")}
+        <div class="note">taxonomy에서 그대로 — LLM 재검증 없음</div>` : ``}
+      ${ks.length ? `` : `<div class="empty">조건에 맞는 항목이 없습니다</div>`}`;
+    return;
+  }
+
+  if (tab === "person" || (tab === "ex" && exTab === "no_signal")) {
+    const p = PERSON[sel];
+    if (!p) { el.innerHTML = `<div class="empty">조건에서 벗어났습니다</div>`; return; }
+    const mine = DATA.cards.filter(k => k.person_id === p.person_id);
+    const byCat = {};
+    for (const k of mine) (byCat[k.category] = byCat[k.category] || []).push(k);
+    el.innerHTML = `
+      <h2>${esc(p.name || "(이름 없음)")}${p.signal_present ? `` :
+        `<span class="badge" style="background:${css("--dim")}">무신호</span>`}</h2>
+      <p class="def">${esc(p.pjt || "")} ${esc(p.cl_level || "")}</p>
+      <div class="nums">
+        <div><b>${mine.length}</b>배정된 항목</div>
+        <div><b>${Object.keys(byCat).length}</b>기여 카테고리</div>
+      </div>
+      ${Object.entries(byCat).map(([cat,ks]) => `
+        <div class="lbl"><a class="link" data-cat="${esc(cat)}">${esc(cat)}</a> ${ks.length}건</div>
+        ${ks.map(cardHTML).join("")}`).join("")}
+      ${mine.length ? `` : `<div class="empty">배정된 항목이 없습니다</div>`}
+      ${p.text ? `<details class="src"><summary>회고 원문 ${p.text.length}자</summary>
+        <pre>${mark(p.text)}</pre></details>`
+       : `<div class="note">${DATA.anonymized
+          ? "익명 표기라 원문을 싣지 않았다 — 원문 안의 실명은 지울 수 없다."
+          : "원문이 없습니다."}</div>`}`;
+    return;
+  }
+
+  // 예외 탭의 Other / 배정 폐기 — 행 자체가 상세다
+  const rows = exRows(exTab);
+  const r = rows[sel];
+  if (!r) { el.innerHTML = `<div class="empty">조건에서 벗어났습니다</div>`; return; }
+  el.innerHTML = `
+    <h2>${exTab === "other" ? "Other로 배정" : "인용검증 폐기"}</h2>
+    <p class="def">${exTab === "other"
+      ? "맞는 카테고리가 없어 흘러간 항목이다. 비율이 높으면 카테고리 체계에 빠진 주제가 있다는 신호다."
+      : "인용을 두 번 대조했으나 원문에서 확인되지 않아 버려진 항목이다."}</p>
+    ${cardHTML(r)}`;
+}
+
+function render(){
+  renderTabs(); renderCrumb(); renderList(); renderDetail();
+  wireLinks(document.getElementById("detail"));
   document.getElementById("detail").scrollTop = 0;
 }
-
-renderList();
+render();
 </script>
 </body>
 </html>

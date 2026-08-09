@@ -120,3 +120,34 @@ def test_build_accepts_paths(tmp_path):
     p.write_text(json.dumps(persons, ensure_ascii=False), encoding="utf-8")
     a.write_text(json.dumps([_a(1, "future_task", "t")], ensure_ascii=False), encoding="utf-8")
     assert len(td_cards.build(a, p)) == 1
+
+
+def test_dropped_facets_are_the_difference():
+    """배정 폐기 목록은 파일로 안 남는다(td_assign이 dropped를 반환만 함).
+    extracted의 facet 중 assignments에 없는 것 = 폐기. 추가 저장 없이 차집합으로."""
+    persons = [_person(1, future_task=[_task("배정됨"), _task("폐기됨")],
+                       capability_gap=[_item("갭도폐기")])]
+    dropped = td_cards.dropped_facets([_a(1, "future_task", "배정됨")], persons)
+    assert {(d["axis"], d["text"]) for d in dropped} == {
+        ("future_task", "폐기됨"), ("capability_gap", "갭도폐기")}
+
+
+def test_dropped_facets_counts_duplicates():
+    """같은 텍스트 facet이 둘인데 하나만 배정됐으면 하나가 폐기다."""
+    persons = [_person(1, future_task=[_task("겹침"), _task("겹침")])]
+    dropped = td_cards.dropped_facets([_a(1, "future_task", "겹침")], persons)
+    assert len(dropped) == 1
+
+
+def test_dropped_facets_excludes_no_signal_people():
+    """무신호 인원은 애초에 배정 대상이 아니다 — 폐기가 아니라 격리다."""
+    persons = [_person(1, signal_present=False, future_task=[_task("무신호")])]
+    assert td_cards.dropped_facets([], persons) == []
+
+
+def test_dropped_facets_carries_author():
+    persons = [_person(1, name="홍길동", future_task=[_task("폐기됨")])]
+    d = td_cards.dropped_facets([], persons)[0]
+    assert d["name"] == "홍길동" and d["pjt"] == "양산기술"
+    d2 = td_cards.dropped_facets([], persons, anonymize=True)[0]
+    assert d2["name"] == "P1"

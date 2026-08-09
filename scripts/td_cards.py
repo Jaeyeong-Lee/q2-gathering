@@ -72,6 +72,39 @@ def build(assignments, persons, *, anonymize=False):
     return cards
 
 
+def dropped_facets(assignments, persons, *, anonymize=False):
+    """인용검증을 통과 못 해 배정에서 빠진 facet들. 반환: list[dict].
+
+    td_assign은 dropped를 반환만 하고 파일로 남기지 않아 목록이 없다. 추가 저장 없이
+    **차집합**으로 구한다 — extracted의 facet 중 assignments가 소비하지 않은 것.
+    같은 키에 facet이 둘인데 배정이 하나면 하나만 폐기이므로 개수로 센다.
+
+    한계: 추출 단계에서 통째로 실패한 사람은 extracted.json에 아예 없어 이 방법으로
+    잡히지 않는다. 그건 td_render.coverage의 failed_count로만 보인다.
+    """
+    assignments, persons = load_json(assignments), load_json(persons)
+    meta = {p["person_id"]: p for p in persons}
+    assigned = {}
+    for a in assignments:
+        key = (a["person_id"], a["axis"], a["text"])
+        assigned[key] = assigned.get(key, 0) + 1
+
+    out = []
+    for person, axis, item in iter_facets(persons):
+        pid = person["person_id"]
+        key = (pid, axis, item["text"])
+        if assigned.get(key, 0) > 0:
+            assigned[key] -= 1
+            continue
+        p = meta.get(pid, {})
+        out.append({"person_id": pid,
+                    "name": f"P{pid}" if anonymize else p.get("name"),
+                    "pjt": p.get("pjt"), "cl_level": p.get("cl_level"),
+                    "axis": axis, "text": item["text"],
+                    "horizon": item.get("horizon")})
+    return out
+
+
 def horizon_distribution(cards):
     """카테고리 -> {단기, 장기, 불명} 건수. **과제 카드만 센다** — 시간은 과제의 속성이지
     역량의 속성이 아니라서 horizon이 future_task에만 있다. 과제가 하나도 없는 카테고리는
