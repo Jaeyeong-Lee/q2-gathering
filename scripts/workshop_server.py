@@ -25,7 +25,7 @@ from pathlib import Path
 import td_cards
 import td_roadmap
 from pipeline_log import OUT_DIR, get_logger
-from td_common import load_json
+from td_common import reject_public_path
 
 log = get_logger("workshop_server")
 
@@ -57,7 +57,6 @@ def tally(cards, votes):
             "disputed": disputed,
             "categories": td_roadmap.category_bands(cards, placed),
             "violations": [c["id"] for c in td_roadmap.violations(cards, placed)],
-            "moved": [m["id"] for m in td_roadmap.moved(cards, placed)],
             "progress": {"voted": voted, "total": len(cards)}}
 
 
@@ -82,13 +81,8 @@ def record(votes, by_voter, *, voter, id, band):
     by_voter.setdefault(voter, {})[id] = band
 
 
-def _reject_public_path(path):
-    if "dist" in Path(path).resolve().parts:
-        raise ValueError("dist/ 아래에는 쓸 수 없다 — 배포 추적 경로다. TD_OUT_DIR을 써라")
-
-
 def save(path, votes, by_voter):
-    _reject_public_path(path)
+    reject_public_path(path)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"votes": votes, "by_voter": by_voter},
@@ -156,13 +150,7 @@ def serve(cards, page, votes_path, *, port=8000):
 def _page(d, anonymize=False):
     """#44의 배치 화면을 그대로 쓰고, 상태 소스만 폴링으로 바꾼다."""
     cards = td_cards.build(d / "assignments.json", d / "extracted.json", anonymize=anonymize)
-    aggregates = load_json(d / "aggregates.json")
-    taxo_path = d / "taxonomy.json"
-    taxo = {c["name"]: c for c in load_json(taxo_path)} if taxo_path.exists() else {}
-    categories = [{**c, "definition": taxo.get(c["name"], {}).get("definition", ""),
-                   "relations": taxo.get(c["name"], {}).get("relations", [])}
-                  for c in aggregates["categories"]]
-    payload = td_roadmap.build_payload(cards, categories)
+    payload = td_roadmap.build_payload(cards, td_roadmap.load_categories(d))
     return td_roadmap.render_html(payload, live=True), payload["cards"]
 
 

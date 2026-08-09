@@ -5,10 +5,11 @@
 질문("17명이 누구야", "그 사람 원문 띄워봐")은 대부분 파일 하나 안에서 답이 안 나온다.
 
 조인은 td_cards가 한다. 여기는 그 위에 카테고리 정의(taxonomy)·회고 원문·예외 목록을
-얹어 화면 데이터를 만들고 렌더할 뿐이다.
+얹어 화면 데이터를 만들고 렌더할 뿐이다. **원문은 extracted.json에 없다** — td_extract가
+담지 않으므로 추출 입력(sources.json/persons.json)을 따로 읽는다.
 
 **생성물은 민감하다** — 카테고리명(레벨 2)과 실명·인용(레벨 3)이 한 파일에 인라인된다.
-출력은 TD_OUT_DIR 아래로만. dist/는 GitHub Pages로 공개되므로 _reject_public_path가
+출력은 TD_OUT_DIR 아래로만. dist/는 GitHub Pages로 공개되므로 td_common.reject_public_path가
 그쪽 경로를 아예 거부한다(docstring만으로는 지켜지지 않아서).
 """
 import json
@@ -19,20 +20,28 @@ import td_assign
 import td_cards
 import td_render
 from pipeline_log import OUT_DIR
-from td_common import load_json
+from td_common import load_json, reject_public_path
 
 
 
-def build_payload(aggregates, persons, assignments, taxonomy=None, *, anonymize=False):
+def build_payload(aggregates, persons, assignments, taxonomy=None, *,
+                  sources=None, anonymize=False):
     """화면이 필요한 것 전부를 하나의 dict로. 순수 함수 — 파일을 쓰지 않는다.
 
     aggregates에는 카테고리 정의가 없고(집계는 이름만 들고 온다) taxonomy에만 있다.
     Other처럼 taxonomy에 없는 카테고리도 목록에서 빠지면 안 되므로 빈 정의로 채운다.
+
+    회고 원문은 **extracted.json에 없다** — td_extract가 담지 않아 입력 파일(sources.json
+    또는 persons.json)에서 따로 가져와야 한다. sources를 안 주면 원문 칸이 빈 채로 동작한다.
     """
     aggregates = load_json(aggregates)
     persons = load_json(persons)
     assignments = load_json(assignments)
     taxonomy = load_json(taxonomy) if taxonomy is not None else []
+    src_text = {}
+    if sources is not None and not anonymize:
+        # id는 사람 id — extracted의 person_id와 같은 값이다(td_extract가 그대로 물려준다).
+        src_text = {d["id"]: d.get("text", "") for d in load_json(sources)}
 
     taxo = {c["name"]: c for c in taxonomy}
     categories = []
@@ -51,7 +60,7 @@ def build_payload(aggregates, persons, assignments, taxonomy=None, *, anonymize=
                "name": f"P{p['person_id']}" if anonymize else p.get("name"),
                "pjt": p.get("pjt"), "cl_level": p.get("cl_level"),
                "signal_present": bool(p.get("signal_present")),
-               "text": "" if anonymize else (p.get("text") or p.get("normalized_text") or "")}
+               "text": src_text.get(p["person_id"], "")}
               for p in persons]
 
     return {
@@ -80,18 +89,13 @@ def render_html(payload):
     return _TEMPLATE.replace("__PAYLOAD__", _embed(payload))
 
 
-def _reject_public_path(out_path):
-    """dist/ 아래로는 쓰지 못하게 막는다 — 그 디렉터리는 GitHub Pages로 배포 추적되므로
-    실명·인용이 박힌 파일이 들어가면 공개된다. 규칙을 주석으로만 두면 오타 한 번에 깨진다."""
-    if "dist" in Path(out_path).resolve().parts:
-        raise ValueError("dist/ 아래에는 쓸 수 없다 — 배포 추적 경로다. TD_OUT_DIR을 써라")
-
-
-def write(aggregates, persons, assignments, taxonomy=None, *, out_path, anonymize=False):
-    _reject_public_path(out_path)
+def write(aggregates, persons, assignments, taxonomy=None, *, out_path,
+          sources=None, anonymize=False):
+    reject_public_path(out_path)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    payload = build_payload(aggregates, persons, assignments, taxonomy, anonymize=anonymize)
+    payload = build_payload(aggregates, persons, assignments, taxonomy,
+                            sources=sources, anonymize=anonymize)
     out_path.write_text(render_html(payload), encoding="utf-8")
     return out_path
 
@@ -290,13 +294,25 @@ function exRows(kind){
 
 // ── 헤더 ────────────────────────────────────────────────────────────
 const cv = DATA.coverage;
-// flex gap은 텍스트 노드엔 안 먹는다 — 항목마다 span으로 감싸야 간격이 생긴다
-document.getElementById("cov").innerHTML = [
-  `대상 <b>${cv.total_people}</b>명`,
-  `무신호 <b>${cv.no_signal}</b> (${Math.round(cv.no_signal_rate*100)}%)`,
-  `배정 <b>${cv.assignments}</b>건`,
-  `Other <b>${cv.other}</b> (${Math.round(cv.other_rate*100)}%)`,
-].map(s => `<span>${s}</span>`).join("");
+// 필터가 걸리면 배지도 그 범위로 다시 센다 — 목록은 걸러졌는데 숫자가 전체면
+// 예외 탭의 건수와 어긋나 어느 쪽을 믿을지 알 수 없다.
+function renderCoverage(){
+  const filtering = F.q || F.pjt || F.cl;
+  const ps = persons(), ks = cards();
+  const n = filtering
+    ? {total: ps.length, no_signal: ps.filter(p => !p.signal_present).length,
+       assignments: ks.length, other: ks.filter(k => k.category === "Other").length}
+    : {total: cv.total_people, no_signal: cv.no_signal,
+       assignments: cv.assignments, other: cv.other};
+  const pct = (a,b) => b ? Math.round(a/b*100) : 0;
+  // flex gap은 텍스트 노드엔 안 먹는다 — 항목마다 span으로 감싸야 간격이 생긴다
+  document.getElementById("cov").innerHTML = [
+    (filtering ? "걸러진 " : "") + `대상 <b>${n.total}</b>명`,
+    `무신호 <b>${n.no_signal}</b> (${pct(n.no_signal, n.total)}%)`,
+    `배정 <b>${n.assignments}</b>건`,
+    `Other <b>${n.other}</b> (${pct(n.other, n.assignments)}%)`,
+  ].map(s => `<span>${s}</span>`).join("");
+}
 if (DATA.anonymized) document.getElementById("anon").textContent = "익명 표기";
 
 for (const [id, key] of [["fpjt","pjt"], ["fcl","cl_level"]]) {
@@ -376,8 +392,8 @@ function renderList(){
       <div class="subtabs">${kinds.map(([k,label]) =>
         `<span class="subtab ${exTab===k?"on":""}" data-x="${k}">${label} ${exRows(k).length}</span>`
       ).join("")}</div>
-      <div class="note">추출 단계에서 통째로 실패한 인원 ${cv.failed_count}명은
-        extracted.json에 없어 목록으로 잡히지 않는다 — 숫자로만 보인다.</div>
+      <div class="note">추출 단계에서 통째로 실패한 사람은 extracted.json에 아예 없어
+        여기에도, 아래 어느 목록에도 잡히지 않는다. 그 수는 추출을 돌린 실행 로그에만 있다.</div>
     </div>` + renderExList();
     for (const el2 of document.querySelectorAll(".subtab"))
       el2.addEventListener("click", () => { exTab = el2.dataset.x; sel = null; render(); });
@@ -385,7 +401,9 @@ function renderList(){
   for (const row of document.querySelectorAll(".row"))
     row.addEventListener("click", () => {
       const k = row.dataset.k;
-      go(tab, tab === "person" ? +k : k, {push:false});
+      // 사람은 숫자 id, 예외 탭의 무신호도 사람이라 숫자여야 선택이 잡힌다.
+      const numeric = tab === "person" || (tab === "ex" && exTab === "no_signal");
+      go(tab, numeric ? +k : k, {push:false});
     });
 }
 
@@ -478,8 +496,8 @@ function renderDetail(){
         <div class="lbl"><a class="link" data-cat="${esc(cat)}">${esc(cat)}</a> ${ks.length}건</div>
         ${ks.map(cardHTML).join("")}`).join("")}
       ${mine.length ? `` : `<div class="empty">배정된 항목이 없습니다</div>`}
-      ${p.text ? `<details class="src"><summary>회고 원문 ${p.text.length}자</summary>
-        <pre>${mark(p.text)}</pre></details>`
+      ${p.text ? `<details class="src" data-src="${p.person_id}">
+        <summary>회고 원문 ${p.text.length}자</summary></details>`
        : `<div class="note">${DATA.anonymized
           ? "익명 표기라 원문을 싣지 않았다 — 원문 안의 실명은 지울 수 없다."
           : "원문이 없습니다."}</div>`}`;
@@ -498,9 +516,19 @@ function renderDetail(){
     ${cardHTML(r)}`;
 }
 
+// 원문은 펼칠 때 만든다 — 200명분을 미리 그리면 DOM이 무거워진다.
+function wireSource(root){
+  for (const d of root.querySelectorAll("details.src")) d.addEventListener("toggle", () => {
+    if (!d.open || d.querySelector("pre")) return;
+    const p = PERSON[+d.dataset.src];
+    d.insertAdjacentHTML("beforeend", `<pre>${mark((p && p.text) || "")}</pre>`);
+  });
+}
+
 function render(){
-  renderTabs(); renderCrumb(); renderList(); renderDetail();
+  renderCoverage(); renderTabs(); renderCrumb(); renderList(); renderDetail();
   wireLinks(document.getElementById("detail"));
+  wireSource(document.getElementById("detail"));
   document.getElementById("detail").scrollTop = 0;
 }
 render();
@@ -520,8 +548,11 @@ def main(*argv):
     d = Path(args[0]) if len(args) > 0 else OUT_DIR / "task_discovery"
     out = Path(args[1]) if len(args) > 1 else d / "inspect.html"
     taxonomy = d / "taxonomy.json"
+    # 원문은 추출 입력에만 있다. 합성이면 sources.json, 실데이터면 persons.json.
+    sources = next((p for p in (d / "sources.json", d.parent / "persons.json") if p.exists()), None)
     res = write(d / "aggregates.json", d / "extracted.json", d / "assignments.json",
-                taxonomy if taxonomy.exists() else None, out_path=out, anonymize=anonymize)
+                taxonomy if taxonomy.exists() else None, out_path=out,
+                sources=sources, anonymize=anonymize)
     # 카테고리명·실명은 찍지 않는다 — 건수만.
     print(f"탐색기 → {res} ({res.stat().st_size // 1024}kb)", file=sys.stderr)
 

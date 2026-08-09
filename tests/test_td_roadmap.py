@@ -178,38 +178,30 @@ def test_category_band_counts_both_kinds_of_card():
     assert td_roadmap.category_bands(td_roadmap.votable(cards), {})["A"] == "중기"
 
 
-def test_moved_cards_are_the_ones_that_differ_from_draft():
-    cards = [_card("A", "future_task", "그대로", "단기"),
-             _card("A", "future_task", "옮김", "단기")]
-    voted = td_roadmap.votable(cards)
-    moved = td_roadmap.moved(voted, {"옮김": "장기", "그대로": "단기"})
-    assert [m["text"] for m in moved] == ["옮김"]
-    assert moved[0]["from"] == "단기" and moved[0]["to"] == "장기"
-
-
-def test_export_records_draft_and_placed_for_every_card():
-    """워크숍이 무엇을 바꿨는지 남지 않으면 결과를 나중에 방어할 수 없다."""
-    cards = [_card("A", "future_task", "t", "단기"), _card("A", "capability_gap", "g")]
-    out = td_roadmap.export(td_roadmap.votable(cards), {"t": "장기"})
-    rows = {r["text"]: r for r in out["cards"]}
-    assert rows["t"]["draft_band"] == "단기" and rows["t"]["band"] == "장기"
-    assert rows["t"]["moved"] is True and rows["g"]["moved"] is False
-    assert out["categories"]["A"] == td_roadmap.category_bands(
-        td_roadmap.votable(cards), {"t": "장기"})["A"]
-
-
-def test_export_flags_violations_under_the_placement():
-    cards = [_card("A", "future_task", "t", "단기"), _card("A", "capability_gap", "g")]
-    out = td_roadmap.export(td_roadmap.votable(cards), {"g": "장기"})
-    assert out["violations"] == ["g"]
-
-
 def test_placement_keys_on_id_not_text():
-    """서로 다른 사람이 같은 문장을 써도 카드는 둘이고 표도 따로 간다."""
+    """서로 다른 사람이 같은 문장을 써도 카드는 둘이고 배치도 따로 간다."""
     a = {**_card("A", "future_task", "같은말", "단기"), "id": "1:future_task:0"}
     b = {**_card("A", "future_task", "같은말", "단기", pid=2), "id": "2:future_task:0"}
     voted = td_roadmap.votable([a, b])
-    out = td_roadmap.export(voted, {"1:future_task:0": "장기"})
-    rows = {r["id"]: r for r in out["cards"]}
-    assert rows["1:future_task:0"]["band"] == "장기"
-    assert rows["2:future_task:0"]["band"] == "단기"
+    bands = td_roadmap.category_bands(voted, {"1:future_task:0": "장기"})
+    # 한 장만 옮겼으므로 나머지 한 장(단기)과 1:1 — 동률이면 이른 쪽
+    assert bands["A"] == "단기"
+
+
+def test_untouched_draft_never_violates():
+    """초안이 스스로 경고를 만들면 경고가 무의미해진다. 과제가 흩어져 있어도 마찬가지."""
+    cards = [_card("A", "future_task", "이른것", "단기"),
+             _card("A", "future_task", "늦은것", "장기"),
+             _card("A", "future_task", "늦은것2", "장기"),
+             _card("A", "capability_gap", "g")]
+    voted = td_roadmap.votable(cards)
+    assert td_roadmap.violations(voted) == []
+
+
+def test_gap_draft_follows_the_earliest_task_not_the_majority():
+    cards = [_card("A", "future_task", "이른것", "중기"),
+             _card("A", "future_task", "늦은것", "장기"),
+             _card("A", "future_task", "늦은것2", "장기"),
+             _card("A", "capability_gap", "g")]
+    gap = next(c for c in td_roadmap.votable(cards) if c["axis"] == "capability_gap")
+    assert gap["draft_band"] == "단기"     # 최빈(장기)-1인 중기가 아니라 최이른(중기)-1

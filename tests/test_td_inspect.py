@@ -4,9 +4,17 @@ import td_inspect
 
 
 def _person(pid, name, **kw):
+    """extracted.json의 사람. **원문(text)이 없다** — td_extract가 담지 않는다.
+    원문은 입력(sources.json/persons.json)에만 있다."""
     return {"person_id": pid, "name": name, "pjt": "양산기술", "cl_level": "CL3",
-            "signal_present": True, "direction": None, "text": f"{name}의 회고 원문",
+            "signal_present": True, "direction": None,
             "future_task": [], "capability_have": [], "capability_gap": [], **kw}
+
+
+def _source(pid, name):
+    """sources.json/persons.json의 사람 — 여기에 원문이 있다."""
+    return {"id": pid, "name": name, "cl_level": "CL3", "pjt": "양산기술",
+            "text": f"{name}의 회고 원문"}
 
 
 def _task(text, horizon="단기"):
@@ -45,10 +53,16 @@ def test_payload_carries_relations():
     assert payload["categories"][0]["relations"] == [{"to": "다른것", "type": "related"}]
 
 
-def test_payload_carries_source_text_per_person():
-    """원문 펼치기(#40)의 재료. 화면은 펼칠 때만 DOM에 그린다."""
-    payload = td_inspect.build_payload(*_fixture())
-    by_id = {p["person_id"]: p for p in payload["persons"]}
+def test_source_text_comes_from_sources_not_extracted():
+    """extracted.json에는 원문이 없다(td_extract가 안 담는다) — 입력 파일을 따로 받아야
+    원문 펼치기가 성립한다. sources 없이 만들면 원문 칸이 비어야 한다."""
+    aggregates, persons, assigns, taxonomy = _fixture()
+    without = td_inspect.build_payload(aggregates, persons, assigns, taxonomy)
+    assert all(p["text"] == "" for p in without["persons"])
+
+    sources = [_source(1, "홍길동"), _source(2, "김영희")]
+    with_src = td_inspect.build_payload(aggregates, persons, assigns, taxonomy, sources=sources)
+    by_id = {p["person_id"]: p for p in with_src["persons"]}
     assert by_id[1]["text"] == "홍길동의 회고 원문"
 
 
@@ -56,8 +70,10 @@ def test_anonymize_drops_source_text_entirely():
     """원문 안의 실명은 정규식으로 지울 수 없다 — 지우는 척하면 그게 더 위험하다.
     익명화를 켜면 원문을 아예 싣지 않는 쪽이 정직하다."""
     aggregates, persons, assigns, taxonomy = _fixture()
-    payload = td_inspect.build_payload(aggregates, persons, assigns, taxonomy, anonymize=True)
+    payload = td_inspect.build_payload(aggregates, persons, assigns, taxonomy,
+                                       sources=[_source(1, "홍길동")], anonymize=True)
     assert all(p["text"] == "" for p in payload["persons"])
+    assert "홍길동" not in json.dumps(payload, ensure_ascii=False)
 
 
 def test_payload_coverage_matches_td_render():

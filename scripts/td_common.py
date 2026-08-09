@@ -18,6 +18,14 @@ AXES = ("future_task", "capability_gap", "capability_have", "direction")
 CALLS_DIR = OUT_DIR / "task_discovery" / "calls"
 
 
+def reject_public_path(out_path):
+    """dist/ 아래로는 산출물을 쓰지 못하게 막는다 — 그 디렉터리는 GitHub Pages로 배포
+    추적되므로 실명·인용·카테고리명이 박힌 파일이 들어가면 즉시 공개된다. 규칙을 주석으로만
+    두면 오타 한 번에 깨지므로 코드로 막는다."""
+    if "dist" in Path(out_path).resolve().parts:
+        raise ValueError("dist/ 아래에는 쓸 수 없다 — 배포 추적 경로다. TD_OUT_DIR을 써라")
+
+
 class Nonretryable(Exception):
     """4xx류 — 재시도해도 소용없는 오류. retry_call이 즉시 던진다."""
 

@@ -18,7 +18,7 @@ from pathlib import Path
 
 import td_cards
 from pipeline_log import OUT_DIR
-from td_common import load_json
+from td_common import load_json, reject_public_path
 
 BANDS = ("단기", "중기", "장기")
 VOTABLE_AXES = ("future_task", "capability_gap")
@@ -33,7 +33,8 @@ def _band_of(horizon):
 
 
 def _category_task_band(cards):
-    """카테고리 -> 과제 카드들의 대표 밴드(최빈, 동률이면 이른 쪽). 과제가 없으면 없음."""
+    """카테고리 -> 과제 카드들의 대표 밴드(최빈, 동률이면 이른 쪽). 과제가 없으면 없음.
+    버블의 초안 위치용 — 카테고리가 통째로 어디쯤인가를 나타낸다."""
     tally = {}
     for c in cards:
         if c["axis"] != "future_task":
@@ -47,13 +48,29 @@ def _category_task_band(cards):
     return out
 
 
+def _earliest_task_band(cards):
+    """카테고리 -> 가장 이른 과제의 밴드. **역량갭 초안과 위반 판정이 같은 기준을 써야 한다** —
+    최빈을 기준으로 초안을 잡으면, 최빈보다 이른 과제가 있는 카테고리에서 손도 안 댄 초안이
+    위반으로 찍힌다."""
+    out = {}
+    for c in cards:
+        if c["axis"] != "future_task":
+            continue
+        b = _band_of(c.get("horizon"))
+        if c["category"] not in out or b < out[c["category"]]:
+            out[c["category"]] = b
+    return out
+
+
 def votable(cards):
     """투표 대상 카드 + 초안 위치. 반환: list[dict] (원본을 건드리지 않는다).
 
-    과제는 자기 horizon을 따르고, 역량갭은 **같은 카테고리 과제 대표 밴드보다 한 칸
-    왼쪽**에서 시작한다. 과제가 없는 카테고리의 역량갭은 당길 기준이 없어 가운데.
+    과제는 자기 horizon을 따르고, 역량갭은 **같은 카테고리에서 가장 이른 과제보다 한 칸
+    왼쪽**에서 시작한다. 위반 판정도 "가장 이른 과제"를 기준으로 하므로 손대지 않은 초안은
+    절대 위반이 아니다 — 초안이 스스로 경고를 만들면 경고가 무의미해진다.
+    과제가 없는 카테고리의 역량갭은 당길 기준이 없어 가운데.
     """
-    task_band = _category_task_band(cards)
+    earliest = _earliest_task_band(cards)
     out = []
     for c in cards:
         if c["axis"] not in VOTABLE_AXES:
@@ -61,7 +78,7 @@ def votable(cards):
         if c["axis"] == "future_task":
             band = _band_of(c.get("horizon"))
         else:
-            base = task_band.get(c["category"])
+            base = earliest.get(c["category"])
             band = 1 if base is None else max(0, base - 1)
         out.append({**c, "draft_band": BANDS[band]})
     return out
@@ -108,28 +125,6 @@ def category_bands(voted, placed=None):
     return {cat: BANDS[counts.index(max(counts))] for cat, counts in tally.items()}
 
 
-def moved(voted, placed=None):
-    """초안과 달라진 카드들. 워크숍이 무엇을 바꿨는지가 산출물의 절반이다."""
-    placed = placed or {}
-    return [{**c, "from": c["draft_band"], "to": _band(c, placed)}
-            for c in voted if _band(c, placed) != c["draft_band"]]
-
-
-def export(voted, placed=None):
-    """워크숍 결과. 초안과 확정을 **둘 다** 남긴다 — 무엇을 바꿨는지 없으면 나중에
-    그 결정을 방어할 수 없다."""
-    placed = placed or {}
-    return {
-        "cards": [{"id": c["id"], "category": c["category"], "axis": c["axis"],
-                   "text": c["text"],
-                   "person_id": c["person_id"], "name": c.get("name"), "pjt": c.get("pjt"),
-                   "draft_band": c["draft_band"], "band": _band(c, placed),
-                   "moved": _band(c, placed) != c["draft_band"]} for c in voted],
-        "categories": category_bands(voted, placed),
-        "violations": [c["id"] for c in violations(voted, placed)],
-    }
-
-
 def build_nodes(cards, categories):
     """카테고리 버블. 세로축(준비도)은 aggregates가 말한 것을 그대로 쓴다.
 
@@ -171,6 +166,17 @@ def build_edges(categories):
     return edges
 
 
+def load_categories(data_dir):
+    """aggregates(숫자) + taxonomy(정의·관계)를 이어 붙인다. 정의는 taxonomy에만 있다."""
+    d = Path(data_dir)
+    aggregates = load_json(d / "aggregates.json")
+    taxo_path = d / "taxonomy.json"
+    taxo = {c["name"]: c for c in load_json(taxo_path)} if taxo_path.exists() else {}
+    return [{**c, "definition": taxo.get(c["name"], {}).get("definition", ""),
+             "relations": taxo.get(c["name"], {}).get("relations", [])}
+            for c in aggregates["categories"]]
+
+
 def build_payload(cards, categories):
     cards, categories = load_json(cards), load_json(categories)
     voted = votable(cards)
@@ -193,22 +199,18 @@ def render_html(payload, *, live=False):
             .replace("__LIVE__", "true" if live else "false"))
 
 
-def _reject_public_path(out_path):
-    """td_inspect와 같은 이유 — dist/는 GitHub Pages로 공개된다."""
-    if "dist" in Path(out_path).resolve().parts:
-        raise ValueError("dist/ 아래에는 쓸 수 없다 — 배포 추적 경로다. TD_OUT_DIR을 써라")
-
-
 def write(cards, categories, *, out_path):
-    _reject_public_path(out_path)
+    reject_public_path(out_path)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(render_html(build_payload(cards, categories)), encoding="utf-8")
     return out_path
 
 
-# ponytail: td_inspect와 같은 판단 — HTML을 파이썬 문자열로 들고 있다. 세 번째 화면이
-# 생기면 build.py의 template.html 방식으로 옮길 것.
+# ponytail: HTML을 파이썬 문자열 상수로 들고 있다(td_inspect도 같다). build.py는
+# archive/template.html을 읽어 토큰 치환하는 방식인데, 여기선 스테이지 스크립트가 별도
+# asset 디렉터리에 의존하지 않는 쪽을 택했다. 화면이 둘로 늘어난 지금 이미 천장에 닿았다 —
+# 세 번째 화면이 생기거나 이 상수를 두 화면이 공유해야 해지면 그때 옮긴다.
 _TEMPLATE = r"""<!doctype html>
 <html lang="ko">
 <head>
@@ -259,6 +261,8 @@ _TEMPLATE = r"""<!doctype html>
   .item .ax{font-size:10.5px;font-weight:650}
   .item p{margin:4px 0 0;font-size:12.5px}
   .item .who{font-size:11px;color:var(--dim);margin-top:5px}
+  .item blockquote{margin:6px 0 0;padding:4px 0 4px 10px;border-left:2px solid var(--line);
+                   font-size:11.5px;color:var(--dim)}
   .ax-future_task{color:var(--gapc)} .ax-capability_gap{color:var(--warn)}
   .bad{border-color:var(--warn)}
   .bad .flag{font-size:11px;color:var(--warn);font-weight:600;margin-top:5px}
@@ -364,7 +368,7 @@ document.getElementById("src").textContent =
 let show = {rel:true, quad:true, bad:true}, sel = null;
 let mode = "matrix", curCat = null;
 const F = {pjt:"", cl:""};
-// placed: 카드 text -> 밴드. 초안과 다른 것만 담는다(비어 있으면 전부 초안 상태).
+// placed: 카드 id -> 밴드. 초안과 다른 것만 담는다(비어 있으면 전부 초안 상태).
 const placed = {};
 const state = DATA.nodes.map(n => ({...n, x:n.draft_band, y:cyOf(n.readiness), r:rad(n.people)}));
 const byName = Object.fromEntries(state.map(s => [s.name, s]));
@@ -372,9 +376,9 @@ const byName = Object.fromEntries(state.map(s => [s.name, s]));
 const bandOf = c => placed[c.id] || c.draft_band;   // 식별은 id — text는 유일하지 않다
 const orgOK = c => (!F.pjt || c.pjt === F.pjt) && (!F.cl || c.cl_level === F.cl);
 
-// 아래 셋은 td_roadmap.py의 category_bands / violations / moved를 그대로 옮긴 것이다.
-// 서버가 없는 A단계라 브라우저가 직접 계산해야 한다 — 규칙이 바뀌면 양쪽을 같이 고칠 것.
-// 파이썬 쪽이 정본이고 테스트가 그쪽을 고정한다.
+// 아래 둘은 td_roadmap.py의 category_bands / violations를 옮긴 것이다. 서버 없이 파일만
+// 여는 모드(A단계)에서만 쓰인다 — 서버가 붙으면 위 applyPlacement가 서버 값을 쓴다.
+// 파이썬 쪽이 정본이고 테스트가 그쪽을 고정한다. 규칙이 바뀌면 양쪽을 같이 고칠 것.
 function categoryBands(){
   const tally = {};
   for (const c of DATA.cards) {
@@ -397,10 +401,12 @@ function currentViolations(){
 }
 function movedCount(){ return DATA.cards.filter(c => bandOf(c) !== c.draft_band).length; }
 
+// 서버가 붙어 있으면 서버 계산이 정본이다 — 같은 규칙을 두 곳에서 돌리면 언젠가 갈라진다.
+// 정적 모드에선 서버가 없으니 브라우저가 직접 센다(아래 세 함수는 파이썬 쪽의 사본).
 function applyPlacement(){
-  const bands = categoryBands();
+  const bands = (SERVER && SERVER.categories) || categoryBands();
   for (const s of state) s.x = bands[s.name] || s.draft_band;
-  BADNOW = currentViolations();
+  BADNOW = SERVER ? new Set(SERVER.violations) : currentViolations();
 }
 let BADNOW = new Set(DATA.violations);
 
@@ -520,6 +526,7 @@ function side(s){
           <div class="ax ax-${a}">${AX_LABEL[a]} · ${esc(bandOf(k))}${
             bandOf(k) !== k.draft_band ? " (초안 " + esc(k.draft_band) + ")" : ""}</div>
           <p>${esc(k.text)}</p>
+          ${k.quote ? `<blockquote>${esc(k.quote)}</blockquote>` : ``}
           <div class="who">${esc(k.name || "?")}${k.pjt ? " · " + esc(k.pjt) : ""}</div>
           ${bad ? `<div class="flag">이 역량이 그것을 쓰는 첫 과제보다 뒤에 있다</div>` : ``}
         </div>`; }).join("")}` : ``).join("")}
@@ -721,14 +728,7 @@ def main(*argv):
     out = Path(args[1]) if len(args) > 1 else d / "roadmap.html"
 
     cards = td_cards.build(d / "assignments.json", d / "extracted.json", anonymize=anonymize)
-    aggregates = load_json(d / "aggregates.json")
-    taxo_path = d / "taxonomy.json"
-    taxo = {c["name"]: c for c in load_json(taxo_path)} if taxo_path.exists() else {}
-    categories = [{**c, "definition": taxo.get(c["name"], {}).get("definition", ""),
-                   "relations": taxo.get(c["name"], {}).get("relations", [])}
-                  for c in aggregates["categories"]]
-
-    res = write(cards, categories, out_path=out)
+    res = write(cards, load_categories(d), out_path=out)
     voted = votable(cards)
     # 카테고리명·실명은 찍지 않는다 — 건수만.
     print(f"로드맵 → {res} (카드 {len(voted)}장 · 선후 위반 {len(violations(voted))}건)",
