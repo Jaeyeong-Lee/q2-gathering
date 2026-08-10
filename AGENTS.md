@@ -67,8 +67,9 @@ reading the code.
 
 ## Running the pipeline
 
-Full design and vocabulary live in **`docs/task-discovery-coldstart.md`**; internal-network
-operations in **`docs/task-discovery-internal-run-guide.md`**. Anything not here is there.
+Full design and vocabulary live in **`docs/task-discovery-coldstart.md`**; artifact formats in
+**`docs/task-discovery-pipeline-reference.md`**; internal-network operations in
+**`docs/task-discovery-internal-run-guide.md`**. Anything not here is there.
 
 ```bash
 export TEXT_PROVIDER=internal
@@ -94,6 +95,39 @@ rm $TD_OUT_DIR/{taxonomy,assignments}.json $TD_OUT_DIR/{taxonomy,assignments}.pr
 Do not delete `extracted.json`, and do not `touch` it either — a changed mtime is read as
 "upstream changed" and forces taxonomy and assign to restart from scratch.
 
+## Workshop tools (after the pipeline finishes)
+
+Three screens sit on top of the finished artifacts. **None of them call an LLM and none add
+dependencies** — you can regenerate them as often as you like, for free.
+
+```bash
+python3 scripts/td_cards.py        $TD_OUT_DIR/task_discovery        # counts only
+python3 scripts/td_inspect.py      $TD_OUT_DIR/task_discovery        # → inspect.html
+python3 scripts/td_roadmap.py      $TD_OUT_DIR/task_discovery        # → roadmap.html
+python3 scripts/workshop_server.py $TD_OUT_DIR/task_discovery 8000   # http://<host>:8000
+```
+
+Add `--anonymize` to any of them to replace names with `P0` form and drop retrospective source
+text entirely.
+
+**Run `td_inspect` first, right after assign finishes.** It is the tool for judging whether the
+taxonomy is any good — it lets you walk from a category to its items to the person who wrote
+them to their full retrospective, and it has an exceptions tab (no-signal / Other / dropped).
+
+`workshop_server` collects each attendee's placement of cards into 단기/중기/장기 and reports
+back which cards the room disagrees on. Full behaviour: **`docs/task-discovery-workshop-tools.md`**.
+
+### These outputs are more sensitive than anything else the pipeline makes
+
+`inspect.html` inlines category names, real names, quotations, **and the full retrospective text**
+in one file. `workshop-input.md` only carries quote fragments; this carries everything.
+
+- Write them **only under `$TD_OUT_DIR`.** The code refuses any path under `dist/`, but do not
+  rely on that — treat it as a rule.
+- Never attach them to a message, never copy their contents anywhere, and **never open them
+  yourself to answer a question for Claude Code.**
+- `workshop-votes.json` is safe by comparison: it holds card ids like `12:future_task:0`, no text.
+
 ## Things to know
 
 - **Source text never reaches the console.** Logs and exception messages carry `seq=`/`id=`
@@ -115,5 +149,5 @@ Do not delete `extracted.json`, and do not `touch` it either — a changed mtime
 | | Heritage Archive | task-discovery |
 |---|---|---|
 | Status | **Done and deployed — leave it alone** | **In progress — this is the work** |
-| Scripts | `embed.py` `similarity.py` `freq.py` `build.py` | `scripts/td_*.py` |
-| Output | `dist/heritage-archive.html` | `$TD_OUT_DIR/*.json` + `workshop-input.md` |
+| Scripts | `embed.py` `similarity.py` `freq.py` `build.py` | `scripts/td_*.py`, `workshop_server.py` |
+| Output | `dist/heritage-archive.html` | `$TD_OUT_DIR/*.json` + `workshop-input.md` + the three workshop screens |

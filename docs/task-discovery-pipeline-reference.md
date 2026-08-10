@@ -358,6 +358,13 @@ extract·assign은 "LLM이 뱉은 인용이 원문에 있나" 대조했는데, �
 1번은 고칠 값어치가 있어 보이는데(`taxonomy.json`을 이미 `narrate`가 읽고 있으니 거기서 정의를
 당겨오면 됨) **아직 안 고쳤다.** 실 LLM 결과를 보고 정한다.
 
+**나중에 추가로 발견한 것 두 가지** (둘 다 [[task-discovery-workshop-tools]]에서 다룬다):
+
+- `future_task[].horizon`이 `td_assign`에서 유실된다 — 시간축의 유일한 데이터 힌트다.
+  `td_cards`가 조인하면서 되살리므로 **재배정은 필요 없다.**
+- `td_aggregate`의 준비도 판정에서 `have=0·gap=0`인 카테고리가 `이미 함`으로 잡힌다.
+  실제로는 "역량 언급이 없다"이지 "보유가 우세하다"가 아니다.
+
 ---
 
 ## 9. 곁가지 — S2 / S4
@@ -398,14 +405,18 @@ extract·assign은 "LLM이 뱉은 인용이 원문에 있나" 대조했는데, �
 `workshop-input.md`와 `interpretation/`이 나오면 파이프라인의 몫은 끝난다.
 **시간축·시퀀싱·전략은 데이터에 없다.** 리더십 워크숍에서 사람이 채운다.
 
-워크숍을 실제로 진행하는 도구(매트릭스뷰·온톨로지 그래프뷰·투표 웹앱)는 전부 `aggregates.json`을
-**읽기만** 하는 render 이후 층이고, 아직 결정 보류 상태다 —
-[[task-discovery-workshop-webapp-plan-parked]].
+워크숍을 실제로 진행하는 도구는 전부 이 산출물들을 **읽기만** 하는 render 이후 층이다.
+셋 다 만들어져 있다 — 탐색기 · 로드맵 매트릭스 · 투표 서버:
+**[[task-discovery-workshop-tools]]**.
+
+그 도구들은 `td_cards`라는 조인 하나 위에 얹혀 있고 **LLM을 부르지 않는다.** 산출물이
+그대로면 몇 번이고 다시 만들 수 있다.
 
 ---
 
 ## 포인터
 
+- **워크숍 도구(탐색기·매트릭스·투표 서버): [[task-discovery-workshop-tools]]**
 - 설계 근거·왜: [[task-discovery-coldstart]]
 - 사내망 운영: [[task-discovery-internal-run-guide]] · `AGENTS.md`
 - 이번 신뢰성 개선 내역: [[task-discovery-migration-2026-08]]

@@ -72,6 +72,13 @@
 | `td_query` | 하이브리드(키워드+벡터 RRF) 질의 + 필터 + 분포집계 | S4 |
 | `td_digest` | 사전 조회 묶음(정적 md, ES 다운 백업) + 커버리지 | S4 |
 | `td_pipeline` | 배선(skip-if-exists, 모델 이원화 call site) | 전부 |
+| `td_cards` | 산출물 조인(카테고리↔항목↔사람↔조직, horizon 복원). 렌더링을 모름 | 워크숍 도구 |
+| `td_inspect` | 역추적 탐색기 HTML (근거 검수·회의용) | 워크숍 도구 |
+| `td_roadmap` | 시간축×준비도 매트릭스 + 카드 배치 HTML | 워크숍 도구 |
+| `workshop_server` | 투표 취합(stdlib http.server) + 이견 아젠다 | 워크숍 도구 |
+
+**워크숍 도구 넷은 `td_render` 이후 층이고 LLM을 부르지 않는다** — 산출물이 그대로면 몇
+번이고 다시 만들 수 있다. 상세: [[task-discovery-workshop-tools]].
 
 ---
 
@@ -185,6 +192,7 @@ no-signal 격리, 항목단위 폐기, 단일 재시도, confidence 스키마 �
 ## 9. 포인터
 
 - **스테이지별 산출물 포맷(무엇이 어떤 JSON으로 나오나): [[task-discovery-pipeline-reference]]**
+- **워크숍 도구(탐색기·매트릭스·투표 서버): [[task-discovery-workshop-tools]]**
 - PRD: 이슈 #13(S1) / #14(S2) / #15(S4)
 - 티켓: #16~#22(S1) / #23~#25(S2) / #26~#29(S4) — 각 acceptance criteria
 - 입력·제약·인프라: `docs/task-discovery-requirements.md`
