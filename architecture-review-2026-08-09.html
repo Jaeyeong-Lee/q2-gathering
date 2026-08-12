@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>Architecture review — VMS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose",
+                       flowchart: { curve: "basis" } });
+</script>
+<style>
+  .seam { stroke-dasharray: 5 4; }
+  .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+  .hatch { background-image: repeating-linear-gradient(45deg, transparent 0 5px, rgba(220,38,38,.12) 5px 10px); }
+  .lbl { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+  pre.mermaid { text-align: center; }
+</style>
+</head>
+<body class="bg-stone-50 text-slate-900">
+<div class="mx-auto max-w-5xl px-6 pt-8">
+  <div class="rounded-lg border border-slate-300 bg-white p-4 text-sm text-slate-700">
+    <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase" class="text-slate-500">보관본 · 2026-08-09 기준</p>
+    <p class="mt-1.5">
+      항목 <b>1</b>(대수표 단일 입구)과 <b>2</b>(소계 규칙)는 <b>반영됨</b> — ADR-0007, <code class="font-mono">core.ledger()</code>.
+      항목 <b>3</b>(템플릿 드리프트)은 <b>기각</b> — v4만 유지, 나머지는 디자인 후보(CLAUDE.md).
+      항목 <b>5</b>는 3의 기각으로 대부분 소멸.
+      <b class="text-red-700">항목 4(읽기 시임 — <code class="font-mono">_view</code> 쿼리 11회)와 6(<code class="font-mono">isinstance(adapter, MockAmsAdapter)</code> — ADR-0002 위반)은 아직 열려 있다.</b>
+    </p>
+    <p class="mt-2 text-xs text-slate-500">Tailwind·Mermaid를 CDN에서 받는다 — 오프라인에서는 스타일 없이 뜬다.</p>
+  </div>
+</div>
+<main class="mx-auto max-w-5xl space-y-14 px-6 py-12">
+
+<header class="space-y-5">
+  <div class="flex items-end justify-between gap-4 border-b border-slate-300 pb-5">
+    <div>
+      <p class="lbl text-slate-500">Architecture review</p>
+      <h1 class="mt-2 font-serif text-4xl">VMS — 대수 관리</h1>
+    </div>
+    <p class="text-right text-xs text-slate-500">2026-08-09<br>68 tests · core 771 · web 719 · db 372 lines</p>
+  </div>
+
+  <div class="grid gap-3 text-xs text-slate-600 sm:grid-cols-4">
+    <div class="flex items-center gap-2"><span class="h-4 w-6 border-2 border-slate-800"></span> module</div>
+    <div class="flex items-center gap-2"><svg width="26" height="8"><line class="seam" x1="0" y1="4" x2="26" y2="4" stroke="#64748b" stroke-width="2"/></svg> seam</div>
+    <div class="flex items-center gap-2"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#dc2626" stroke-width="2"/></svg> leakage</div>
+    <div class="flex items-center gap-2"><span class="deep h-4 w-6"></span> deep module</div>
+  </div>
+
+  <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+    <span class="lbl">Verified live</span>
+    <p class="mt-1.5">The <code class="font-mono">승용 A</code> tab renders a pivot totalling <b>30</b> vehicles.
+    Clicking any cell returns <b>0</b> rows — silently. Candidate 1 is the seam that lets this happen.</p>
+  </div>
+</header>
+
+<!-- ─────────────────────────── 1 ─────────────────────────── -->
+<article id="c1" class="space-y-5">
+  <div class="flex flex-wrap items-center gap-2">
+    <h2 class="font-serif text-2xl">1 · Collapse the pivot-request chain into one module</h2>
+    <span class="rounded bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white">Strong</span>
+    <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-700">in-process</span>
+  </div>
+
+  <p class="font-mono text-xs text-slate-600">vms/web.py:54 _pivot_ctx · :313 _pivot_view · :330 _load_pivot · :519 drilldown</p>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">Before — 3 shallow modules, 1 decision</p>
+      <pre class="mermaid">
+flowchart TD
+  R1["GET /pivot"] --> L["_load_pivot<br/>4 params"]
+  L --> V["_pivot_view<br/>9 params"]
+  V --> C["_pivot_ctx<br/>10 params → 16-key dict"]
+  R2["GET /drilldown"] -.->|"bypasses<br/>all three"| X["v.category == category"]
+  X --> Z["0 rows"]
+  classDef leak stroke:#dc2626,stroke-width:2px,fill:#fef2f2;
+  classDef thin fill:#f8fafc,stroke:#cbd5e1;
+  class R2,X,Z leak
+  class L,V,C thin
+      </pre>
+    </div>
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">After — one interface, both readers</p>
+      <pre class="mermaid">
+flowchart TD
+  R1["GET /pivot"] --> D["대수표 조회<br/>(conn, 축 선택) → 표 + 소속판정"]
+  R2["GET /drilldown"] --> D
+  D --> T["table"]
+  D --> E["evidence rows"]
+  classDef deep fill:#0f172a,stroke:#0f172a,color:#fff;
+  class D deep
+      </pre>
+    </div>
+  </div>
+
+  <dl class="grid gap-4 text-sm sm:grid-cols-2">
+    <div><dt class="lbl text-slate-500">Problem</dt>
+      <dd class="mt-1">Two readers of the same 대수표 answer <em>"which 제품군 is this vehicle in?"</em> differently — <code class="font-mono">/pivot</code> through <code class="font-mono">effective_category</code>, <code class="font-mono">/drilldown</code> through raw <code class="font-mono">v.category</code>.</dd></div>
+    <div><dt class="lbl text-slate-500">Solution</dt>
+      <dd class="mt-1">One module owns a 대수표 request: partition membership, 축 resolution, 소계, and the row set behind any cell. Both routes cross the same interface.</dd></div>
+  </dl>
+
+  <ul class="grid gap-1.5 text-sm sm:grid-cols-2">
+    <li>✦ Drilldown bug impossible by construction</li>
+    <li>✦ 10 params → connection + query</li>
+    <li>✦ Delete 2 pass-through modules</li>
+    <li>✦ Tests hit one interface, not HTML</li>
+    <li>✦ 축 knowledge stops leaking to routes</li>
+    <li>✦ 소계 exclusion lands in one place</li>
+  </ul>
+</article>
+
+<!-- ─────────────────────────── 2 ─────────────────────────── -->
+<article id="c2" class="space-y-5">
+  <div class="flex flex-wrap items-center gap-2">
+    <h2 class="font-serif text-2xl">2 · Make 소계 double-counting impossible, not forbidden</h2>
+    <span class="rounded bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white">Strong</span>
+    <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-700">in-process</span>
+  </div>
+
+  <p class="font-mono text-xs text-slate-600">vms/core.py:10 SUBTOTAL · :301 count · :392 render_rows · :743 add_subtotal_cols · vms/web.py:97,119 · templates_*/_pivot.html</p>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">Before — invariant held by discipline at 9 sites</p>
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-2"><span class="lbl w-24 shrink-0 text-slate-400">core</span><div class="h-5 flex-1 rounded-sm bg-amber-200"></div><span class="w-8 text-right font-mono text-xs">×5</span></div>
+        <div class="flex items-center gap-2"><span class="lbl w-24 shrink-0 text-slate-400">web</span><div class="h-5 w-2/3 rounded-sm bg-amber-200"></div><span class="w-8 text-right font-mono text-xs">×2</span></div>
+        <div class="flex items-center gap-2"><span class="lbl w-24 shrink-0 text-slate-400">tpl v4</span><div class="h-5 w-1/2 rounded-sm bg-amber-200"></div><span class="w-8 text-right font-mono text-xs">×3</span></div>
+        <div class="flex items-center gap-2"><span class="lbl w-24 shrink-0 text-red-500">tpl v1–v3</span><div class="hatch h-5 w-1/2 rounded-sm border border-red-300"></div><span class="w-8 text-right font-mono text-xs text-red-600">forgot</span></div>
+      </div>
+      <p class="mt-4 text-xs text-slate-500">Each site independently remembers <code class="font-mono">c.sub != SUBTOTAL</code>.
+      The one consumer that <em>can't</em> get it wrong is <code class="font-mono">_pivot_xlsx</code> — it reads
+      already-derived totals, never <code class="font-mono">Pivot + cols</code>.</p>
+    </div>
+
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">After — derived values, not raw columns</p>
+      <div class="deep rounded-md p-4 text-white">
+        <p class="lbl text-slate-400">대수표 (deep)</p>
+        <p class="mt-2 text-sm">rows · col_totals · grand<br><span class="text-slate-400">already de-duplicated</span></p>
+        <div class="mt-3 space-y-1 rounded border border-slate-600 bg-slate-800/60 p-2 text-xs text-slate-400">
+          <p>internal: 실열 vs 소계 열</p>
+          <p>internal: 합산 규칙</p>
+        </div>
+      </div>
+      <div class="mt-3 flex gap-2 text-xs">
+        <span class="rounded border border-slate-300 px-2 py-1">table</span>
+        <span class="rounded border border-slate-300 px-2 py-1">csv</span>
+        <span class="rounded border border-slate-300 px-2 py-1">xlsx</span>
+        <span class="text-slate-500">— none know SUBTOTAL exists</span>
+      </div>
+    </div>
+  </div>
+
+  <dl class="grid gap-4 text-sm sm:grid-cols-2">
+    <div><dt class="lbl text-slate-500">Problem</dt>
+      <dd class="mt-1">소계 is a synthetic 축 value. Every consumer of <code class="font-mono">Pivot</code> + <code class="font-mono">cols</code> must remember to exclude it from sums; three template sets already forgot.</dd></div>
+    <div><dt class="lbl text-slate-500">Solution</dt>
+      <dd class="mt-1">Stop exposing raw columns. The module hands out rows and totals with 소계 already accounted for — the exclusion rule has one home.</dd></div>
+  </dl>
+
+  <ul class="grid gap-1.5 text-sm sm:grid-cols-2">
+    <li>✦ 9 sites → 1</li>
+    <li>✦ Forgetting becomes impossible</li>
+    <li>✦ No literal <code class="font-mono">'소계'</code> in templates</li>
+    <li>✦ One test guards the invariant</li>
+  </ul>
+</article>
+
+<!-- ─────────────────────────── 3 ─────────────────────────── -->
+<article id="c3" class="space-y-5">
+  <div class="flex flex-wrap items-center gap-2">
+    <h2 class="font-serif text-2xl">3 · Four adapters at a seam that only one satisfies</h2>
+    <span class="rounded bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white">Strong</span>
+    <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-700">local-substitutable</span>
+  </div>
+
+  <p class="font-mono text-xs text-slate-600">vms/templates/ · templates_v2/ · templates_v3/ · templates_v4/ · CLAUDE.md:102</p>
+
+  <div class="rounded-lg border border-slate-200 bg-white p-4">
+    <p class="lbl mb-3 text-slate-500">Contract coverage — context variables per template set</p>
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-slate-300 text-left">
+        <th class="py-1.5 lbl font-medium text-slate-500">context var</th>
+        <th class="lbl text-center font-medium text-slate-500">templates/</th>
+        <th class="lbl text-center font-medium text-slate-500">v2</th>
+        <th class="lbl text-center font-medium text-slate-500">v3</th>
+        <th class="lbl text-center font-medium text-slate-500">v4</th>
+      </tr></thead>
+      <tbody class="font-mono text-xs">
+        <tr class="border-b border-slate-100"><td class="py-1.5">sync_result</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="text-center text-emerald-600">✓</td><td class="text-center text-emerald-600">✓</td><td class="text-center text-emerald-600">✓</td></tr>
+        <tr class="border-b border-slate-100"><td class="py-1.5">notice</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="text-center text-emerald-600">✓</td><td class="text-center text-emerald-600">✓</td></tr>
+        <tr class="border-b border-slate-100"><td class="py-1.5">health / trend / flow</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="text-center text-emerald-600">✓</td><td class="text-center text-emerald-600">✓</td></tr>
+        <tr class="border-b border-slate-100"><td class="py-1.5">subtotal (소계 guard)</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="text-center text-emerald-600">✓</td></tr>
+        <tr class="border-b border-slate-100"><td class="py-1.5">cat_rows / model_rows</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="text-center text-emerald-600">✓</td></tr>
+        <tr><td class="py-1.5">mapping-smell hint</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="bg-red-50 text-center text-red-600">✕</td><td class="text-center text-emerald-600">✓</td><td class="text-center text-emerald-600">✓</td></tr>
+      </tbody>
+    </table>
+    <p class="mt-4 text-xs text-slate-500">
+      They don't crash — Jinja ignores unreferenced context. They <b>silently degrade</b>:
+      the 동기화 change-summary is invisible on the default set; the new-Site typo 알람 never renders;
+      <code class="font-mono">/admin/category</code> and <code class="font-mono">/admin/model-group</code> have no UI in three of four sets;
+      and a 소계 cell in v1–v3 links to <code class="font-mono">line=소계</code>, matching no vehicle.
+    </p>
+  </div>
+
+  <div class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+    <b>Also:</b> <code class="font-mono">templates_v3/</code> and <code class="font-mono">templates_v4/</code> are untracked in git.
+    The only sets carrying the current contract are the ones not under version control.
+  </div>
+
+  <dl class="grid gap-4 text-sm sm:grid-cols-2">
+    <div><dt class="lbl text-slate-500">Problem</dt>
+      <dd class="mt-1">One adapter is a hypothetical seam; two make it real. Here four adapters sit at the seam and three no longer satisfy the interface — the seam costs 4× edits and buys nothing.</dd></div>
+    <div><dt class="lbl text-slate-500">Solution</dt>
+      <dd class="mt-1">Delete the sets that lost the contract, or demote them to a frozen snapshot that routes never serve. Keep the switch only if two sets are genuinely maintained.</dd></div>
+  </dl>
+
+  <ul class="grid gap-1.5 text-sm sm:grid-cols-2">
+    <li>✦ New alarm type: 7 files → 3</li>
+    <li>✦ Silent degradation becomes impossible</li>
+    <li>✦ Tests stop pinning <code class="font-mono">template_dir</code></li>
+    <li>✦ Delete ~2,000 lines of drifted Jinja</li>
+  </ul>
+</article>
+
+<!-- ─────────────────────────── 4 ─────────────────────────── -->
+<article id="c4" class="space-y-5">
+  <div class="flex flex-wrap items-center gap-2">
+    <h2 class="font-serif text-2xl">4 · Give the read side a seam — web.py is the join engine</h2>
+    <span class="rounded bg-amber-500 px-2 py-0.5 text-xs font-semibold text-white">Worth exploring</span>
+    <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-700">in-process</span>
+  </div>
+
+  <p class="font-mono text-xs text-slate-600">vms/web.py:272 _view · :330 _load_pivot · :343 _admin_ctx · :255 _record_counts · vms/db.py (31 fns)</p>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">Before — cross-section of one GET /</p>
+      <div class="space-y-1">
+        <div class="border-l-4 border-slate-800 bg-slate-100 py-1.5 pl-3 text-xs">route</div>
+        <div class="border-l-4 border-red-400 bg-red-50 py-1.5 pl-3 text-xs">_view — <b>11 db.load_* calls</b>, hand-ordered</div>
+        <div class="ml-4 grid grid-cols-4 gap-1">
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">vehicles</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">mapping</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">overrides</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">sites</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">acked</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">obs</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">alarms</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">moves</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">snapshots</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">model_grp</div>
+          <div class="rounded bg-slate-100 px-1 py-1 text-center font-mono text-[10px]">prefs</div>
+        </div>
+        <div class="border-l-4 border-slate-400 bg-slate-50 py-1.5 pl-3 text-xs">core pure functions</div>
+      </div>
+      <p class="mt-3 text-xs text-red-700">POST /sync loads <code class="font-mono">vehicles</code> three times · <code class="font-mono">_admin_ctx</code> loads it twice in one function</p>
+    </div>
+
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">After — one band owns assembly</p>
+      <div class="space-y-1">
+        <div class="border-l-4 border-slate-800 bg-slate-100 py-1.5 pl-3 text-xs">route</div>
+        <div class="deep border-l-4 border-slate-900 py-6 pl-3 text-xs text-white">
+          <span class="lbl text-slate-400">현황 조회 (deep)</span><br>
+          <span class="mt-1 block text-slate-300">load once → assemble → hand to core</span>
+        </div>
+        <div class="border-l-4 border-slate-400 bg-slate-50 py-1.5 pl-3 text-xs">core pure functions</div>
+      </div>
+      <p class="mt-3 text-xs text-slate-500">Single-table SQL stays (CLAUDE.md); the <em>ordering</em> a JOIN would express gets a home instead of living in route bodies.</p>
+    </div>
+  </div>
+
+  <dl class="grid gap-4 text-sm sm:grid-cols-2">
+    <div><dt class="lbl text-slate-500">Problem</dt>
+      <dd class="mt-1">There is no seam between 저장 and 코어. Each new derived screen hand-writes its own load list; three of them already disagree about what to load.</dd></div>
+    <div><dt class="lbl text-slate-500">Solution</dt>
+      <dd class="mt-1">One module answers "what does 현황 look like right now" — routes ask it, tests ask it, no route assembles.</dd></div>
+  </dl>
+
+  <div class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+    <b>Touches CLAUDE.md's "단일 테이블 SQL만" convention</b> — but doesn't break it. The rule is about SQL shape; this is about who calls it. Worth reopening only if the load-list duplication keeps producing bugs.
+  </div>
+
+  <ul class="grid gap-1.5 text-sm sm:grid-cols-2">
+    <li>✦ 3 vehicle loads per sync → 1</li>
+    <li>✦ Assembly becomes testable</li>
+    <li>✦ New screen ≠ new load list</li>
+    <li>✦ The untested middle gets an interface</li>
+  </ul>
+</article>
+
+<!-- ─────────────────────────── 5 ─────────────────────────── -->
+<article id="c5" class="space-y-5">
+  <div class="flex flex-wrap items-center gap-2">
+    <h2 class="font-serif text-2xl">5 · 알람 carries its own vocabulary across the seam</h2>
+    <span class="rounded bg-amber-500 px-2 py-0.5 text-xs font-semibold text-white">Worth exploring</span>
+    <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-700">in-process</span>
+  </div>
+
+  <p class="font-mono text-xs text-slate-600">vms/core.py:46 Alarm · templates_v2|v3|v4/_content.html type_names · 4× <code>a.id is none</code></p>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">Before — core's enum re-declared downstream</p>
+      <pre class="mermaid">
+flowchart LR
+  A["core.Alarm<br/>type · kind · id"] -.-> T2["v2 type_names"]
+  A -.-> T3["v3 type_names"]
+  A -.-> T4["v4 type_names"]
+  A -.-> D2["v2 id is none"]
+  A -.-> D3["v3 id is none"]
+  A -.-> D4["v4 id is none"]
+  A -.-> D1["v1 id is not none"]
+  classDef leak stroke:#dc2626,stroke-width:2px,fill:#fef2f2;
+  class T2,T3,T4,D1,D2,D3,D4 leak
+      </pre>
+    </div>
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <p class="lbl mb-3 text-slate-500">After — the 알람 answers for itself</p>
+      <pre class="mermaid">
+flowchart LR
+  A["core.Alarm<br/>label · dismissal · hint"] --> T["template renders<br/>what it is told"]
+  classDef deep fill:#0f172a,stroke:#0f172a,color:#fff;
+  class A deep
+      </pre>
+      <p class="mt-3 text-xs text-slate-500">"원인을 고치면 사라짐 / 확인해야 사라짐" is a domain distinction
+      (CONTEXT.md 알람 — 두 종류). It is currently inferred from <code class="font-mono">id is None</code> by every template.</p>
+    </div>
+  </div>
+
+  <dl class="grid gap-4 text-sm sm:grid-cols-2">
+    <div><dt class="lbl text-slate-500">Problem</dt>
+      <dd class="mt-1">A 알람's label and whether it is dismissible are domain facts, re-derived in Jinja in every set. The default set shows raw <code class="font-mono">unmapped-dept</code> strings.</dd></div>
+    <div><dt class="lbl text-slate-500">Solution</dt>
+      <dd class="mt-1">The 알람 carries its own label and dismissal mode. Templates render, they don't classify.</dd></div>
+  </dl>
+
+  <ul class="grid gap-1.5 text-sm sm:grid-cols-2">
+    <li>✦ New alarm type: 1 file</li>
+    <li>✦ Korean labels leave Jinja</li>
+    <li>✦ Classification becomes testable</li>
+    <li>✦ No set can forget a type</li>
+  </ul>
+</article>
+
+<!-- ─────────────────────────── 6 ─────────────────────────── -->
+<article id="c6" class="space-y-5">
+  <div class="flex flex-wrap items-center gap-2">
+    <h2 class="font-serif text-2xl">6 · The demo backfill reaches through the source adapter seam</h2>
+    <span class="rounded bg-slate-400 px-2 py-0.5 text-xs font-semibold text-white">Speculative</span>
+    <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-700">ports &amp; adapters</span>
+  </div>
+
+  <p class="font-mono text-xs text-slate-600">vms/web.py:255 _record_counts · vms/adapters.py:166 generate_count_history</p>
+
+  <div class="rounded-lg border border-slate-200 bg-white p-4">
+    <div class="grid items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
+      <div>
+        <p class="lbl mb-2 text-slate-500">Before</p>
+        <div class="rounded border-2 border-slate-800 p-3 text-xs">
+          <code class="font-mono">_record_counts</code>
+          <p class="mt-2 rounded bg-red-50 p-2 font-mono text-[11px] text-red-700">isinstance(adapter, MockAmsAdapter)</p>
+        </div>
+      </div>
+      <svg width="60" height="90"><line class="seam" x1="30" y1="0" x2="30" y2="90" stroke="#dc2626" stroke-width="2"/></svg>
+      <div>
+        <p class="lbl mb-2 text-slate-500">Seam (ADR-0002)</p>
+        <div class="rounded border-2 border-slate-300 p-3 text-xs text-slate-500">
+          AmsAdapter Protocol<br><span class="text-[11px]">fetch_all() only</span>
+        </div>
+      </div>
+    </div>
+    <p class="mt-4 text-xs text-slate-600">The write path asks <em>which concrete adapter is live</em> to decide whether to fabricate 12 months of 대수 history. ADR-0002 says the core and web layers must not know.</p>
+  </div>
+
+  <div class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+    <b>Contradicts ADR-0002</b> (source adapter + mock 경계) — and unlike the other candidates, here the ADR is right and the code is wrong. No decision to reopen; just a leak to close.
+  </div>
+
+  <ul class="grid gap-1.5 text-sm sm:grid-cols-2">
+    <li>✦ Real adapter can't trip demo data</li>
+    <li>✦ Backfill becomes a seeding decision</li>
+    <li>✦ adapters.py gets its first test</li>
+  </ul>
+</article>
+
+<!-- ─────────────────────────── top ─────────────────────────── -->
+<section id="top-recommendation" class="rounded-xl border-2 border-slate-900 bg-white p-7">
+  <p class="lbl text-slate-500">Top recommendation</p>
+  <h2 class="mt-2 font-serif text-3xl"><a href="#c1" class="underline decoration-emerald-500 decoration-2 underline-offset-4">1 · Collapse the pivot-request chain</a></h2>
+  <p class="mt-4 max-w-2xl text-slate-700">
+    It is the only candidate with a bug already shipped: the <code class="font-mono">승용 A</code> tab counts 30 vehicles
+    and its cells drill down to nothing. The three-module chain has one real decision in it and spreads that decision
+    across 23 parameters, so a second reader was written that never learned it. Deepening here fixes the live bug,
+    deletes two pass-through modules, and gives candidate 2 somewhere to put the 소계 rule.
+  </p>
+</section>
+
+<footer class="border-t border-slate-300 pt-6 text-xs text-slate-500">
+  Vocabulary: <span class="font-mono">module · interface · implementation · depth · seam · adapter · leverage · locality</span>.
+  Domain terms from CONTEXT.md. ADR-0001…0005 not re-litigated except where marked.
+</footer>
+
+</main>
+</body>
+</html>
