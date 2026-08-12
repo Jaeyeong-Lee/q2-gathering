@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「나의 근원경쟁력」 자료 기반 미래 과제 찾기</title>
+<style>
+  /* 사내망 문서 — CDN 없이 인라인. report-style 타이포·팔레트를 페이지 포맷으로 */
+  :root{
+    --bg:#e7e5e4; --paper:#fafaf9;
+    --s900:#0f172a; --s700:#334155; --s500:#64748b; --s400:#94a3b8;
+    --s300:#cbd5e1; --s200:#e2e8f0; --s100:#f1f5f9;
+    --em700:#047857; --em100:#d1fae5; --em50:#ecfdf5;
+    --am700:#b45309; --am600:#d97706; --am100:#fef3c7; --am50:#fffbeb;
+    --rd700:#b91c1c; --rd100:#fee2e2; --rd50:#fef2f2;
+    --serif:"Nanum Myeongjo","Apple SD Gothic Neo","Malgun Gothic",Georgia,serif;
+    --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",-apple-system,"Segoe UI",sans-serif;
+    --mono:"SFMono-Regular",Consolas,"D2Coding",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--s900);font-family:var(--sans);
+       font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  /* ── 페이지 ── */
+  .pages{padding:28px 20px 60px;display:flex;flex-direction:column;align-items:center;gap:22px}
+  .page{width:1180px;height:664px;background:var(--paper);
+        border:1px solid var(--s300);box-shadow:0 1px 3px rgba(15,23,42,.08);
+        padding:44px 52px 40px;position:relative;display:flex;flex-direction:column;
+        flex:0 0 auto}
+  .pno{position:absolute;right:52px;bottom:20px;font-family:var(--mono);
+       font-size:10.5px;color:var(--s400);letter-spacing:.1em}
+  .ptag{position:absolute;left:52px;bottom:20px;font-size:10px;letter-spacing:.12em;
+        text-transform:uppercase;color:var(--s400);font-weight:600}
+
+  /* ── 타이포 ── */
+  h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0;letter-spacing:-.01em}
+  h1{font-size:42px;line-height:1.24}
+  h2{font-size:26px;line-height:1.28}
+  .ph{display:flex;align-items:baseline;gap:13px;padding-bottom:13px;
+      border-bottom:1px solid var(--s300);margin-bottom:22px;flex-wrap:wrap}
+  .lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+       color:var(--s500);font-weight:600;display:block}
+  .mono{font-family:var(--mono);font-size:11.5px;color:var(--s500)}
+  .src{font-family:var(--mono);font-size:11.5px;color:var(--s500);margin-top:4px}
+  p{margin:10px 0 0;color:var(--s700)}
+  p:first-child{margin-top:0}
+  b,strong{font-weight:700;color:var(--s900)}
+  .lead{font-size:17px;color:var(--s900)}
+  .foot{margin-top:auto;padding-top:14px;font-size:12.5px;color:var(--s400)}
+  .badge{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+         border-radius:99px;padding:3px 9px}
+  .b-em{background:var(--em100);color:var(--em700)}
+  .b-am{background:var(--am100);color:var(--am700)}
+  .b-s{background:var(--s100);color:var(--s500)}
+
+  /* ── 카드 ── */
+  .card{background:#fff;border:1px solid var(--s200);border-radius:5px;padding:14px 16px}
+  .card.em{border-color:var(--em100);background:var(--em50)}
+  .card.em>.lbl{color:var(--em700)}
+  .card.am{border-color:var(--am100);background:var(--am50)}
+  .card.am>.lbl{color:var(--am700)}
+  .card.rd{border:1.5px solid var(--rd100);background:var(--rd50)}
+  .card.rd>.lbl{color:var(--rd700)}
+  .card.hard{border:2px solid var(--s900)}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+
+  /* ── 표 ── */
+  table{border-collapse:collapse;width:100%;margin-top:14px;font-size:14px}
+  th{text-align:left;padding:6px 11px 7px;border-bottom:1.5px solid var(--s300);
+     font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--s500);font-weight:600}
+  td{padding:8px 11px;border-bottom:1px solid var(--s200);vertical-align:top;color:var(--s700)}
+  td:first-child{color:var(--s900);font-weight:600;white-space:nowrap}
+  td.w{font-weight:400;color:var(--s700);white-space:normal}
+  td.m{font-family:var(--mono);font-size:11.5px;color:var(--s500);white-space:nowrap}
+  td.c{text-align:center;color:var(--s900);white-space:nowrap}
+  tr.hi td{background:var(--am50)}
+
+  ul{margin:10px 0 0;padding:0;list-style:none}
+  li{margin:6px 0;padding-left:16px;position:relative;color:var(--s700)}
+  li::before{content:"—";position:absolute;left:0;color:var(--s300)}
+  ul.gain{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px}
+  ul.gain li::before{content:"✦";color:var(--em700)}
+  ol.n{margin:12px 0 0;padding:0;list-style:none;counter-reset:n}
+  ol.n li{counter-increment:n;padding-left:29px}
+  ol.n li::before{content:counter(n);font-family:var(--serif);font-weight:700;
+    font-size:15px;color:var(--s900)}
+
+  blockquote{margin:0;border-left:3px solid var(--s900);padding:2px 0 2px 17px;
+             font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--s900)}
+  .fill{font-family:var(--mono);font-size:11.5px;color:var(--am700);
+        background:var(--am100);border-bottom:1px dashed var(--am600);padding:1px 5px;white-space:nowrap}
+  svg{display:block;max-width:100%;height:auto}
+  .cap{font-size:11.5px;color:var(--s400);margin-top:7px}
+
+  @media print{
+    body{background:#fff}
+    .pages{padding:0;gap:0}
+    .page{width:100%;height:100vh;border:0;box-shadow:none;page-break-after:always}
+    @page{size:landscape;margin:0}
+  }
+  @media (max-width:1240px){
+    .pages{padding:14px 10px 40px}
+    .page{width:100%;height:auto;min-height:auto;padding:30px 24px 44px}
+    h1{font-size:30px}h2{font-size:21px}
+    .g2,.g3,ul.gain{grid-template-columns:1fr}
+    td:first-child{white-space:normal}
+    .pno,.ptag{position:static;margin-top:16px;display:block}
+  }
+</style>
+</head>
+<body>
+<div class="pages">
+
+<!-- ═══ 1 표지 ═══ -->
+<section class="page" style="justify-content:center">
+  <span class="lbl">AX 경쟁력 회의 · 진행 보고 · 2026-08-14</span>
+  <h1 style="margin-top:16px">「나의 근원경쟁력」 자료 기반<br>미래 과제 찾기</h1>
+  <p class="lead" style="margin-top:22px;max-width:640px">
+    부서원 약 200명이 작성한 자료를 전수 분석해<br>팀 차원의 미래 과제와 역량 갭을 도출한다.</p>
+  <div style="display:flex;gap:44px;margin-top:38px">
+    <div><b style="font-family:var(--serif);font-size:22px;display:block">~200</b><span class="lbl">대상 인원</span></div>
+    <div><b style="font-family:var(--serif);font-size:22px;display:block">~1,000</b><span class="lbl">LLM 호출</span></div>
+    <div><b style="font-family:var(--serif);font-size:22px;display:block">5</b><span class="lbl">처리 단계</span></div>
+    <div><b style="font-family:var(--serif);font-size:22px;display:block">261</b><span class="lbl">테스트</span></div>
+  </div>
+  <span class="pno">01</span>
+</section>
+
+<!-- ═══ 2 요약 ═══ -->
+<section class="page">
+  <div class="ph"><h2>1 · 요약</h2></div>
+
+  <table style="margin-top:0">
+    <tr><td>대상</td><td class="w">부서원 약 200명 · CL2/CL3/CL4 · 1회성 작성 자료</td></tr>
+    <tr><td>방식</td><td class="w">사내망 LLM 기반 5단계 자동 분석</td></tr>
+    <tr><td>완료</td><td class="w">파이프라인 구축 및 검증 (테스트 261건 통과)</td></tr>
+    <tr><td>진행</td><td class="w">분류 체계의 도메인 검증</td></tr>
+    <tr><td>산출물</td><td class="w">부서별 과제 군집 · 시간 × 역량 확보 매트릭스</td></tr>
+  </table>
+
+  <div class="card hard" style="margin-top:20px">
+    <span class="lbl">핵심 판단</span>
+    <p style="margin-top:8px">자료에서 항목을 뽑는 작업과 그 항목에 이름을 붙이는 작업은 성격이 다르다.
+    앞은 원문 대조로 자동 검증이 가능하고, 뒤는 불가능하다.</p>
+    <p><strong>따라서 분류 체계 확정은 자동화 대상에서 제외하고, 부서 담당자 검토를 절차에 포함했다.</strong></p>
+  </div>
+
+  <span class="ptag">요약</span><span class="pno">02</span>
+</section>
+
+<!-- ═══ 3 배경 ═══ -->
+<section class="page">
+  <div class="ph"><h2>2 · 배경과 확보 데이터</h2></div>
+
+  <span class="lbl">요구사항 · 2026-07-24</span>
+  <blockquote style="margin-top:10px">부서원이 작성한 근원경쟁력 자료를 기반으로 팀의 향후 방향을 정리할 것</blockquote>
+
+  <table>
+    <tr><th>항목</th><th>내용</th></tr>
+    <tr><td>작성자</td><td class="w">성명 · 담당 프로젝트/파트 · CL</td></tr>
+    <tr><td>본문</td><td class="w">「나의 근원경쟁력」 PPT 원문</td></tr>
+    <tr><td>규모</td><td class="w">약 200명 · <b>1회성 작성</b> (반복 수집 없음)</td></tr>
+    <tr><td>제약</td><td class="w">보안상 외부 반출 금지</td></tr>
+  </table>
+
+  <div class="g2">
+    <div class="card">
+      <span class="lbl">CL2 · CL3</span>
+      <p style="margin-top:7px">3단 구성이 원칙 — ① 상반기 성과·하반기 전략 ② 커리어 회고·확보 역량 ③ 미래 업무</p>
+    </div>
+    <div class="card">
+      <span class="lbl">CL4</span>
+      <p style="margin-top:7px">미래 위주 서술형</p>
+    </div>
+  </div>
+
+  <p class="foot">원칙일 뿐이므로 미준수 문서와 내용이 사실상 없는 문서가 함께 섞여 있다.</p>
+  <span class="ptag">배경</span><span class="pno">03</span>
+</section>
+
+<!-- ═══ 4 과제 정의 ═══ -->
+<section class="page">
+  <div class="ph"><h2>3 · 과제 정의</h2><span class="badge b-em">목표 설정</span></div>
+
+  <p class="lead"><strong>요구는 팀 단위, 데이터는 개인 단위다.</strong></p>
+  <p>자료 200건은 각자가 자기 프로젝트 맥락에서 쓴 개인·근미래 서술이다.
+  팀 차원의 방향은 여기에 직접 적혀 있지 않고, 200건을 종합해야 나온다.</p>
+
+  <div class="g2">
+    <div class="card">
+      <span class="lbl">Before — 사람이 종합할 경우</span>
+      <ul>
+        <li><b>기준 일관성</b> — 동일한 잣대로 판단하기 어렵다. 순서·피로도가 개입한다.</li>
+        <li><b>소수 의견 소실</b> — 요약은 다수를 남기고 소수를 버린다.</li>
+        <li><b>근거 추적</b> — 종합 결과에서 개별 원문으로 돌아가기 어렵다.</li>
+      </ul>
+    </div>
+    <div class="card em">
+      <span class="lbl">After — 파이프라인이 종합할 경우</span>
+      <ul>
+        <li><b>동일 기준</b> — 200건 전부에 같은 질문을 적용한다.</li>
+        <li><b>소수 의견 보존</b> — 인원이 적은 카테고리를 별도 트랙으로 남긴다.</li>
+        <li><b>역추적</b> — 모든 항목이 원문 인용을 함께 보관한다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card hard" style="margin-top:16px">
+    <span class="lbl">따라서 목표를 다음과 같이 설정했다</span>
+    <ol class="n">
+      <li>200건 전수를 <b>동일 기준</b>으로 처리한다</li>
+      <li>소수 의견을 <b>별도로 보존</b>한다</li>
+      <li>모든 결과를 <b>원문 인용으로 역추적</b> 가능하게 한다</li>
+    </ol>
+  </div>
+
+  <p class="foot">처리 시간 단축이 목적이 아니다 — 사람이 하면 품질이 담보되지 않는 부분을 기계에 맡긴 것이다.</p>
+  <span class="ptag">과제 정의</span><span class="pno">04</span>
+</section>
+
+<!-- ═══ 5 처리 방식 ═══ -->
+<section class="page">
+  <div class="ph"><h2>4 · 처리 방식</h2><span class="badge b-s">5단계</span>
+    <span class="src" style="margin-left:auto">scripts/td_pipeline.py</span></div>
+
+  <svg viewBox="0 0 1064 116" role="img" aria-label="5단계 파이프라인">
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6.4" refY="2.9" orient="auto">
+      <path d="M0,0 L6.4,2.9 L0,5.8 z" fill="#94a3b8"/></marker></defs>
+    <g font-family="system-ui,sans-serif">
+      <rect x="2" y="16" width="186" height="54" rx="4" fill="#047857" fill-opacity=".9"/>
+      <text x="95" y="39" font-size="13" fill="#fff" text-anchor="middle" font-weight="600">① 추출</text>
+      <text x="95" y="57" font-size="10.5" fill="#d1fae5" text-anchor="middle">약 200회</text>
+      <line x1="192" y1="43" x2="212" y2="43" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+
+      <rect x="216" y="16" width="186" height="54" rx="4" fill="#fffbeb" stroke="#d97706" stroke-width="1.6" stroke-dasharray="5 3"/>
+      <text x="309" y="39" font-size="13" fill="#92400e" text-anchor="middle" font-weight="600">② 분류 체계</text>
+      <text x="309" y="57" font-size="10.5" fill="#b45309" text-anchor="middle">약 30회</text>
+      <line x1="406" y1="43" x2="426" y2="43" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+
+      <rect x="430" y="16" width="186" height="54" rx="4" fill="#047857" fill-opacity=".9"/>
+      <text x="523" y="39" font-size="13" fill="#fff" text-anchor="middle" font-weight="600">③ 배정</text>
+      <text x="523" y="57" font-size="10.5" fill="#d1fae5" text-anchor="middle">약 600~800회</text>
+      <line x1="620" y1="43" x2="640" y2="43" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+
+      <rect x="644" y="16" width="186" height="54" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1.4"/>
+      <text x="737" y="39" font-size="13" fill="#0f172a" text-anchor="middle" font-weight="600">④ 집계</text>
+      <text x="737" y="57" font-size="10.5" fill="#64748b" text-anchor="middle">LLM 미사용</text>
+      <line x1="834" y1="43" x2="854" y2="43" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ar)"/>
+
+      <rect x="858" y="16" width="186" height="54" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1.4"/>
+      <text x="951" y="39" font-size="13" fill="#0f172a" text-anchor="middle" font-weight="600">⑤ 정리</text>
+      <text x="951" y="57" font-size="10.5" fill="#64748b" text-anchor="middle">LLM 미사용</text>
+
+      <rect x="2"   y="92" width="13" height="10" rx="2" fill="#047857" fill-opacity=".9"/>
+      <text x="21"  y="101" font-size="10.5" fill="#334155">원문 대조 있음</text>
+      <rect x="132" y="92" width="13" height="10" rx="2" fill="#fffbeb" stroke="#d97706" stroke-width="1.2" stroke-dasharray="3 2"/>
+      <text x="151" y="101" font-size="10.5" fill="#334155">사람이 확정</text>
+      <rect x="252" y="92" width="13" height="10" rx="2" fill="#fff" stroke="#cbd5e1" stroke-width="1.2"/>
+      <text x="271" y="101" font-size="10.5" fill="#334155">LLM 미사용 — 결과 동일</text>
+      <text x="1062" y="10" font-size="10.5" fill="#94a3b8" text-anchor="end">총 약 1,000회 · 전 단계 사내망</text>
+    </g>
+  </svg>
+
+  <table>
+    <tr><th style="width:110px">단계</th><th>처리 내용</th><th style="width:170px">산출물</th></tr>
+    <tr><td>① 추출</td><td class="w">자료 원문에서 과제·역량·방향 항목화</td><td class="m">extracted.json</td></tr>
+    <tr class="hi"><td>② 분류 체계</td><td class="w">유사 항목을 묶어 카테고리 정의</td><td class="m">taxonomy.json</td></tr>
+    <tr><td>③ 배정</td><td class="w">추출 항목을 카테고리에 배정</td><td class="m">assignments.json</td></tr>
+    <tr><td>④ 집계</td><td class="w">카테고리별 인원·역량 확보 여부 산출</td><td class="m">aggregates.json</td></tr>
+    <tr><td>⑤ 정리</td><td class="w">열람 가능한 문서로 생성</td><td class="m">workshop-input.md</td></tr>
+  </table>
+
+  <p class="foot">중간 산출물을 전부 파일로 남긴다 — 잘못된 단계부터 재실행하며, 중단되어도 중단 지점부터 재개된다.</p>
+  <span class="ptag">처리 방식</span><span class="pno">05</span>
+</section>
+
+<!-- ═══ 6 추출 ═══ -->
+<section class="page">
+  <div class="ph"><h2>5 · 추출 단계</h2><span class="badge b-em">자동 검증</span>
+    <span class="src" style="margin-left:auto">scripts/td_extract.py</span></div>
+
+  <p class="lead">자료 한 건에서 네 가지를 뽑는다. <strong>200건 전부에 동일한 질문을 적용한다.</strong></p>
+
+  <table>
+    <tr><th style="width:150px">축</th><th>내용</th></tr>
+    <tr><td>미래 과제</td><td class="w">앞으로 수행하려는 업무 <span class="mono">(+ 시점: 단기/장기/불명)</span></td></tr>
+    <tr><td>보유 역량</td><td class="w">이미 확보했다고 서술한 역량</td></tr>
+    <tr><td>필요 역량</td><td class="w">부족하거나 필요하다고 서술한 역량</td></tr>
+    <tr><td>지향 방향</td><td class="w">전반적 방향</td></tr>
+  </table>
+
+  <div class="g2">
+    <div class="card">
+      <span class="lbl">항목마다 근거 문장을 함께 보관</span>
+      <p style="margin-top:7px"><span class="mono">text</span> — 정리된 서술</p>
+      <p><span class="mono">quotes</span> — 그 서술의 근거가 된 <b>원문 그대로의 문장</b></p>
+    </div>
+    <div class="card">
+      <span class="lbl">내용이 없는 자료는 별도 표시</span>
+      <p style="margin-top:7px">서술이 사실상 없는 자료를 임의 분류하지 않고 <b>「신호 없음」</b>으로 분리한다.</p>
+    </div>
+  </div>
+
+  <p class="foot">근거 문장을 함께 들고 가는 것이 다음 장 검증 체계 전체의 출발점이다.</p>
+  <span class="ptag">추출</span><span class="pno">06</span>
+</section>
+
+<!-- ═══ 7 신뢰성 ═══ -->
+<section class="page">
+  <div class="ph"><h2>6 · 신뢰성 확보</h2><span class="badge b-em">코드가 수행</span>
+    <span class="src" style="margin-left:auto">td_extract.py:54 · :56 · :86</span></div>
+
+  <p class="lead">자동 분석 결과를 그대로 신뢰할 수 없으므로 네 가지 장치를 두었다.</p>
+
+  <table>
+    <tr><th style="width:32px"></th><th style="width:160px">장치</th><th>내용</th></tr>
+    <tr><td class="c">①</td><td>원문 대조</td>
+        <td class="w">근거 문장이 자료 원문에 실제로 존재하는지 대조한다. 없으면 생성된 문장이므로 폐기한다.</td></tr>
+    <tr><td class="c">②</td><td>인용 복제 차단</td>
+        <td class="w">정리 서술이 원문을 그대로 옮긴 것에 불과하면 폐기한다.</td></tr>
+    <tr><td class="c">③</td><td>항목 단위 폐기</td>
+        <td class="w">위반 시 <b>해당 항목만</b> 버리고 재질의한다. 자료 한 건 전체를 버리지 않는다.</td></tr>
+    <tr><td class="c">④</td><td>처리 결과 공개</td>
+        <td class="w">신호 없음·기타 건수를 함께 보고한다. 소수 인원 카테고리는 별도 트랙으로 보존한다.</td></tr>
+  </table>
+
+  <div class="card hard" style="margin-top:18px">
+    <p style="font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--s900);margin:0">
+      결과적으로, 추출 단계 산출물의 <strong>모든 문장은 원문 대조를 통과한 것</strong>이다.</p>
+  </div>
+
+  <span class="ptag">신뢰성</span><span class="pno">07</span>
+</section>
+
+<!-- ═══ 8 결과 ① ═══ -->
+<section class="page">
+  <div class="ph"><h2>7 · 중간 결과 ① — 과제 군집</h2><span class="badge b-am">검증 전 초안</span></div>
+
+  <p class="lead">추출된 미래 과제를 카테고리로 묶고, 부서·CL별 분포를 교차 확인한다.</p>
+
+  <div class="card am" style="margin-top:14px">
+    <span class="lbl">카테고리 카드 형식</span>
+    <p style="font-family:var(--serif);font-size:18px;color:var(--s900);margin-top:9px">
+      <span class="fill">카테고리명</span> — <span class="fill">N</span>명</p>
+    <p style="font-style:italic">인용: "<span class="fill">원문 발췌</span>"</p>
+    <p>관련 부서: <span class="fill">부서 목록</span></p>
+  </div>
+
+  <table>
+    <tr><th>구분</th><th style="width:300px">값</th></tr>
+    <tr><td>도출 카테고리</td><td><span class="fill">N</span> 개</td></tr>
+    <tr><td>최다 인원 카테고리</td><td><span class="fill">명칭</span> · <span class="fill">N</span> 명</td></tr>
+    <tr><td>소수 의견 보존</td><td><span class="fill">N</span> 건</td></tr>
+    <tr><td>신호 없음</td><td><span class="fill">N</span> 명</td></tr>
+  </table>
+
+  <div class="card hard" style="margin-top:16px">
+    <p style="margin:0"><strong>모든 수치는 개별 원문까지 역추적된다.</strong>
+    "이 숫자의 근거가 무엇인가"라는 질문에 해당 인원의 원문을 즉시 제시할 수 있다.</p>
+  </div>
+
+  <p class="foot">인원수가 곧 중요도는 아니다 — 소수 의견 트랙을 따로 두는 이유가 여기 있다.</p>
+  <span class="ptag">결과 ①</span><span class="pno">08</span>
+</section>
+
+<!-- ═══ 9 결과 ② ═══ -->
+<section class="page">
+  <div class="ph"><h2>8 · 중간 결과 ② — 시간 × 역량 확보 매트릭스</h2>
+    <span class="src" style="margin-left:auto">td_roadmap.py:23</span></div>
+
+  <p>군집만으로는 순서가 나오지 않는다. 두 축을 얹어 배치한다.</p>
+
+  <svg viewBox="0 0 1064 286" role="img" aria-label="시간 × 역량 확보 매트릭스" style="margin-top:10px">
+    <defs><linearGradient id="vx" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d97706" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#047857" stop-opacity=".45"/></linearGradient></defs>
+    <g font-family="system-ui,sans-serif">
+      <rect x="132" y="12" width="912" height="86" fill="#fffbeb" fill-opacity=".5"/>
+      <rect x="132" y="12" width="304" height="86" fill="#fef2f2" fill-opacity=".85"/>
+      <text x="143" y="29" font-size="10.5" fill="#dc2626" font-weight="650">시급 · 역량 미확보 — 우선 검토</text>
+
+      <rect x="122" y="12" width="5" height="176" fill="url(#vx)"/>
+      <line x1="132" y1="12" x2="132" y2="188" stroke="#94a3b8" stroke-width="1.2"/>
+      <line x1="132" y1="188" x2="1044" y2="188" stroke="#94a3b8" stroke-width="1.2"/>
+      <line x1="436" y1="12" x2="436" y2="188" stroke="#f1f5f9"/>
+      <line x1="740" y1="12" x2="740" y2="188" stroke="#f1f5f9"/>
+      <line x1="132" y1="98" x2="1044" y2="98" stroke="#e2e8f0" stroke-dasharray="4 4"/>
+
+      <text x="114" y="30"  font-size="11" fill="#b45309" text-anchor="end" font-weight="650">역량 미확보</text>
+      <text x="114" y="182" font-size="11" fill="#047857" text-anchor="end" font-weight="650">역량 확보</text>
+      <text x="284" y="208" font-size="11.5" fill="#334155" text-anchor="middle">단기</text>
+      <text x="588" y="208" font-size="11.5" fill="#334155" text-anchor="middle">중기</text>
+      <text x="892" y="208" font-size="11.5" fill="#334155" text-anchor="middle">장기</text>
+
+      <circle cx="272" cy="52" r="27" fill="#d97706" fill-opacity=".8"/>
+      <text x="272" y="56" font-size="10.5" fill="#fff" text-anchor="middle">카테고리 A</text>
+      <circle cx="560" cy="72" r="21" fill="#d97706" fill-opacity=".68"/>
+      <text x="560" y="76" font-size="10" fill="#fff" text-anchor="middle">B</text>
+      <circle cx="866" cy="144" r="32" fill="#047857" fill-opacity=".78"/>
+      <text x="866" y="148" font-size="10.5" fill="#fff" text-anchor="middle">카테고리 C</text>
+      <circle cx="344" cy="156" r="17" fill="#047857" fill-opacity=".68"/>
+      <text x="344" y="160" font-size="10" fill="#fff" text-anchor="middle">D</text>
+
+      <line x1="132" y1="234" x2="1044" y2="234" stroke="#e2e8f0" stroke-dasharray="5 4"/>
+      <text x="114" y="252" font-size="10.5" fill="#64748b" text-anchor="end">축 밖</text>
+      <circle cx="272" cy="248" r="9" fill="#94a3b8" fill-opacity=".55"/>
+      <circle cx="318" cy="248" r="7" fill="#94a3b8" fill-opacity=".55"/>
+      <text x="346" y="252" font-size="10.5" fill="#64748b">역량 언급 없음 — 판정 불가로 두고, 확보로 처리하지 않는다</text>
+
+      <text x="1044" y="9" font-size="10.5" fill="#94a3b8" text-anchor="end">버블 크기 = 언급 인원수 · 배치 예시</text>
+    </g>
+  </svg>
+
+  <div class="g2" style="margin-top:12px">
+    <div class="card hard">
+      <span class="lbl">세로축 — 데이터가 결정 (고정)</span>
+      <p style="margin-top:7px">"팀에 해당 역량이 있다"가 아니라
+      <strong>"확보했다고 쓴 서술이 부족하다고 쓴 서술보다 많다"</strong>이다.</p>
+    </div>
+    <div class="card am">
+      <span class="lbl">가로축 — 사람이 확정 (초안 자동)</span>
+      <p style="margin-top:7px">단기 <span class="fill">N</span> / 중기 <span class="fill">N</span> / 장기 <span class="fill">N</span>
+      &nbsp;·&nbsp; 판정 불가 <span class="fill">N</span>건</p>
+    </div>
+  </div>
+
+  <span class="ptag">결과 ②</span><span class="pno">09</span>
+</section>
+
+<!-- ═══ 10 한계 (실측) ═══ -->
+<section class="page">
+  <div class="ph"><h2>9 · 한계</h2><span class="badge b-am">구조적 제약</span></div>
+
+  <div class="card rd">
+    <span class="lbl">실측 — 코드에서 직접 확인</span>
+    <p style="margin-top:8px"><strong>LLM을 호출하는 세 단계 중 원문 대조 코드가 있는 곳은 두 곳이다.</strong></p>
+    <table style="margin-top:11px">
+      <tr><th style="width:130px">단계</th><th style="width:200px">원문 대조 코드</th><th>의미</th></tr>
+      <tr><td>추출</td><td class="m" style="color:#047857">td_extract.py · 12건</td><td class="w">뽑은 문장이 원문에 있는지 대조</td></tr>
+      <tr><td>배정</td><td class="m" style="color:#047857">td_assign.py · 10건</td><td class="w">배정 근거를 인용으로 확인</td></tr>
+      <tr class="hi"><td>분류 체계</td><td class="m" style="color:#b91c1c">td_taxonomy.py · <b>0건</b></td><td class="w"><b>대조할 원문이 존재하지 않는다</b></td></tr>
+    </table>
+  </div>
+
+  <div class="g2">
+    <div class="card am">
+      <span class="lbl">분류 체계 — 카테고리 명칭과 경계</span>
+      <p style="margin-top:7px">모델은 당사 도메인 지식이 없다. 사내 용어를 일반 용어로 치환하거나
+      조직 감각과 맞지 않는 경계로 묶는다.</p>
+      <p>코드가 보는 것은 관계 구조의 형식적 정합성뿐 — <b>명칭의 타당성은 판정하지 못한다.</b></p>
+    </div>
+    <div class="card am">
+      <span class="lbl">시점 판정 — 단기 / 장기</span>
+      <p style="margin-top:7px">자료에 시점을 명시한 작성자가 거의 없다.
+      현재 값은 <b>모델의 추정</b>이며 원문으로 검증할 수단이 없다.</p>
+      <p>사례 — <span class="fill">LLM 명칭</span> → <span class="fill">실제 용어</span></p>
+    </div>
+  </div>
+
+  <p class="foot">모델 성능을 높여 해결되는 문제가 아니다 — 판단 근거가 데이터에 없는 구조적 문제다.</p>
+  <span class="ptag">한계</span><span class="pno">10</span>
+</section>
+
+<!-- ═══ 11 대응 ═══ -->
+<section class="page">
+  <div class="ph"><h2>10 · 대응 — 도메인 검증 절차</h2><span class="badge b-em">도구 구축 완료</span></div>
+
+  <p class="lead"><strong>전수 검토는 하지 않는다.</strong> 자동 검증이 성립하지 않는 지점에만 사람이 개입한다.</p>
+
+  <table>
+    <tr><th style="width:120px">구분</th><th style="width:280px">대상</th><th>사유</th></tr>
+    <tr class="hi"><td>사람이 확정</td><td>카테고리 명칭·경계 / 시점 구분</td><td class="w">원문으로 검증 불가</td></tr>
+    <tr><td>확인만</td><td>추출 결과</td><td class="w">원문 대조를 이미 통과</td></tr>
+    <tr><td>확인만</td><td>배정 결과</td><td class="w">체계 확정 후에는 기계적 분류</td></tr>
+    <tr><td>불필요</td><td>집계 · 문서 생성</td><td class="w">LLM 미사용, 결과 재현성 있음</td></tr>
+  </table>
+
+  <div class="g2">
+    <div class="card">
+      <span class="lbl">진행 방식</span>
+      <p style="margin-top:7px">부서별 담당자 참석, <b>약 4시간</b></p>
+      <p>분류 체계 초안 검토·수정 / 시점 구분을 현업 기준으로 조정</p>
+    </div>
+    <div class="card em">
+      <span class="lbl">검토용 화면은 구축되어 있다</span>
+      <p style="margin-top:7px"><b>탐색기</b> 근거 원문 확인 · <b>매트릭스</b> 배치 조망 · <b>취합 화면</b> 의견 수렴</p>
+      <p class="src" style="color:var(--em700)">세 화면 모두 LLM 미호출 — 반복 실행 비용 없음</p>
+    </div>
+  </div>
+
+  <p class="foot">검토 대상은 카테고리 수십 개 수준이지 자료 200건이 아니다.</p>
+  <span class="ptag">대응</span><span class="pno">11</span>
+</section>
+
+<!-- ═══ 12 향후 계획 ═══ -->
+<section class="page">
+  <div class="ph"><h2>11 · 향후 계획</h2></div>
+
+  <table style="margin-top:0">
+    <tr><th style="width:42px"></th><th>내용</th><th style="width:170px">소요</th></tr>
+    <tr><td class="c">1</td><td class="w">부서 담당자 분류 체계 검토</td><td style="font-weight:600">4시간</td></tr>
+    <tr><td class="c">2</td><td class="w">확정 체계로 배정·집계 재실행</td><td class="w">자동 처리</td></tr>
+    <tr><td class="c">3</td><td class="w">결과 검수 (담당자 개별 확인)</td><td class="w">별도 소집 없음</td></tr>
+    <tr><td class="c">4</td><td class="w">부서별 미래 과제 정리본 완성</td><td class="w">—</td></tr>
+  </table>
+
+  <div class="card hard" style="margin-top:18px">
+    <span class="lbl">최종 산출물</span>
+    <ul class="gain" style="margin-top:10px">
+      <li>부서별 과제 군집 — 인원 · 부서 · CL 분포</li>
+      <li>시간 × 역량 확보 매트릭스</li>
+      <li>소수 의견 목록</li>
+      <li>처리 커버리지 보고</li>
+    </ul>
+  </div>
+
+  <p class="foot">산출물은 결론이 아니라 논의의 출발점으로 사용하는 것을 전제로 한다.</p>
+  <span class="ptag">향후 계획</span><span class="pno">12</span>
+</section>
+
+<!-- ═══ 13 부록 ═══ -->
+<section class="page">
+  <div class="ph"><h2>부록 · 채울 값과 예상 질문</h2></div>
+
+  <div class="g2" style="margin-top:0">
+    <div>
+      <span class="lbl">사내망에서 채울 값</span>
+      <table style="margin-top:9px">
+        <tr><th style="width:44px">항</th><th>항목</th></tr>
+        <tr><td class="c">6</td><td class="w">신호 없음 · 기타 · 소수 의견 건수</td></tr>
+        <tr><td class="c">7</td><td class="w">카테고리 수 · 명칭 · 인원수 · 인용</td></tr>
+        <tr><td class="c">8</td><td class="w">시점 분포 · 판정 불가 건수</td></tr>
+        <tr><td class="c">9</td><td class="w">명칭 불일치 사례 1~2건</td></tr>
+      </table>
+      <div class="card rd" style="margin-top:12px">
+        <span class="lbl">결정 필요</span>
+        <p style="margin-top:7px">7항 인용에 <b>실명을 표기할지 익명 처리할지.</b>
+        익명 옵션은 구현되어 있다.</p>
+      </div>
+    </div>
+    <div>
+      <span class="lbl">예상 질문</span>
+      <table style="margin-top:9px">
+        <tr><th style="width:180px">질문</th><th>답변</th></tr>
+        <tr><td class="w">결과가 틀리면 어떻게 아는가</td><td class="w">모든 항목이 원문 인용까지 역추적된다.</td></tr>
+        <tr><td class="w">왜 사람이 안 읽었나</td><td class="w">전수를 동일 기준으로 판단하고 소수 의견까지 보존하는 것이 목적이다.</td></tr>
+        <tr><td class="w">외부 유출 위험은</td><td class="w">전 과정 사내망 LLM으로만 처리했다.</td></tr>
+        <tr><td class="w">바로 의사결정 가능한가</td><td class="w">분류 체계 검증 전이므로 초안이다.</td></tr>
+        <tr><td class="w">다시 하면 비용은</td><td class="w">배정 재실행 기준 약 600~800회 호출.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <p class="foot">다루지 않은 것 — 모델 선정 근거, 임베딩·검색 구성, 실행 인프라 상세, 개별 인원의 회고 내용.</p>
+  <span class="ptag">부록</span><span class="pno">13</span>
+</section>
+
+</div>
+</body>
+</html>
