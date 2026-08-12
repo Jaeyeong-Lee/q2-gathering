@@ -1,0 +1,396 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로드맵 매트릭스 — 부서 분리 목업</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  svg{display:block;max-width:100%;height:auto}
+  text{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif}
+</style>
+
+<main class="mx-auto max-w-5xl space-y-14 px-6 py-12 bg-stone-50 text-slate-900">
+
+<header class="border-b border-slate-300 pb-6">
+  <div class="lbl text-slate-500">task-discovery · S5 워크숍 화면 · 목업</div>
+  <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
+    <h1 class="font-serif text-4xl leading-tight">로드맵 매트릭스를<br>부서별로 나눈다면</h1>
+    <div class="text-right font-mono text-xs text-slate-500">
+      <div>2026-08-12</div>
+      <div>td_roadmap.py 739줄 · td_cards.py 148줄</div>
+      <div>추가 LLM 콜 0</div>
+    </div>
+  </div>
+  <p class="mt-4 max-w-2xl text-sm text-slate-600">
+    세로축(준비도)은 데이터가 말한 것이라 고정이고, 가로축(시간)만 워크숍에서 사람이 정한다.
+    여기서 다루는 건 <b>그 한 장을 부서별로 쪼갤 때 무엇이 깨지는가</b>다.
+  </p>
+</header>
+
+<!-- ── 가상 데이터 경고 ── -->
+<section class="border-2 border-red-600 bg-red-50 p-5">
+  <div class="lbl text-red-700">이 문서의 모든 숫자와 이름은 가상이다</div>
+  <p class="mt-2 text-sm text-slate-800">
+    카테고리는 <span class="font-mono text-xs">A~F</span>, 부서는 <span class="font-mono text-xs">ㄱ~ㄹ</span>로 썼다.
+    실제 <span class="font-mono text-xs">taxonomy.json</span>·<span class="font-mono text-xs">aggregates.json</span>을
+    열지 않았고, 배치·인원·준비도 전부 배치를 보이기 위해 지어낸 값이다.
+    <b>레이아웃 판단용이고, 이 그림에서 어떤 사실도 읽어내면 안 된다.</b>
+  </p>
+</section>
+
+<!-- ── 범례 ── -->
+<section>
+  <div class="lbl text-slate-500">기호</div>
+  <div class="mt-3 grid gap-4 sm:grid-cols-4 text-xs">
+    <div class="flex items-center gap-2">
+      <svg viewBox="0 0 40 24" class="w-10"><circle cx="20" cy="12" r="10" fill="#0e9384" opacity=".85"/></svg>
+      <span>버블 = 카테고리<br><span class="text-slate-500">크기 = 기여 인원</span></span>
+    </div>
+    <div class="flex items-center gap-2">
+      <svg viewBox="0 0 40 24" class="w-10"><circle cx="20" cy="12" r="10" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="3 3"/></svg>
+      <span>점선 테두리<br><span class="text-slate-500">역량 언급 0건</span></span>
+    </div>
+    <div class="flex items-center gap-2">
+      <svg viewBox="0 0 40 24" class="w-10"><rect x="8" y="4" width="24" height="16" fill="none" stroke="#dc2626" stroke-width="2"/></svg>
+      <span>빨간 테두리<br><span class="text-slate-500">선후 제약 위반</span></span>
+    </div>
+    <div class="flex items-center gap-2">
+      <svg viewBox="0 0 40 24" class="w-10"><line x1="6" y1="12" x2="34" y2="12" stroke="#1b1d20" stroke-width="1.5"/><line x1="28" y1="7" x2="34" y2="12" stroke="#1b1d20" stroke-width="1.5"/><line x1="28" y1="17" x2="34" y2="12" stroke="#1b1d20" stroke-width="1.5"/></svg>
+      <span>화살표<br><span class="text-slate-500">taxonomy relations</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ── 1. 버블 해부 ── -->
+<article id="c1">
+  <div class="flex flex-wrap items-baseline gap-3">
+    <h2 class="font-serif text-2xl">1 · 버블 하나에 무엇을 실을 수 있나</h2>
+    <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span>
+  </div>
+  <p class="mt-1 font-mono text-xs text-slate-500">td_roadmap.py:128 build_nodes · 12개 필드</p>
+
+  <p class="mt-4 text-sm text-slate-700">
+    <code class="font-mono text-xs">build_nodes</code>가 버블마다 내주는 값은 열두 개다. 이 중 화면에
+    실을 수 있는 건 위치 2, 크기 1, 색 1, 테두리 1 — 다섯 자리뿐이다. 어느 값을 어느 자리에 놓느냐가
+    이 화면의 전부다.
+  </p>
+
+  <div class="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+    <svg viewBox="0 0 660 250">
+      <!-- 버블 본체 -->
+      <circle cx="170" cy="125" r="54" fill="#0e9384" opacity=".22"/>
+      <circle cx="170" cy="125" r="54" fill="none" stroke="#0e9384" stroke-width="2.5"/>
+      <text x="170" y="120" text-anchor="middle" font-size="14" font-weight="650" fill="#1b1d20">카테고리 C</text>
+      <text x="170" y="139" text-anchor="middle" font-size="11" fill="#6b7280">14명 · 3부서</text>
+
+      <!-- 지시선 -->
+      <g stroke="#cbd5e1" stroke-width="1">
+        <line x1="170" y1="60"  x2="170" y2="34"/><line x1="170" y1="34" x2="330" y2="34"/>
+        <line x1="224" y1="125" x2="330" y2="125"/>
+        <line x1="170" y1="190" x2="170" y2="216"/><line x1="170" y1="216" x2="330" y2="216"/>
+        <line x1="132" y1="172" x2="96"  y2="205"/><line x1="96" y1="205" x2="40" y2="205"/>
+      </g>
+
+      <!-- 라벨 -->
+      <text x="340" y="30"  font-size="11.5" font-weight="650" fill="#1b1d20">가로 위치 = draft_band</text>
+      <text x="340" y="46"  font-size="11" fill="#6b7280">과제 카드 horizon의 최빈값. 사람이 끌어 옮긴다.</text>
+
+      <text x="340" y="121" font-size="11.5" font-weight="650" fill="#1b1d20">크기 = people</text>
+      <text x="340" y="137" font-size="11" fill="#6b7280">이 카테고리에 항목을 낸 사람 수.</text>
+
+      <text x="340" y="212" font-size="11.5" font-weight="650" fill="#1b1d20">세로 위치 = readiness</text>
+      <text x="340" y="228" font-size="11" fill="#6b7280">선행 신호 / 갭만 있음 / 이미 함.</text>
+
+      <text x="40" y="222" font-size="11.5" font-weight="650" fill="#d97706">색 = ?</text>
+      <text x="40" y="238" font-size="11" fill="#6b7280">여기가 비어 있다.</text>
+    </svg>
+  </div>
+
+  <div class="mt-5 border-l-4 border-amber-500 bg-amber-50 p-4">
+    <div class="lbl text-amber-700">색을 준비도에 쓰면 세로축과 같은 정보가 두 번 나온다</div>
+    <p class="mt-2 text-sm text-slate-800">
+      세로 위치가 이미 <code class="font-mono text-xs">readiness</code>다. 색까지 준비도로 칠하면 자리 하나를
+      낭비한다. 빈 자리에 넣을 값으로는 <code class="font-mono text-xs">pjt_spread</code>(몇 개 부서가 이 카테고리를
+      말했나)가 가장 값이 크다 — <b>"이건 우리 부서만의 문제가 아니다"가 한눈에 보이는 유일한 신호</b>이고,
+      부서별로 화면을 쪼개면 제일 먼저 사라지는 정보이기도 하다.
+    </p>
+  </div>
+</article>
+
+<!-- ── 2. 세로축은 한 척도가 아니다 ── -->
+<article id="c2">
+  <div class="flex flex-wrap items-baseline gap-3">
+    <h2 class="font-serif text-2xl">2 · 세로축 세 칸은 같은 질문이 아니다</h2>
+    <span class="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">Worth exploring</span>
+  </div>
+  <p class="mt-1 font-mono text-xs text-slate-500">td_aggregate.py:44-49</p>
+
+  <div class="mt-5 grid gap-4 md:grid-cols-2">
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <div class="lbl text-slate-500">판정식 그대로</div>
+      <pre class="mt-2 overflow-x-auto font-mono text-xs leading-relaxed text-slate-800">if people &lt;= 2:      "선행 신호"
+elif gap &gt; have:    "갭만 있음"
+else:               "이미 함"</pre>
+      <p class="mt-3 text-xs text-slate-600">
+        첫 줄은 <b>인원수</b> 질문이고, 아래 두 줄은 <b>보유 대비 필요</b> 질문이다.
+        축 하나에 두 질문이 얹혀 있다.
+      </p>
+    </div>
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <div class="lbl text-slate-500">그림으로 그리면</div>
+      <svg viewBox="0 0 300 150" class="mt-2">
+        <line x1="70" y1="12" x2="70" y2="138" stroke="#e3e5e8" stroke-width="1"/>
+        <text x="64" y="34"  text-anchor="end" font-size="10.5" fill="#d97706">갭만 있음</text>
+        <text x="64" y="76"  text-anchor="end" font-size="10.5" fill="#0e9384">이미 함</text>
+        <text x="64" y="118" text-anchor="end" font-size="10.5" fill="#7c5cd6">선행 신호</text>
+        <rect x="70" y="18"  width="220" height="42" fill="#fef3c7" opacity=".55"/>
+        <rect x="70" y="60"  width="220" height="42" fill="#d1fae5" opacity=".55"/>
+        <rect x="70" y="102" width="220" height="42" fill="#ede9fe" opacity=".55"/>
+        <text x="180" y="44" text-anchor="middle" font-size="10" fill="#92400e">보유 vs 필요 — 연속</text>
+        <text x="180" y="86" text-anchor="middle" font-size="10" fill="#065f46">보유 vs 필요 — 연속</text>
+        <text x="180" y="128" text-anchor="middle" font-size="10" fill="#5b21b6">인원 ≤ 2 — 별개 질문</text>
+        <line x1="70" y1="102" x2="290" y2="102" stroke="#7c5cd6" stroke-width="2" stroke-dasharray="5 3"/>
+      </svg>
+      <p class="mt-2 text-xs text-slate-600">
+        점선 아래는 축이 아니라 <b>별도 트랙</b>이다.
+        <code class="font-mono text-xs">aggregates.json</code>이 이미 <code class="font-mono text-xs">minority</code>를
+        따로 들고 있는 게 그 근거다(<code class="font-mono text-xs">td_aggregate.py:57</code>).
+      </p>
+    </div>
+  </div>
+  <p class="mt-4 text-sm text-slate-700">
+    그림을 그려보면 드러난다 — 선행 신호를 세로축 한 칸으로 두면 "준비가 덜 됐다"로 읽히는데,
+    실제 뜻은 <b>"말한 사람이 둘 이하다"</b>다. 화면에서 구분선을 그어두는 편이 정직하다.
+    이건 부서 분리와 직결된다(4번).
+  </p>
+</article>
+
+<!-- ── 3. Before / After ── -->
+<article id="c3">
+  <div class="flex flex-wrap items-baseline gap-3">
+    <h2 class="font-serif text-2xl">3 · 한 장 vs 부서별</h2>
+    <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span>
+  </div>
+  <p class="mt-1 font-mono text-xs text-slate-500">td_roadmap.main → roadmap.html (현재 1장)</p>
+
+  <div class="mt-6 space-y-6">
+    <!-- BEFORE -->
+    <div class="rounded-lg border border-slate-200 bg-white p-4">
+      <div class="lbl text-slate-500">Before — 전체 한 장 (현재 코드)</div>
+      <svg viewBox="0 0 660 300" class="mt-3">
+        <!-- 격자 -->
+        <g stroke="#e3e5e8" stroke-width="1">
+          <line x1="92" y1="30" x2="92" y2="262"/>
+          <line x1="281" y1="30" x2="281" y2="262"/>
+          <line x1="470" y1="30" x2="470" y2="262"/>
+          <line x1="92" y1="262" x2="659" y2="262"/>
+          <line x1="92" y1="107" x2="659" y2="107"/>
+          <line x1="92" y1="184" x2="659" y2="184"/>
+        </g>
+        <line x1="92" y1="184" x2="659" y2="184" stroke="#7c5cd6" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <!-- 축 라벨 -->
+        <text x="186" y="280" text-anchor="middle" font-size="11" fill="#6b7280">단기</text>
+        <text x="375" y="280" text-anchor="middle" font-size="11" fill="#6b7280">중기 <tspan fill="#dc2626">(=불명)</tspan></text>
+        <text x="564" y="280" text-anchor="middle" font-size="11" fill="#6b7280">장기</text>
+        <text x="84" y="72"  text-anchor="end" font-size="10.5" fill="#d97706">갭만 있음</text>
+        <text x="84" y="149" text-anchor="end" font-size="10.5" fill="#0e9384">이미 함</text>
+        <text x="84" y="226" text-anchor="end" font-size="10.5" fill="#7c5cd6">선행 신호</text>
+        <text x="92" y="20"  font-size="10" letter-spacing=".1em" fill="#9aa1ab">← 사람이 정한다 →</text>
+        <!-- 버블: 부서가 섞여 있다 -->
+        <g>
+          <circle cx="170" cy="66"  r="30" fill="#0e9384" opacity=".2"/><circle cx="170" cy="66" r="30" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="170" y="64" text-anchor="middle" font-size="11" font-weight="650">A</text>
+          <text x="170" y="78" text-anchor="middle" font-size="9" fill="#6b7280">ㄱ·ㄴ 12명</text>
+
+          <circle cx="352" cy="60"  r="22" fill="#0e9384" opacity=".2"/><circle cx="352" cy="60" r="22" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="352" y="58" text-anchor="middle" font-size="11" font-weight="650">B</text>
+          <text x="352" y="71" text-anchor="middle" font-size="9" fill="#6b7280">ㄷ 7명</text>
+
+          <circle cx="238" cy="146" r="34" fill="#0e9384" opacity=".2"/><circle cx="238" cy="146" r="34" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="238" y="144" text-anchor="middle" font-size="11" font-weight="650">C</text>
+          <text x="238" y="158" text-anchor="middle" font-size="9" fill="#6b7280">ㄱ·ㄴ·ㄹ 14명</text>
+
+          <circle cx="556" cy="72"  r="19" fill="#0e9384" opacity=".2"/><circle cx="556" cy="72" r="19" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="556" y="70" text-anchor="middle" font-size="11" font-weight="650">D</text>
+          <text x="556" y="83" text-anchor="middle" font-size="9" fill="#6b7280">ㄹ 5명</text>
+
+          <circle cx="430" cy="150" r="16" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="3 3"/>
+          <text x="430" y="148" text-anchor="middle" font-size="11" font-weight="650">E</text>
+          <text x="430" y="161" text-anchor="middle" font-size="9" fill="#6b7280">ㄷ 4명</text>
+
+          <circle cx="196" cy="222" r="12" fill="#7c5cd6" opacity=".2"/><circle cx="196" cy="222" r="12" fill="none" stroke="#7c5cd6" stroke-width="2"/>
+          <text x="196" y="226" text-anchor="middle" font-size="10" font-weight="650">F</text>
+          <circle cx="600" cy="220" r="11" fill="#7c5cd6" opacity=".2"/><circle cx="600" cy="220" r="11" fill="none" stroke="#7c5cd6" stroke-width="2"/>
+          <text x="600" y="224" text-anchor="middle" font-size="10" font-weight="650">G</text>
+        </g>
+      </svg>
+      <p class="mt-3 text-xs text-slate-600">
+        <b>ㄱ의 A와 ㄷ의 B가 나란히 있는데 서로 아무 관계가 없다.</b> 도메인이 다르면 같은 칸에 있다는
+        사실이 정보가 아니라 노이즈다. 버블 20개가 넘어가면 어느 것이 내 얘기인지 못 찾는다.
+      </p>
+    </div>
+
+    <!-- AFTER -->
+    <div class="rounded-lg border-2 border-emerald-600 bg-white p-4">
+      <div class="lbl text-emerald-700">After — 공통 한 장 + 부서별 작은 배수</div>
+      <svg viewBox="0 0 660 400" class="mt-3">
+        <!-- 상단: 공통 -->
+        <text x="0" y="12" font-size="10.5" letter-spacing=".1em" fill="#6b7280">2개 이상 부서가 말한 것 — 전원 논의</text>
+        <g stroke="#e3e5e8" stroke-width="1">
+          <line x1="92" y1="22" x2="92" y2="150"/><line x1="281" y1="22" x2="281" y2="150"/>
+          <line x1="470" y1="22" x2="470" y2="150"/><line x1="92" y1="150" x2="659" y2="150"/>
+          <line x1="92" y1="65" x2="659" y2="65"/><line x1="92" y1="108" x2="659" y2="108"/>
+        </g>
+        <text x="84" y="47"  text-anchor="end" font-size="9.5" fill="#d97706">갭</text>
+        <text x="84" y="90"  text-anchor="end" font-size="9.5" fill="#0e9384">보유</text>
+        <text x="84" y="133" text-anchor="end" font-size="9.5" fill="#7c5cd6">선행</text>
+        <circle cx="170" cy="44" r="24" fill="#d97706" opacity=".28"/><circle cx="170" cy="44" r="24" fill="none" stroke="#d97706" stroke-width="2.5"/>
+        <text x="170" y="42" text-anchor="middle" font-size="11" font-weight="650">A</text>
+        <text x="170" y="55" text-anchor="middle" font-size="8.5" fill="#6b7280">2부서</text>
+        <circle cx="238" cy="88" r="30" fill="#dc2626" opacity=".28"/><circle cx="238" cy="88" r="30" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+        <text x="238" y="86" text-anchor="middle" font-size="11" font-weight="650">C</text>
+        <text x="238" y="99" text-anchor="middle" font-size="8.5" fill="#6b7280">3부서</text>
+        <text x="300" y="90" font-size="10" fill="#6b7280">← 색 = 부서 확산도. 진할수록 여러 부서 공통.</text>
+
+        <!-- 구분 -->
+        <line x1="0" y1="178" x2="660" y2="178" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="0" y="200" font-size="10.5" letter-spacing=".1em" fill="#6b7280">부서 고유 — 각 부서 안에서 논의</text>
+
+        <!-- 하단: 3개 소형 매트릭스 -->
+        <g>
+          <text x="10" y="222" font-size="10.5" font-weight="650" fill="#1b1d20">부서 ㄱ</text>
+          <g stroke="#e3e5e8" stroke-width="1">
+            <line x1="10" y1="230" x2="10" y2="330"/><line x1="10" y1="330" x2="190" y2="330"/>
+            <line x1="70" y1="230" x2="70" y2="330"/><line x1="130" y1="230" x2="130" y2="330"/>
+            <line x1="10" y1="263" x2="190" y2="263"/><line x1="10" y1="296" x2="190" y2="296"/>
+          </g>
+          <circle cx="40" cy="247" r="14" fill="#0e9384" opacity=".2"/><circle cx="40" cy="247" r="14" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="40" y="251" text-anchor="middle" font-size="9.5" font-weight="650">H</text>
+          <circle cx="152" cy="280" r="10" fill="#0e9384" opacity=".2"/><circle cx="152" cy="280" r="10" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="152" y="284" text-anchor="middle" font-size="9" font-weight="650">I</text>
+          <text x="100" y="348" text-anchor="middle" font-size="9" fill="#9aa1ab">단기 · 중기 · 장기</text>
+
+          <text x="240" y="222" font-size="10.5" font-weight="650" fill="#1b1d20">부서 ㄴ</text>
+          <g stroke="#e3e5e8" stroke-width="1">
+            <line x1="240" y1="230" x2="240" y2="330"/><line x1="240" y1="330" x2="420" y2="330"/>
+            <line x1="300" y1="230" x2="300" y2="330"/><line x1="360" y1="230" x2="360" y2="330"/>
+            <line x1="240" y1="263" x2="420" y2="263"/><line x1="240" y1="296" x2="420" y2="296"/>
+          </g>
+          <circle cx="330" cy="245" r="12" fill="#0e9384" opacity=".2"/><circle cx="330" cy="245" r="12" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="330" y="249" text-anchor="middle" font-size="9.5" font-weight="650">J</text>
+          <circle cx="270" cy="312" r="9" fill="#7c5cd6" opacity=".2"/><circle cx="270" cy="312" r="9" fill="none" stroke="#7c5cd6" stroke-width="2"/>
+          <text x="270" y="316" text-anchor="middle" font-size="9" font-weight="650">K</text>
+          <text x="330" y="348" text-anchor="middle" font-size="9" fill="#9aa1ab">단기 · 중기 · 장기</text>
+
+          <text x="470" y="222" font-size="10.5" font-weight="650" fill="#1b1d20">부서 ㄷ</text>
+          <g stroke="#e3e5e8" stroke-width="1">
+            <line x1="470" y1="230" x2="470" y2="330"/><line x1="470" y1="330" x2="650" y2="330"/>
+            <line x1="530" y1="230" x2="530" y2="330"/><line x1="590" y1="230" x2="590" y2="330"/>
+            <line x1="470" y1="263" x2="650" y2="263"/><line x1="470" y1="296" x2="650" y2="296"/>
+          </g>
+          <circle cx="560" cy="247" r="13" fill="#0e9384" opacity=".2"/><circle cx="560" cy="247" r="13" fill="none" stroke="#0e9384" stroke-width="2"/>
+          <text x="560" y="251" text-anchor="middle" font-size="9.5" font-weight="650">B</text>
+          <circle cx="500" cy="280" r="9" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="3 3"/>
+          <text x="500" y="284" text-anchor="middle" font-size="9" font-weight="650">E</text>
+          <text x="560" y="348" text-anchor="middle" font-size="9" fill="#9aa1ab">단기 · 중기 · 장기</text>
+        </g>
+      </svg>
+      <p class="mt-3 text-xs text-slate-600">
+        위 한 장이 <b>전원이 같이 볼 것</b>, 아래 작은 배수가 <b>부서가 각자 볼 것</b>이다.
+        같은 카테고리가 여러 부서에 걸치면 위로 올라가고, 아래에서는 사라진다 — 그래야 중복 논의가 없다.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+    <div>✦ 부서별 화면은 버블 5~8개 — 눈으로 훑어진다</div>
+    <div>✦ "여러 부서 공통"이 위쪽 한 장으로 분리돼 오히려 더 잘 보인다</div>
+    <div>✦ 각 부서가 병렬로 동시에 논의할 수 있다 — 워크숍 시간이 줄어든다</div>
+    <div>✦ 카드 필터는 이미 공짜다 — <code class="font-mono text-xs">td_cards.py:71</code>이 카드에 <code class="font-mono text-xs">pjt</code>를 싣는다</div>
+  </div>
+</article>
+
+<!-- ── 4. 함정 ── -->
+<article id="c4">
+  <div class="flex flex-wrap items-baseline gap-3">
+    <h2 class="font-serif text-2xl">4 · 쪼개면 세로축이 전부 "선행 신호"로 뭉갠다</h2>
+    <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">함정</span>
+  </div>
+  <p class="mt-1 font-mono text-xs text-slate-500">td_aggregate.py:17 WEAK = 2 · :44 people &lt;= weak</p>
+
+  <p class="mt-4 text-sm text-slate-700">
+    부서별 버블을 그리려면 <b>부서별로 집계를 다시 해야 한다</b>. 지금
+    <code class="font-mono text-xs">aggregates.json</code>은 전체 집계이고, 거기서 카테고리를 골라내는 게
+    아니라 <code class="font-mono text-xs">people</code>·<code class="font-mono text-xs">have</code>·<code class="font-mono text-xs">gap</code>이
+    부서 안에서 다시 세어져야 <code class="font-mono text-xs">readiness</code>가 그 부서의 사실이 된다.
+    순수 함수라 LLM 콜은 0이다.
+  </p>
+
+  <div class="mt-5 grid gap-4 md:grid-cols-2">
+    <div class="rounded-lg border border-red-300 bg-red-50 p-4">
+      <div class="lbl text-red-700">문턱을 그대로 두면</div>
+      <svg viewBox="0 0 280 120" class="mt-2">
+        <text x="0" y="16" font-size="10" fill="#6b7280">전체 200명 · 카테고리 C</text>
+        <rect x="0" y="24" width="200" height="18" fill="#0e9384" opacity=".3"/>
+        <text x="206" y="37" font-size="10" fill="#065f46">14명 → 이미 함</text>
+        <text x="0" y="70" font-size="10" fill="#6b7280">부서 ㄱ 안에서 같은 카테고리</text>
+        <rect x="0" y="78" width="29" height="18" fill="#7c5cd6" opacity=".35"/>
+        <text x="35" y="91" font-size="10" fill="#5b21b6">2명 → 선행 신호</text>
+        <text x="0" y="114" font-size="9.5" fill="#dc2626">같은 카테고리가 화면마다 다른 색이 된다</text>
+      </svg>
+    </div>
+    <div class="rounded-lg border border-emerald-300 bg-emerald-50 p-4">
+      <div class="lbl text-emerald-700">문턱을 부서 규모에 맞추면</div>
+      <pre class="mt-2 overflow-x-auto font-mono text-xs leading-relaxed text-slate-800">td_aggregate.aggregate(
+    부서_카드, persons,
+    weak=max(1, 부서인원 // 10),
+)</pre>
+      <p class="mt-2 text-xs text-slate-700">
+        <code class="font-mono text-xs">weak</code>는 이미 키워드 인자로 열려 있다
+        (<code class="font-mono text-xs">td_aggregate.py:20</code>). 새 코드가 아니라 값만 넘기면 된다.
+      </p>
+    </div>
+  </div>
+
+  <p class="mt-4 text-sm text-slate-700">
+    <b>"소수 의견"은 전체 기준으로만 뜻이 있는 말이다.</b> 부서 20명 중 3명이 말한 건 소수 의견이 아니라
+    그 부서의 주요 관심사일 수 있다. 문턱을 안 바꾸고 쪼개면 부서별 화면이 온통 보라색이 되고, 세로축이
+    아무것도 구분하지 못한다.
+  </p>
+</article>
+
+<!-- ── Top recommendation ── -->
+<section class="border-2 border-slate-900 bg-white p-7">
+  <div class="lbl text-slate-500">top recommendation</div>
+  <h2 class="mt-2 font-serif text-3xl leading-snug">부서 분리는 화면 문제가 아니라 집계 문제다</h2>
+  <p class="mt-4 text-sm leading-relaxed text-slate-700">
+    카드를 <code class="font-mono text-xs">pjt</code>로 거르는 건 한 줄이다. 그런데 그것만 하면 버블 숫자가
+    전체 기준으로 남아 <b>화면은 부서별인데 세로축은 전사 기준</b>인 어긋난 그림이 된다. 필요한 변경은 셋:
+  </p>
+  <ol class="mt-4 space-y-2 text-sm text-slate-800">
+    <li><b>1.</b> 부서별로 <code class="font-mono text-xs">td_aggregate.aggregate()</code>를 다시 호출한다 — 콜 0, 순수 함수</li>
+    <li><b>2.</b> <code class="font-mono text-xs">weak</code>를 부서 인원에 비례시킨다 — 인자가 이미 열려 있다</li>
+    <li><b>3.</b> <code class="font-mono text-xs">pjt_spread ≥ 2</code>를 공통 화면으로 올리고 부서 화면에서 뺀다</li>
+  </ol>
+  <p class="mt-4 text-sm text-slate-700">
+    <code class="font-mono text-xs">td_roadmap.py</code>의 <code class="font-mono text-xs">votable</code>·<code class="font-mono text-xs">violations</code>·<code class="font-mono text-xs">category_bands</code>는
+    전부 카드 리스트를 인자로 받는 순수 함수라 <b>부서별로 나눠 넣으면 그대로 동작한다.</b> 새 로직이 없다.
+  </p>
+</section>
+
+<!-- ── 푸터 ── -->
+<footer class="border-t border-slate-300 pt-6 text-xs text-slate-500">
+  <div class="lbl">이 문서가 쓴 어휘</div>
+  <p class="mt-2 font-mono leading-relaxed">
+    버블 = 카테고리 · 카드 = 항목 하나 · draft_band = 초안 위치 · readiness = 준비도 ·
+    pjt_spread = 부서 확산도 · weak = 소수의견 문턱 · capability_silent = 역량 언급 0건
+  </p>
+  <div class="lbl mt-6">다루지 않은 것</div>
+  <p class="mt-2 leading-relaxed">
+    투표 서버를 부서별로 나눌 것인가(지금은 세션 하나에 <code class="font-mono">votes.json</code> 하나),
+    중기 밴드에 "판단된 중기"와 "불명"을 어떻게 갈라 보일 것인가,
+    부서에 안 걸리는 카드(<code class="font-mono">pjt</code>가 빈 값)의 처리.
+    <b>추출 수율이 확보되기 전에는 이 화면의 두 축 모두 신뢰할 수 없다</b> — 그건 별 문서다.
+  </p>
+</footer>
+
+</main>
