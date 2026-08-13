@@ -1,6 +1,6 @@
-# 워크숍 도구 — 탐색기 · 로드맵 매트릭스 · 투표 서버
+# 워크숍 도구 — 탐색기 · 로드맵 매트릭스 · 투표 서버 · pjt 뷰어
 
-> 파이프라인이 끝난 **뒤에** 쓰는 화면 셋. 전부 `td_cards` 조인 위에 얹혀 있고,
+> 파이프라인이 끝난 **뒤에** 쓰는 화면들. 전부 `td_cards` 조인 위에 얹혀 있고,
 > **LLM을 한 번도 부르지 않으며 새 의존성이 없다.** 산출물을 다시 만들어도 공짜다.
 >
 > 파이프라인 자체는 [[task-discovery-pipeline-reference]], 설계 근거는
@@ -11,13 +11,17 @@
 
 ---
 
-## 1. 세 도구가 답하는 질문이 다르다
+## 1. 도구마다 답하는 질문이 다르다
 
 | 도구 | 답하는 질문 | 서버 | 언제 |
 |---|---|---|---|
 | **탐색기** `td_inspect` | "이 숫자가 어디서 왔지?" | 불필요 | 배정이 끝난 **직후**, 결과 검수 |
 | **로드맵 매트릭스** `td_roadmap` | "전체가 어떤 모양이지?" | 불필요 | 워크숍 준비 · 진행자 1인 모드 |
 | **투표 서버** `workshop_server` | "우리는 언제 할 건가?" | 필요 | 워크숍 당일, 참석자 각자 PC |
+| **pjt 뷰어** `td_view` | "우리가 뭘 만들었지?" | 불필요 | 보고 자리, pjt별 산출물 화면 |
+
+`td_view`만 `td_cards` 조인을 쓰지 않는다. 파일 사이를 잇지 않고 **산출물 넷을 그대로**
+보여주는 물건이라서다. pjt 여러 개를 한 파일에 담아 상단 버튼으로 갈아끼운다.
 
 ```
 extracted · taxonomy · assignments · aggregates
@@ -45,6 +49,29 @@ python3 scripts/td_inspect.py     $TD_OUT_DIR/task_discovery      # → inspect.
 python3 scripts/td_roadmap.py     $TD_OUT_DIR/task_discovery      # → roadmap.html
 python3 scripts/workshop_server.py $TD_OUT_DIR/task_discovery 8000 # http://<호스트>:8000
 ```
+
+**pjt 뷰어는 인자가 다르다** — 한 pjt가 아니라 pjt들이 들어 있는 **상위 디렉터리**를 준다.
+
+```bash
+python3 scripts/td_view.py <pjt들이 있는 루트> [출력경로] [--anonymize]
+
+# 예: pjt_a/extracted.json … pjt_h/aggregates.json 이 있을 때
+python3 scripts/td_view.py $TD_OUT_DIR/pjt-outputs  view.html
+```
+
+- 루트 바로 아래의 `pjt_*` 디렉터리를 찾는다. 산출물이 `pjt_a/task_discovery/` 처럼
+  한 겹 더 들어가 있어도 찾는다. 산출물이 하나도 없는 디렉터리는 건너뛴다.
+- 화면에 부서명을 띄우려면 `scripts/td_view.py`의 `PJT_LABELS`에 `"pjt_a": "부서명"`을
+  적는다. 비워두면 디렉터리명이 그대로 나온다.
+- 실데이터 없이 화면만 확인하려면 가짜 산출물을 만들어 쓴다:
+
+```bash
+python3 scripts/td_demo.py data/task_discovery/demo          # 가짜 8개 pjt 생성
+python3 scripts/td_view.py data/task_discovery/demo demo.html
+```
+
+  `td_demo`는 `td_sources`의 합성 어휘를 쓰고 집계는 `td_aggregate`를 호출한다 —
+  숫자끼리 앞뒤가 맞는다. 파이프라인 검증용이 아니라 **화면 확인용**이다.
 
 - 인자 없이 실행하면 `$TD_OUT_DIR/task_discovery`(없으면 `data/task_discovery`)를 본다.
 - 출력 경로를 두 번째 인자로 줄 수 있다. **`dist/` 아래는 코드가 거부한다**(3절).
