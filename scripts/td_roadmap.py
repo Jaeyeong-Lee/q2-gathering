@@ -1,7 +1,9 @@
 """task-discovery 워크숍 로드맵 매트릭스 (S5-1, #43).
 
-td_cards의 조인 위에 **시간축 × 준비도 매트릭스**를 그린다. 세로축(준비도)은 데이터가
-말한 것이라 고정이고, 가로축(시간)만 워크숍에서 사람이 정한다 — 회고에는 시퀀싱이 없다.
+td_cards의 조인 위에 **시간축 × 역량 확보 매트릭스**를 그린다. 세로축은 갭 비율
+gap/(have+gap)이라 데이터가 정하고(위=미확보), 가로축(시간)만 워크숍에서 사람이 정한다 —
+회고에는 시퀀싱이 없다. 보유·갭 언급이 하나도 없는 카테고리는 축에 놓을 근거가 없어
+축 밖 트랙에 따로 둔다.
 
 투표 대상은 future_task(뭘 할 것인가)와 capability_gap(뭘 언제까지 갖춰야 하는가) 둘뿐이다.
 capability_have·direction은 "언제"라는 질문 자체가 성립하지 않아 배경으로만 쓴다.
@@ -350,11 +352,15 @@ const esc = s => String(s == null ? "" : s)
 const el = (t,a={}) => { const e = document.createElementNS(NS,t);
   for (const k in a) e.setAttribute(k, a[k]); return e; };
 
-const W=900, H=560, M={t:30,r:24,b:48,l:112};
-const PW=W-M.l-M.r, PH=H-M.t-M.b, bandH=PH/3;
-const R_BAND = {"이미 함":0, "갭만 있음":1, "선행 신호":2};   // 아래→위
+const W=900, H=628, M={t:30,r:24,b:116,l:112};
+const PW=W-M.l-M.r, PH=H-M.t-M.b;
+const LANE_T = M.t+PH+30, LANE_H = 50;      // 축 밖 트랙 — 판정 불가
 const cx = b => M.l + PW*(BANDS.indexOf(b) + 0.5)/3;
-const cyOf = r => M.t + PH - ((R_BAND[r] ?? 1) + 0.5)*bandH;
+
+// 세로축 = 갭 비율. 위로 갈수록 미확보. 언급이 하나도 없으면 축 위에 놓을 근거가 없다.
+const ratioOf = n => (n.have + n.gap) ? n.gap/(n.have + n.gap) : null;
+const cyOf = n => ratioOf(n) === null ? LANE_T + LANE_H/2 : M.t + PH*(1 - ratioOf(n));
+const hueOf = n => ratioOf(n) === null ? "--dim" : (READINESS[n.readiness] || "--dim");
 const rad = p => 9 + Math.sqrt(Math.max(p,1))*3.2;
 const alpha = n => 0.32 + 0.5*((n.pjt_spread/3) + (n.cl_spread/3))/2;
 
@@ -370,7 +376,7 @@ let mode = "matrix", curCat = null;
 const F = {pjt:"", cl:""};
 // placed: 카드 id -> 밴드. 초안과 다른 것만 담는다(비어 있으면 전부 초안 상태).
 const placed = {};
-const state = DATA.nodes.map(n => ({...n, x:n.draft_band, y:cyOf(n.readiness), r:rad(n.people)}));
+const state = DATA.nodes.map(n => ({...n, x:n.draft_band, y:cyOf(n), r:rad(n.people)}));
 const byName = Object.fromEntries(state.map(s => [s.name, s]));
 
 const bandOf = c => placed[c.id] || c.draft_band;   // 식별은 id — text는 유일하지 않다
@@ -412,10 +418,11 @@ let BADNOW = new Set(DATA.violations);
 
 // 같은 칸에 겹친 버블을 세로로만 밀어낸다 — 가로는 시간축이라 건드리면 뜻이 바뀐다.
 function relax(){
-  for (const b of [0,1,2]) {
-    const g = state.filter(s => (R_BAND[s.readiness] ?? 1) === b);
-    const lo = M.t + PH - (b+1)*bandH + 13, hi = M.t + PH - b*bandH - 13;
-    g.forEach(s => { s.y = cyOf(s.readiness); });
+  const zones = [[state.filter(s => ratioOf(s) !== null), M.t, M.t+PH],
+                 [state.filter(s => ratioOf(s) === null), LANE_T, LANE_T+LANE_H]];
+  for (const [g, top, bot] of zones) {
+    const lo = top + 13, hi = bot - 13;
+    g.forEach(s => { s.y = cyOf(s); });
     for (let it=0; it<80; it++) {
       let moved = false;
       for (let i=0;i<g.length;i++) for (let j=i+1;j<g.length;j++) {
@@ -443,33 +450,39 @@ function draw(){
   svg.appendChild(defs);
 
   if (show.quad) {
-    svg.appendChild(el("rect",{x:M.l, y:M.t+PH-2*bandH, width:PW/3, height:bandH,
+    svg.appendChild(el("rect",{x:M.l, y:M.t, width:PW/3, height:PH/2,
       fill:css("--warn"), "fill-opacity":.055}));
-    svg.appendChild(el("rect",{x:M.l+PW*2/3, y:M.t, width:PW/3, height:bandH,
+    svg.appendChild(el("rect",{x:M.l+PW*2/3, y:M.t, width:PW/3, height:PH/2,
       fill:css("--seed"), "fill-opacity":.06}));
     const tag = (x,y,t,c) => { const n = el("text",{x, y, "font-size":10.5, fill:c,
       "font-weight":700}); n.textContent = t; svg.appendChild(n); };
-    tag(M.l+9, M.t+PH-2*bandH+16, "위험 구역 — 급한데 역량이 없다", css("--warn"));
-    tag(M.l+PW*2/3+9, M.t+16, "씨앗 — 지금 투자 결정", css("--seed"));
+    tag(M.l+9, M.t+16, "위험 구역 — 급한데 역량이 없다", css("--warn"));
+    tag(M.l+PW*2/3+9, M.t+PH/2-8, "씨앗 — 지금 투자 결정", css("--seed"));
   }
 
-  for (let i=0;i<=3;i++) {
+  for (let i=0;i<=3;i++)
     svg.appendChild(el("line",{x1:M.l+PW*i/3, y1:M.t, x2:M.l+PW*i/3, y2:M.t+PH,
       stroke:css("--line"), "stroke-width":1}));
-    svg.appendChild(el("line",{x1:M.l, y1:M.t+PH*i/3, x2:M.l+PW, y2:M.t+PH*i/3,
-      stroke:css("--line"), "stroke-width":1}));
-  }
+  [0, .5, 1].forEach(f => svg.appendChild(el("line",{x1:M.l, y1:M.t+PH*f, x2:M.l+PW, y2:M.t+PH*f,
+    stroke:css("--line"), "stroke-width":1, "stroke-dasharray": f === .5 ? "4 4" : ""})));
+
+  // 축 밖 트랙 — 판과 떼어 놓는다. 여기 있는 것은 위아래 어느 쪽도 아니다.
+  svg.appendChild(el("rect",{x:M.l, y:LANE_T, width:PW, height:LANE_H, fill:css("--line"),
+    "fill-opacity":.22, rx:4}));
   BANDS.forEach((b,i) => { const n = el("text",{x:M.l+PW*(i+0.5)/3, y:M.t+PH+21,
     "text-anchor":"middle", "font-size":12, fill:css("--dim"), "font-weight":600});
     n.textContent = b; svg.appendChild(n); });
-  Object.entries(R_BAND).forEach(([r,i]) => { const n = el("text",{x:M.l-12,
-    y:M.t+PH-(i+0.5)*bandH+4, "text-anchor":"end", "font-size":12,
-    fill:css(READINESS[r]), "font-weight":650}); n.textContent = r; svg.appendChild(n); });
+  const ylab = (y,t,c,w) => { const n = el("text",{x:M.l-12, y, "text-anchor":"end",
+    "font-size":12, fill:c, "font-weight":w||650}); n.textContent = t; svg.appendChild(n); };
+  ylab(M.t+14, "미확보", css("--gapc"));
+  ylab(M.t+PH/2+4, "반반", css("--dim"), 500);
+  ylab(M.t+PH-4, "확보", css("--ready"));
+  ylab(LANE_T+LANE_H/2+4, "축 밖 · 판정 불가", css("--dim"), 600);
   const ax = (x,y,t,rot) => { const n = el("text",{x, y, "font-size":11, fill:css("--dim"),
     "text-anchor":"middle"}); if (rot) n.setAttribute("transform", `rotate(-90 ${x} ${y})`);
     n.textContent = t; svg.appendChild(n); };
   ax(M.l+PW/2, H-10, "언제 할 것인가  —  워크숍에서 정한다");
-  ax(18, M.t+PH/2, "준비도  —  데이터가 말한 것 (고정)", true);
+  ax(18, M.t+PH/2, "역량 확보  —  데이터가 말한 것 (고정)", true);
 
   if (show.rel) for (const e of DATA.edges) {
     const a = byName[e.from], b = byName[e.to];
@@ -484,8 +497,8 @@ function draw(){
     const bad = show.bad && (BY_CAT[s.name] || []).some(c => BADNOW.has(c.id));
     const g = el("g",{class:"node" + (sel === s.name ? " sel" : "")});
     g.appendChild(el("circle",{cx:cx(s.x), cy:s.y, r:s.r,
-      fill:css(READINESS[s.readiness] || "--dim"), "fill-opacity":alpha(s),
-      stroke: bad ? css("--warn") : css(READINESS[s.readiness] || "--dim"),
+      fill:css(hueOf(s)), "fill-opacity":alpha(s),
+      stroke: bad ? css("--warn") : css(hueOf(s)),
       "stroke-width": bad ? 2.4 : 1.2,
       "stroke-dasharray": bad ? "4 2" : ""}));
     const words = s.name.split(" ");
@@ -516,8 +529,9 @@ function side(s){
       <div><b>${s.have}</b>보유 언급</div>
       <div><b>${s.gap}</b>갭 언급</div>
     </div>
-    ${s.capability_silent ? `<div class="note">보유·갭 언급이 하나도 없다.
-      준비도 "${esc(s.readiness)}"는 보유가 우세해서가 아니라 역량 언급이 없어서 나온 값이다.</div>` : ``}
+    ${s.capability_silent ? `<div class="note">보유·갭 언급이 하나도 없어 세로축에 놓을 근거가 없다 —
+      축 밖 트랙에 두었다. 집계의 준비도 "${esc(s.readiness)}"는 보유가 우세해서가 아니라
+      역량 언급이 없어서 나온 값이므로 확보로 읽지 말 것.</div>` : ``}
     ${s.horizon_known ? `` : `<div class="note">미래과제가 없어 시간축 초안을 계산할 근거가 없다 —
       가운데에 놓았다.</div>`}
     ${groups.map(([a,g]) => g.length ? `<div class="lbl">${AX_LABEL[a]} ${g.length}건</div>
