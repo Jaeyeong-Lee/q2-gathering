@@ -24,7 +24,7 @@
   /* ── 페이지 — 화면에 한 장씩, 뷰포트에 맞춰 축소 ── */
   .deck{position:fixed;inset:0;overflow:hidden;background:var(--paper)}
   /* 그리드 가운데 정렬은 판이 뷰포트보다 넓을 때 시작 쪽으로 밀린다 — 절대 위치로 잡는다 */
-  .pages{position:absolute;left:50%;top:50%;width:1180px;height:664px;
+  .pages{position:absolute;left:50%;top:50%;width:1280px;height:720px;
          transform:translate(-50%,-50%) scale(var(--k,1))}
   .page{position:absolute;inset:0;background:var(--paper);
         padding:44px 52px 40px;display:flex;flex-direction:column;
@@ -532,10 +532,10 @@ text는 quote의 복사가 아니라 서술이어야 한다.</span>
     go(e.clientX < innerWidth / 4 ? i - 1 : i + 1);
   });
 
-  // 1180x664 고정 판을 뷰포트에 꽉 맞춘다 — 짧은 쪽 기준, 확대도 한다
+  // 1280x720 고정 판을 뷰포트에 꽉 맞춘다 — 짧은 쪽 기준, 확대도 한다
   function fit(){
     document.documentElement.style.setProperty(
-      '--k', Math.min(innerWidth / 1180, innerHeight / 664));
+      '--k', Math.min(innerWidth / 1280, innerHeight / 720));
   }
   addEventListener('resize', fit); fit();
 
