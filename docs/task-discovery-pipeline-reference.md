@@ -80,7 +80,7 @@ aggregates.json             카테고리별 숫자
 
     "future_task": [
       { "text": "대상·방법·이유를 담은 서술", "horizon": "단기|장기|불명",
-        "quotes": ["원문 발췌"] }
+        "ax_mentioned": true, "quotes": ["원문 발췌"] }
     ],
     "capability_have": [ { "text": "...", "quotes": ["..."] } ],
     "capability_gap":  [ { "text": "...", "quotes": ["..."] } ]
@@ -91,6 +91,8 @@ aggregates.json             카테고리별 숫자
 **핵심 규칙**
 
 - **4축**: `future_task` / `capability_have` / `capability_gap`(리스트) + `direction`(단수 또는 `null`)
+- `ax_mentioned`는 **`future_task`에만** 붙는다. LLM이 아니라 코드가 `quotes`에서 AX 표현을 관찰해
+  붙이는 사실이지 "진짜 AX 과제냐"는 판정이 아니다 — 실체 판정은 워크숍 몫. 근거: `docs/adr/0001-…`
 - `quotes`는 **원문에서 글자 그대로**. 공백·개행 제거 후 대조(`quote_in_source`)해서 통과 못 하면 그 항목을 버린다.
 - `text`가 `quotes`의 단순 복사면 거부(`text_is_copy_of_quotes`) — 서술이어야 한다.
 - **무내용 문서**는 `signal_present: false` + 모든 축 비움. 억지 분류하지 않는다.

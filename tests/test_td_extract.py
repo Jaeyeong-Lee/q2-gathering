@@ -107,3 +107,31 @@ def test_batch_continues_when_one_person_hard_fails(tmp_path):
     assert ids == [1, 3]  # 2번은 폐기, 배치는 계속
     assert summary["failed"] == [2]
     assert json.loads(out.read_text(encoding="utf-8"))  # 즉시 영속화됨
+
+
+def test_ax_mentioned_tags_tasks_from_quotes_only():
+    """태그는 원문 인용에 AX 표현이 있을 때만 붙는다 — text가 아니라 quotes를 본다."""
+    src = "AX 기반 Yield 최적화를 하고 싶다. 그리고 Fail 분석 시간을 줄이겠다."
+    call = _resp(future_task=[
+        {"text": "수율을 개선한다", "horizon": "장기", "quotes": ["AX 기반 Yield 최적화"]},
+        # text에 AI가 들어가도 인용에 없으면 안 붙는다 (근거 없는 태그 방지)
+        {"text": "AI로 분석 시간을 줄인다", "horizon": "단기", "quotes": ["Fail 분석 시간을 줄이"]},
+    ])
+    person, dropped = td_extract.extract_person(_doc(text=src), call, sleep=NOOP)
+    assert not dropped
+    assert [t["ax_mentioned"] for t in person["future_task"]] == [True, False]
+
+
+def test_ax_regex_ignores_latin_substrings():
+    """FAIL·MAIN 안의 'AI'를 잡으면 태그가 전부 True가 된다."""
+    assert not td_extract._AX_RE.search("FAIL 분석과 MAIN 로직")
+    assert td_extract._AX_RE.search("AI/ML 기반")
+    assert td_extract._AX_RE.search("머신러닝 모델")
+
+
+def test_ax_mentioned_not_added_to_capability_axes():
+    """역량 축엔 붙이지 않는다 — 소비처가 없다."""
+    call = _resp(capability_gap=[{"text": "AI 역량이 필요하다는 뜻",
+                                  "quotes": ["파이썬 데이터 분석 역량이 필요"]}])
+    person, _ = td_extract.extract_person(_doc(), call, sleep=NOOP)
+    assert "ax_mentioned" not in person["capability_gap"][0]

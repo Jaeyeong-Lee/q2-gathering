@@ -1,7 +1,7 @@
 """task-discovery 스테이지 1: facet 추출 (S1-2, #16).
 
 sources.json → extracted.json. 사람 단위로 signal_present + 4축을 뽑는다:
-  future_task[] (horizon 포함) / capability_have[] / capability_gap[] / direction(단수)
+  future_task[] (horizon·ax_mentioned 포함) / capability_have[] / capability_gap[] / direction(단수)
 각 항목은 text·quotes[]. 무내용 문서는 signal_present=false + 빈 축.
 
 인용검증·재시도는 td_common 공유 헬퍼 재사용. 검증 실패는 재시도를 유발하고,
@@ -9,6 +9,7 @@ sources.json → extracted.json. 사람 단위로 signal_present + 4축을 뽑�
 LLM은 call(prompt)->str 주입 (tags.py 패턴). llm.py 프로바이더 라우팅과 함께 쓴다.
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -20,6 +21,12 @@ ROOT = Path(__file__).parent.parent
 log = get_logger("td_extract")
 
 LIST_AXES = ("future_task", "capability_have", "capability_gap")
+
+# AX 태그는 **판정이 아니라 관찰**이다 — 원문에 이 표현이 실제로 적혔을 때만 붙는다.
+# "이게 진짜 AX냐"는 LLM이 방어할 수 없는 주관이라 파이프라인이 하지 않는다(confidence를
+# 스키마에서 뺀 것과 같은 이유). 라틴 약어는 앞뒤가 알파벳이면 제외한다 — 그러지 않으면
+# FAIL·MAIN 안의 'AI'가 걸린다.
+_AX_RE = re.compile(r"(?<![A-Za-z])(?:AX|AI|ML)(?![A-Za-z])|머신러닝|딥러닝|인공지능")
 
 _SCHEMA = """JSON 객체로만 답하라. 형식:
 {"signal_present": true/false,
@@ -56,13 +63,30 @@ def _valid_item(item, source):
     return not text_is_copy_of_quotes(item.get("text", ""), quotes)
 
 
+def _ax_mentioned(item):
+    """원문 인용에 AX 표현이 있는가. **text가 아니라 quotes만 본다** — quotes는
+    quote_in_source로 원문 발췌가 보장되지만 text는 LLM이 고쳐 쓴 서술이라, 원문에 없던
+    'AI'가 서술에 끼어들면 근거 없는 태그가 된다.
+
+    한계: 인용이 AX 표현이 없는 다른 문장으로 잡히면 놓친다. 의도된 누락이다 —
+    놓친 쪽은 워크숍에서 사람이 줍는다(시간축을 사람이 채우는 것과 같은 논리).
+    """
+    return any(_AX_RE.search(q) for q in item.get("quotes") or [])
+
+
 def _filter(parsed, source):
     """축별로 유효 항목만 남기고 폐기 항목을 모은다. (clean_axes, direction, dropped)."""
     clean, dropped = {}, []
     for axis in LIST_AXES:
         kept = []
         for item in parsed.get(axis) or []:
-            (kept if _valid_item(item, source) else dropped).append(item)
+            if not _valid_item(item, source):
+                dropped.append(item)
+                continue
+            # 과제에만 붙인다. 역량갭의 AX 여부는 소비처가 없다.
+            if axis == "future_task":
+                item["ax_mentioned"] = _ax_mentioned(item)
+            kept.append(item)
         clean[axis] = kept
     direction = parsed.get("direction")
     if direction is not None and not _valid_item(direction, source):

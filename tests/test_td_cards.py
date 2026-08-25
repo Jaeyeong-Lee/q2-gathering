@@ -178,3 +178,18 @@ def test_card_id_does_not_leak_text():
     persons = [_person(1, future_task=[_task("민감한 내용")])]
     cid = td_cards.build([_a(1, "future_task", "민감한 내용")], persons)[0]["id"]
     assert "민감한" not in cid
+
+
+def test_card_carries_ax_mentioned():
+    """추출이 붙인 태그가 카드까지 온다 — horizon과 같은 복원 경로."""
+    task = {**_task("AX로 자동화한다", "장기"), "ax_mentioned": True}
+    persons = [_person(1, future_task=[task])]
+    cards = td_cards.build([_a(1, "future_task", "AX로 자동화한다")], persons)
+    assert cards[0]["ax_mentioned"] is True
+
+
+def test_ax_mentioned_false_when_origin_missing():
+    """대응 원 항목이 없으면 False — 근거 없이 참이 되면 안 된다."""
+    persons = [_person(1, future_task=[])]
+    cards = td_cards.build([_a(1, "future_task", "상류가 어긋난 배정")], persons)
+    assert cards[0]["ax_mentioned"] is False

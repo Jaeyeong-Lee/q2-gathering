@@ -4,8 +4,8 @@ assignments(어느 카테고리냐) + extracted(누가·어느 조직이냐)를 
 레코드**를 만든다. 렌더링을 전혀 모른다 — td_inspect(탐색기)와 td_roadmap(워크숍)이
 이 위에 각자 화면을 얹는다. 조인을 두 번 구현하면 언젠가 갈라진다.
 
-**horizon을 여기서 함께 싣는다.** 어차피 assignments↔extracted를 잇고 있고 원 항목에
-horizon이 붙어 있으므로 같이 들고 오면 된다. aggregates.json에 넣어봐야 소비자가 없고
+**horizon·ax_mentioned를 여기서 함께 싣는다.** 어차피 assignments↔extracted를 잇고 있고
+원 항목에 둘 다 붙어 있으므로 같이 들고 오면 된다. aggregates.json에 넣어봐야 소비자가 없고
 (render·narrate 둘 다 안 씀) 같은 값을 두 곳에서 계산할 이유가 없다 — td_aggregate는
 건드리지 않는다.
 """
@@ -75,6 +75,9 @@ def build(assignments, persons, *, anonymize=False):
             "text": a["text"],
             "quote": a.get("quote", ""),
             "horizon": (origin or {}).get("horizon"),
+            # 과제 아닌 축·대응 항목 없음은 둘 다 False다. 태그는 "AX라고 적혀 있었다"는
+            # 사실이라, 근거가 없으면 참일 수 없다.
+            "ax_mentioned": bool((origin or {}).get("ax_mentioned")),
         })
     return cards
 
