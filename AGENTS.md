@@ -71,6 +71,10 @@ Full design and vocabulary live in **`docs/task-discovery-coldstart.md`**; artif
 **`docs/task-discovery-pipeline-reference.md`**; internal-network operations in
 **`docs/task-discovery-internal-run-guide.md`**. Anything not here is there.
 
+> **On branch `feat/td-extract-ax-tag`, read `docs/task-discovery-handoff-2026-08-25.md` first.**
+> It changes what you run this time: a new `TD_OUT_DIR`, a filtered `persons.json` (SW only,
+> ~30 people), and a schema field (`ax_mentioned`) that `td_peek` does not yet count.
+
 ```bash
 export TEXT_PROVIDER=internal
 export TEXT_API_KEY=<internal key>
