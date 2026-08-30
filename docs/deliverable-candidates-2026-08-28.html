@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>산출물 후보 10종 — 백지에서</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .lbl { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+  .sk { width: 100%; height: auto; display: block; background: #fbfaf9; }
+  .rule { border-left: 4px solid #0f172a; }
+</style>
+</head>
+<body class="bg-stone-50 text-slate-900">
+<main class="mx-auto max-w-5xl space-y-14 px-6 py-12">
+
+<!-- ─────────────── 헤더 ─────────────── -->
+<header class="border-b border-slate-300 pb-8">
+  <p class="lbl text-slate-500">q2-gathering · 산출물 설계</p>
+  <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
+    <h1 class="font-serif text-4xl leading-tight">백지에서 세어본 산출물 10종</h1>
+    <div class="font-mono text-xs text-slate-500 text-right leading-relaxed">
+      2026-08-28<br />
+      회고 150명 · 임베딩 98명 · 후보 10종
+    </div>
+  </div>
+  <p class="mt-5 max-w-3xl text-slate-700 leading-relaxed">
+    기존 화면(<span class="font-mono text-xs">dist/heritage-archive.html</span>)을 어떻게 고칠지가 아니라,
+    <strong>손에 쥔 원재료로 무엇을 내놓을 수 있는가</strong>를 다시 센 문서다.
+    후보마다 필요한 데이터가 이미 있는지, 계산해야 하는지, 아예 없는지를 붙였다.
+    고르는 건 사람이 한다 — 이 문서는 선택지를 펼치는 데까지만 한다.
+  </p>
+</header>
+
+<!-- ─────────────── 실측 박스 ─────────────── -->
+<section>
+  <p class="lbl text-slate-500">직접 확인한 사실</p>
+  <div class="mt-2 rounded border border-red-400 bg-red-50 p-5">
+    <p class="text-slate-900 leading-relaxed">
+      <strong>두 파이프라인은 같은 <span class="font-mono text-xs">data/persons.json</span>을 읽으면서 접점이 0이다.</strong>
+      <span class="font-mono text-xs">scripts/td_*.py</span> 어디에도
+      <span class="font-mono text-xs">neighbors</span>·<span class="font-mono text-xs">build.py</span>·<span class="font-mono text-xs">heritage-archive</span> 참조가 없고,
+      반대로 <span class="font-mono text-xs">scripts/build.py</span>·<span class="font-mono text-xs">archive/template.html</span>도
+      <span class="font-mono text-xs">taxonomy</span>·<span class="font-mono text-xs">ax_mentioned</span>를 모른다.
+      단위부터 다르다 — 은하수는 <strong>사람 1명 = 노드</strong>, task-discovery는 <strong>facet 1개 = 단위</strong>다.
+    </p>
+    <p class="mt-3 text-slate-700 leading-relaxed">
+      그래서 지금 화면이 답하는 질문은 "누가 누구와 비슷한가" 하나뿐이다.
+      아래 후보 대부분은 없던 데이터를 만드는 게 아니라, <strong>이미 계산돼 있는데 어떤 화면에도 안 나온 것</strong>을 꺼내는 일이다.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────── 원재료 인벤토리 ─────────────── -->
+<section>
+  <p class="lbl text-slate-500">원재료 인벤토리</p>
+  <h2 class="mt-2 font-serif text-2xl">손에 쥔 것</h2>
+  <p class="mt-2 text-slate-700">후보가 허풍인지 아닌지는 여기서 갈린다.</p>
+
+  <div class="mt-5 grid gap-4 md:grid-cols-2">
+    <div class="rounded border border-slate-200 bg-white p-5">
+      <p class="lbl text-emerald-700">이미 만들어져 있음</p>
+      <ul class="mt-3 space-y-2 text-sm text-slate-700">
+        <li><strong>회고 원문 150명분</strong> — <span class="font-mono text-xs">persons.json</span>: <span class="font-mono text-xs">id·name·pjt·cl_level·text</span></li>
+        <li><strong>사람 임베딩</strong> — Gemini, 인당 1벡터. <span class="text-amber-700">98/150명 (쿼터로 중단)</span></li>
+        <li><strong>사람 유사도 top-30</strong> — <span class="font-mono text-xs">neighbors.json</span>, 코사인</li>
+        <li><strong>형태소 명사 빈도</strong> — <span class="font-mono text-xs">freq.json</span>, 인당. 로컬 계산, LLM 0회</li>
+        <li><strong>facet 4축</strong> — <span class="font-mono text-xs">future_task · capability_have · capability_gap · direction</span></li>
+        <li><strong>taxonomy 카테고리</strong> + facet 단위 배정</li>
+        <li><strong>확산도</strong> — <span class="font-mono text-xs">pjt_spread · cl_spread</span></li>
+        <li><strong>AX 언급 태그</strong> — <span class="font-mono text-xs">ax_mentioned</span></li>
+      </ul>
+    </div>
+    <div class="rounded border border-slate-200 bg-white p-5">
+      <p class="lbl text-slate-500">없거나 죽어 있음</p>
+      <ul class="mt-3 space-y-2 text-sm text-slate-700">
+        <li><strong>인물 태그</strong> — <span class="text-red-700">100% 더미.</span> <span class="font-mono text-xs">tags.py</span>의 <span class="font-mono text-xs">consolidate_pool</span> 크래시. 지금 화면의 태그 칩·태그 필터·에고 엣지 라벨 3개 기능이 전부 이 위에 서 있다</li>
+        <li><strong>과제(facet) 좌표</strong> — 임베딩은 <span class="font-mono text-xs">td_index.py</span>에 있으나 2D로 떨군 적 없음. <em>계산 필요</em></li>
+        <li><strong>시간축</strong> — 회고에 없다. <strong>없는 것</strong>. 로드맵의 시퀀싱은 워크숍에서 사람이 채운다</li>
+        <li><strong>중요도·우선순위</strong> — 데이터에 없다. 확산도는 "몇 조직이 말했나"지 "중요하다"가 아니다</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 범례 ─────────────── -->
+<section>
+  <p class="lbl text-slate-500">범례</p>
+  <h2 class="mt-2 font-serif text-2xl">후보 카드 읽는 법</h2>
+  <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded border border-slate-200 bg-white p-4">
+      <svg class="h-10 w-full" viewBox="0 0 120 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="6" fill="#047857" />
+        <text x="36" y="24" font-size="11" fill="#334155" font-family="monospace">있음</text>
+      </svg>
+      <p class="lbl text-emerald-700">데이터 있음</p>
+      <p class="mt-1 text-xs text-slate-600">파일을 읽어 붙이면 끝</p>
+    </div>
+    <div class="rounded border border-slate-200 bg-white p-4">
+      <svg class="h-10 w-full" viewBox="0 0 120 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="6" fill="none" stroke="#334155" stroke-width="2" />
+        <text x="36" y="24" font-size="11" fill="#334155" font-family="monospace">계산</text>
+      </svg>
+      <p class="lbl text-slate-600">계산 필요</p>
+      <p class="mt-1 text-xs text-slate-600">스크립트 한 벌 추가</p>
+    </div>
+    <div class="rounded border border-slate-200 bg-white p-4">
+      <svg class="h-10 w-full" viewBox="0 0 120 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="6" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="3 3" />
+        <text x="36" y="24" font-size="11" fill="#334155" font-family="monospace">해석</text>
+      </svg>
+      <p class="lbl text-amber-700">해석층</p>
+      <p class="mt-1 text-xs text-slate-600">데이터에 없는 걸 그린다. 화면에 그렇게 적어야 한다</p>
+    </div>
+    <div class="rounded border border-slate-200 bg-white p-4">
+      <svg class="h-10 w-full" viewBox="0 0 120 40" aria-hidden="true">
+        <rect x="10" y="12" width="18" height="16" rx="2" fill="#0f172a" />
+        <rect x="32" y="12" width="18" height="16" rx="2" fill="#94a3b8" />
+        <rect x="54" y="12" width="18" height="16" rx="2" fill="#e2e8f0" />
+        <text x="80" y="24" font-size="11" fill="#334155" font-family="monospace">S M L</text>
+      </svg>
+      <p class="lbl text-slate-600">비용</p>
+      <p class="mt-1 text-xs text-slate-600">S=수십 줄 · M=화면 한 벌 · L=파이프라인+화면</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 후보 카드 ─────────────── -->
+<section class="space-y-10">
+  <div>
+    <p class="lbl text-slate-500">후보</p>
+    <h2 class="mt-2 font-serif text-3xl">산출물 10종</h2>
+    <p class="mt-2 max-w-3xl text-slate-700">각 카드는 <strong>답하는 질문 하나</strong>로 정의된다. 질문이 겹치는 후보는 둘 중 하나만 만들면 된다.</p>
+  </div>
+
+  <!-- A -->
+  <article id="c-a" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">A · 은하수 — 사람 지도</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-emerald-50 px-2 py-1 text-emerald-800 border border-emerald-200">데이터 있음</span>
+        <span class="lbl rounded bg-slate-900 px-2 py-1 text-white">S</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">archive/template.html · scripts/build.py — 이미 존재, 유일하게 완성된 산출물</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="사람 노드가 팀별로 뭉친 네트워크 스케치">
+          <g stroke="#cbd5e1" stroke-width=".8">
+            <path d="M60 50 L90 70 M90 70 L70 100 M90 70 L120 55 M120 55 L150 80 M150 80 L190 60 M190 60 L225 85 M225 85 L200 115 M150 80 L145 120 M70 100 L110 118" />
+          </g>
+          <g fill="#0f172a">
+            <circle cx="60" cy="50" r="4" /><circle cx="90" cy="70" r="6" /><circle cx="70" cy="100" r="4" /><circle cx="110" cy="118" r="3.5" />
+          </g>
+          <g fill="#64748b">
+            <circle cx="120" cy="55" r="4" /><circle cx="150" cy="80" r="7" /><circle cx="145" cy="120" r="4" />
+          </g>
+          <g fill="#94a3b8">
+            <circle cx="190" cy="60" r="5" /><circle cx="225" cy="85" r="4" /><circle cx="200" cy="115" r="3.5" />
+          </g>
+          <text x="62" y="138" font-size="8" fill="#94a3b8" font-family="monospace">팀 A</text>
+          <text x="140" y="145" font-size="8" fill="#94a3b8" font-family="monospace">팀 B</text>
+          <text x="200" y="138" font-size="8" fill="#94a3b8" font-family="monospace">팀 C</text>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>누가 누구와 비슷한 얘기를 썼나.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span>회고 원문 임베딩 코사인 top-30. 형태소 빈도(워드클라우드).</p>
+        <p><span class="lbl text-slate-500 block">한계</span>색이 <span class="font-mono text-xs">pjt</span>(팀)라 <strong>조직도와 같은 정보</strong>다. 비슷하다는 것만 말하고 무엇에 대해 비슷한지는 말하지 않는다. 실 코사인이 0.93~0.97에 몰려 별들이 중앙으로 뭉치는 문제가 미해결(<span class="font-mono text-xs">todos/009</span> 1항).</p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>발표회 · 상시</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- B -->
+  <article id="c-b" class="rounded border-2 border-slate-900 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">B · 성좌 — 주제 지도</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-slate-100 px-2 py-1 text-slate-700 border border-slate-300">계산 필요</span>
+        <span class="lbl rounded bg-slate-500 px-2 py-1 text-white">M</span>
+        <span class="lbl rounded bg-emerald-600 px-2 py-1 text-white">Strong</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">td_index.py(facet 임베딩 있음) → 2D 투영 필요 · 화면 한 벌</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="과제 노드가 주제별로 묶이고 성좌 선으로 연결된 스케치">
+          <g stroke="#94a3b8" stroke-width=".9" stroke-dasharray="2 2" fill="none">
+            <path d="M45 45 L75 35 L95 60 L70 78 Z" />
+            <path d="M155 50 L185 40 L205 65 L175 80 Z" />
+            <path d="M105 110 L140 100 L155 128 L118 135 Z" />
+          </g>
+          <g fill="#0f172a">
+            <circle cx="45" cy="45" r="3" /><circle cx="75" cy="35" r="5" /><circle cx="95" cy="60" r="3.5" /><circle cx="70" cy="78" r="3" />
+            <circle cx="155" cy="50" r="3.5" /><circle cx="185" cy="40" r="6" /><circle cx="205" cy="65" r="3" /><circle cx="175" cy="80" r="4" />
+            <circle cx="105" cy="110" r="3" /><circle cx="140" cy="100" r="4.5" /><circle cx="155" cy="128" r="3" /><circle cx="118" cy="135" r="3" />
+          </g>
+          <circle cx="255" cy="105" r="2.5" fill="#0f172a" />
+          <text x="40" y="22" font-size="9" fill="#334155" font-family="monospace">카테고리 α</text>
+          <text x="152" y="26" font-size="9" fill="#334155" font-family="monospace">카테고리 β</text>
+          <text x="100" y="152" font-size="9" fill="#334155" font-family="monospace">카테고리 γ</text>
+          <text x="234" y="126" font-size="8" fill="#94a3b8" font-family="monospace">외톨이</text>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>우리가 <strong>무엇을</strong> 말했나. 어떤 주제가 여러 팀에서 동시에 나왔나.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span>별 = facet(과제) 1개. 묶음 = taxonomy 카테고리. 크기 = 확산도(<span class="font-mono text-xs">pjt_spread</span>). 전부 이미 계산돼 있고, 없는 건 <strong>2D 좌표 하나</strong>다.</p>
+        <p><span class="lbl text-slate-500 block">왜 센가</span>A가 못 넘는 벽을 정확히 넘는다. 별이 사람이면 팀 색이 조직도를 반복하지만, 별이 과제면 <strong>팀을 가로질러 같은 말을 한 사람들</strong>이 한 성좌에 모인다. "우리 팀만의 문제가 아니다"가 그림 한 장이 된다.</p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>발표회 · 워크숍 · 상시 — 셋 다</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- C -->
+  <article id="c-c" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">C · 빈 하늘 — 공백 지도</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-amber-50 px-2 py-1 text-amber-800 border border-amber-200">해석층</span>
+        <span class="lbl rounded bg-slate-900 px-2 py-1 text-white">S</span>
+        <span class="lbl rounded bg-emerald-600 px-2 py-1 text-white">Strong</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">B와 같은 좌표계 · 같은 화면의 뒷면</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="별이 몰린 영역과 비어 있는 영역을 점선 원으로 표시한 스케치">
+          <g fill="#cbd5e1">
+            <circle cx="55" cy="50" r="3" /><circle cx="72" cy="38" r="4" /><circle cx="88" cy="58" r="3" /><circle cx="65" cy="72" r="3" /><circle cx="95" cy="42" r="2.5" />
+            <circle cx="175" cy="45" r="3.5" /><circle cx="195" cy="60" r="3" /><circle cx="188" cy="34" r="2.5" />
+          </g>
+          <circle cx="150" cy="115" r="30" fill="none" stroke="#b45309" stroke-width="1.4" stroke-dasharray="4 3" />
+          <circle cx="150" cy="115" r="2" fill="#b45309" />
+          <text x="118" y="152" font-size="9" fill="#b45309" font-family="monospace">1명만 말함</text>
+          <circle cx="240" cy="55" r="24" fill="none" stroke="#b45309" stroke-width="1.4" stroke-dasharray="4 3" />
+          <text x="214" y="92" font-size="9" fill="#b45309" font-family="monospace">아무도 안 함</text>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>우리가 <strong>안 보고 있는 방향</strong>은 어디인가.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span><span class="font-mono text-xs">capability_gap</span> + 확산도. 확산도 1인 카테고리, 배정 facet이 극소인 영역을 흐리게 표시.</p>
+        <div class="rounded border border-amber-300 bg-amber-50 p-3">
+          <p class="lbl text-amber-800">기존 결정과 충돌</p>
+          <p class="mt-1 text-slate-800"><span class="font-mono text-xs">CONTEXT.md</span>는 "로드맵을 만들지 않는다 — 시간축·시퀀싱·전략은 데이터에 없고 워크숍에서 사람이 채운다"고 못 박았다. 빈 하늘은 <strong>없는 것을 그리는</strong> 화면이라 이 선에 제일 가깝다. <strong>코드가 아니라 화면 문구로 지켜야 한다</strong> — "안 나온 영역"이지 "안 중요한 영역"이 아니라고 화면에 적는다.</p>
+        </div>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>워크숍 · 발표회</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- D -->
+  <article id="c-d" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">D · 개인 별자리 카드</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-emerald-50 px-2 py-1 text-emerald-800 border border-emerald-200">데이터 있음</span>
+        <span class="lbl rounded bg-slate-900 px-2 py-1 text-white">S</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">기존 딥링크 #ego=&lt;id&gt; 재사용 · 상세 패널 확장</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="한 사람 중심의 궤도 뷰와 그 사람 과제 목록 카드">
+          <rect x="12" y="14" width="150" height="132" rx="4" fill="#fff" stroke="#e2e8f0" />
+          <circle cx="87" cy="72" r="9" fill="#0f172a" />
+          <g stroke="#cbd5e1" stroke-width=".8" fill="none"><circle cx="87" cy="72" r="34" /><circle cx="87" cy="72" r="52" /></g>
+          <g fill="#64748b"><circle cx="112" cy="50" r="4" /><circle cx="58" cy="92" r="4" /><circle cx="121" cy="88" r="3.5" /><circle cx="62" cy="46" r="3" /><circle cx="87" cy="124" r="3.5" /><circle cx="38" cy="66" r="3" /></g>
+          <rect x="174" y="14" width="114" height="132" rx="4" fill="#fff" stroke="#e2e8f0" />
+          <text x="184" y="32" font-size="8" fill="#94a3b8" font-family="monospace">내가 말한 과제</text>
+          <g fill="#e2e8f0"><rect x="184" y="40" width="94" height="9" rx="2" /><rect x="184" y="55" width="80" height="9" rx="2" /><rect x="184" y="70" width="88" height="9" rx="2" /></g>
+          <text x="184" y="98" font-size="8" fill="#94a3b8" font-family="monospace">비어 있다고 쓴 것</text>
+          <g fill="#e2e8f0"><rect x="184" y="106" width="72" height="9" rx="2" /><rect x="184" y="121" width="90" height="9" rx="2" /></g>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>내 회고는 이 지도 어디에 놓였고, 나와 같은 생각을 한 사람은 누구인가.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span>기존 에고 뷰 + 그 사람의 facet 카드(4축)를 붙인다. 원문 → 뽑아낸 과제가 한 화면에 나란히.</p>
+        <p><span class="lbl text-slate-500 block">왜 센가</span>상시 페이지의 <strong>재방문 동기</strong>다. 150명에게 각자의 링크가 생기면 발표 다음 날에도 열린다. 동시에 파이프라인 검증도 된다 — 본인이 자기 카드를 보고 "이건 내가 한 말이 아닌데"를 잡아낸다.</p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>상시</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- E -->
+  <article id="c-e" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">E · 부서 단면 — 팀 × 주제</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-emerald-50 px-2 py-1 text-emerald-800 border border-emerald-200">데이터 있음</span>
+        <span class="lbl rounded bg-slate-900 px-2 py-1 text-white">S</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">aggregates 수준의 집계 · 표 한 장</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="팀을 행, 카테고리를 열로 둔 히트맵 격자 스케치">
+          <g font-size="8" fill="#94a3b8" font-family="monospace">
+            <text x="14" y="34">팀 A</text><text x="14" y="58">팀 B</text><text x="14" y="82">팀 C</text><text x="14" y="106">팀 D</text><text x="14" y="130">팀 E</text>
+            <text x="52" y="18">α</text><text x="92" y="18">β</text><text x="132" y="18">γ</text><text x="172" y="18">δ</text><text x="212" y="18">ε</text><text x="252" y="18">ζ</text>
+          </g>
+          <g>
+            <rect x="46" y="24" width="30" height="16" fill="#0f172a" /><rect x="86" y="24" width="30" height="16" fill="#cbd5e1" /><rect x="126" y="24" width="30" height="16" fill="#e2e8f0" /><rect x="166" y="24" width="30" height="16" fill="#64748b" /><rect x="206" y="24" width="30" height="16" fill="#f1f5f9" /><rect x="246" y="24" width="30" height="16" fill="#e2e8f0" />
+            <rect x="46" y="48" width="30" height="16" fill="#94a3b8" /><rect x="86" y="48" width="30" height="16" fill="#0f172a" /><rect x="126" y="48" width="30" height="16" fill="#e2e8f0" /><rect x="166" y="48" width="30" height="16" fill="#f1f5f9" /><rect x="206" y="48" width="30" height="16" fill="#cbd5e1" /><rect x="246" y="48" width="30" height="16" fill="#f1f5f9" />
+            <rect x="46" y="72" width="30" height="16" fill="#e2e8f0" /><rect x="86" y="72" width="30" height="16" fill="#64748b" /><rect x="126" y="72" width="30" height="16" fill="#0f172a" /><rect x="166" y="72" width="30" height="16" fill="#cbd5e1" /><rect x="206" y="72" width="30" height="16" fill="#f1f5f9" /><rect x="246" y="72" width="30" height="16" fill="#e2e8f0" />
+            <rect x="46" y="96" width="30" height="16" fill="#f1f5f9" /><rect x="86" y="96" width="30" height="16" fill="#e2e8f0" /><rect x="126" y="96" width="30" height="16" fill="#94a3b8" /><rect x="166" y="96" width="30" height="16" fill="#0f172a" /><rect x="206" y="96" width="30" height="16" fill="#e2e8f0" /><rect x="246" y="96" width="30" height="16" fill="#f1f5f9" />
+            <rect x="46" y="120" width="30" height="16" fill="#e2e8f0" /><rect x="86" y="120" width="30" height="16" fill="#f1f5f9" /><rect x="126" y="120" width="30" height="16" fill="#cbd5e1" /><rect x="166" y="120" width="30" height="16" fill="#e2e8f0" /><rect x="206" y="120" width="30" height="16" fill="#0f172a" /><rect x="246" y="120" width="30" height="16" fill="#94a3b8" />
+          </g>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>팀마다 무엇이 다른가. 어떤 주제가 <strong>전 팀에 걸쳐</strong> 나왔나.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span>facet × 카테고리 배정을 <span class="font-mono text-xs">pjt</span>로 집계. 지도가 아니라 <strong>표</strong>라서 제일 빨리 만들고 제일 정확하게 읽힌다.</p>
+        <p><span class="lbl text-slate-500 block">주의</span>가로줄(전 팀 진한 칸)은 "우리 모두의 문제", 세로 한 칸만 진한 건 "그 팀만의 문제". <strong>이 두 줄 읽는 법을 화면에 적어야</strong> 히트맵이 장식이 안 된다.</p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>워크숍 · 상시</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- F -->
+  <article id="c-f" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">F · AX 렌즈</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-emerald-50 px-2 py-1 text-emerald-800 border border-emerald-200">데이터 있음</span>
+        <span class="lbl rounded bg-slate-900 px-2 py-1 text-white">S</span>
+        <span class="lbl rounded bg-emerald-600 px-2 py-1 text-white">Strong</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">ax_mentioned — 카드까지 실려 있으나 어떤 화면에도 안 나옴</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="대부분의 별은 흐리고 일부만 밝게 점등된 스케치">
+          <g fill="#e2e8f0">
+            <circle cx="45" cy="45" r="3" /><circle cx="95" cy="60" r="3.5" /><circle cx="70" cy="78" r="3" /><circle cx="155" cy="50" r="3.5" /><circle cx="205" cy="65" r="3" /><circle cx="105" cy="110" r="3" /><circle cx="155" cy="128" r="3" /><circle cx="118" cy="135" r="3" /><circle cx="60" cy="115" r="3" /><circle cx="245" cy="110" r="3" /><circle cx="230" cy="35" r="3" /><circle cx="180" cy="100" r="3" />
+          </g>
+          <g fill="#0f172a">
+            <circle cx="75" cy="35" r="5" /><circle cx="185" cy="40" r="6" /><circle cx="140" cy="100" r="5" /><circle cx="255" cy="75" r="4" />
+          </g>
+          <g stroke="#0f172a" stroke-width=".7" fill="none" opacity=".35">
+            <circle cx="75" cy="35" r="11" /><circle cx="185" cy="40" r="12" /><circle cx="140" cy="100" r="11" /><circle cx="255" cy="75" r="10" />
+          </g>
+          <text x="16" y="152" font-size="9" fill="#334155" font-family="monospace">AX를 실제로 입에 올린 자리만 점등</text>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>"AI로 하겠다"는 말이 <strong>어디에서</strong> 나왔나. 한 팀에 몰려 있나, 전 부서에 흩어져 있나.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span><span class="font-mono text-xs">ax_mentioned</span> 하나. A든 B든 <strong>기존 지도 위에 얹는 렌즈</strong>라 화면을 새로 만들지 않는다.</p>
+        <div class="rounded border border-amber-300 bg-amber-50 p-3">
+          <p class="lbl text-amber-800">문구를 틀리면 안 되는 지점</p>
+          <p class="mt-1 text-slate-800"><span class="font-mono text-xs">CONTEXT.md</span> 정의상 <span class="font-mono text-xs">ax_mentioned</span>는 <strong>"원문에 AX 표현이 적혀 있었다"는 관찰</strong>이지 "이게 진짜 AX 과제다"라는 판정이 아니다. 화면 라벨을 "AX 과제"로 쓰면 그 선을 넘는다. <strong>"AX를 언급한"</strong>으로 쓴다.</p>
+        </div>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>발표회 — 아무도 아직 못 본 그림이라 가장 새롭다</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- G -->
+  <article id="c-g" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">G · 워크숍 보드</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-slate-100 px-2 py-1 text-slate-700 border border-slate-300">계산 필요</span>
+        <span class="lbl rounded bg-slate-500 px-2 py-1 text-white">M</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">scripts/workshop_server.py · td_roadmap.py — 부분적으로 이미 있음</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="사분면 위에 카드를 옮겨 배치하는 보드 스케치">
+          <line x1="150" y1="16" x2="150" y2="144" stroke="#cbd5e1" stroke-width="1" />
+          <line x1="24" y1="80" x2="284" y2="80" stroke="#cbd5e1" stroke-width="1" />
+          <g fill="#fff" stroke="#0f172a" stroke-width="1">
+            <rect x="46" y="30" width="46" height="22" rx="3" /><rect x="96" y="46" width="46" height="22" rx="3" />
+            <rect x="176" y="26" width="46" height="22" rx="3" /><rect x="212" y="52" width="46" height="22" rx="3" />
+            <rect x="60" y="96" width="46" height="22" rx="3" />
+          </g>
+          <g fill="#e2e8f0">
+            <rect x="52" y="37" width="30" height="3" /><rect x="102" y="53" width="30" height="3" /><rect x="182" y="33" width="30" height="3" /><rect x="218" y="59" width="30" height="3" /><rect x="66" y="103" width="30" height="3" />
+          </g>
+          <g stroke="#b45309" stroke-width="1.2" stroke-dasharray="3 2" fill="none"><rect x="188" y="96" width="48" height="24" rx="3" /></g>
+          <text x="192" y="134" font-size="8" fill="#b45309" font-family="monospace">여기로 끌기</text>
+          <text x="26" y="26" font-size="8" fill="#94a3b8" font-family="monospace">축 1 →</text>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>없다 — 이건 <strong>답을 사람이 쓰는 화면</strong>이다. 파이프라인이 카드를 놓고, 순위는 워크숍에서 사람이 정한다.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span>facet 카드 + 카테고리. 축 정의는 <span class="font-mono text-xs">docs/task-discovery-roadmap-mockup-2026-08-12.html</span>에 이미 목업이 있다.</p>
+        <p><span class="lbl text-slate-500 block">한계</span>발표회용이 아니다. 무대에서 15명이 동시에 카드를 끄는 그림은 안 나온다. <strong>워크숍 전용</strong>으로 잡아야 설계가 단순해진다.</p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>워크숍</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- H -->
+  <article id="c-h" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">H · 발표 항해</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-emerald-50 px-2 py-1 text-emerald-800 border border-emerald-200">데이터 있음</span>
+        <span class="lbl rounded bg-slate-900 px-2 py-1 text-white">S</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">기존 딥링크 #ego= · #view= 시퀀스를 자동 재생</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="네 장면이 화살표로 이어진 필름스트립 스케치">
+          <g fill="#fff" stroke="#e2e8f0"><rect x="14" y="40" width="56" height="46" rx="3" /><rect x="88" y="40" width="56" height="46" rx="3" /><rect x="162" y="40" width="56" height="46" rx="3" /><rect x="236" y="40" width="52" height="46" rx="3" /></g>
+          <g fill="#cbd5e1"><circle cx="30" cy="58" r="3" /><circle cx="46" cy="70" r="3" /><circle cx="56" cy="54" r="3" /></g>
+          <g fill="#0f172a"><circle cx="116" cy="63" r="7" /></g>
+          <g fill="#cbd5e1"><circle cx="102" cy="52" r="2.5" /><circle cx="132" cy="76" r="2.5" /></g>
+          <g fill="#e2e8f0"><rect x="170" y="50" width="40" height="6" /><rect x="170" y="62" width="30" height="6" /><rect x="170" y="74" width="36" height="6" /></g>
+          <g fill="#0f172a"><circle cx="252" cy="55" r="4" /><circle cx="270" cy="70" r="4" /></g>
+          <g stroke="#94a3b8" stroke-width="1" fill="none" marker-end="url(#ah)">
+            <path d="M72 63 L86 63" /><path d="M146 63 L160 63" /><path d="M220 63 L234 63" />
+          </g>
+          <defs><marker id="ah" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#94a3b8" /></marker></defs>
+          <g font-size="8" fill="#94a3b8" font-family="monospace"><text x="20" y="104">전체</text><text x="94" y="104">한 사람</text><text x="168" y="104">단어</text><text x="240" y="104">AX</text></g>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>10분 안에 무슨 얘기를 어떤 순서로 하나.</p>
+        <p><span class="lbl text-slate-500 block">쓰는 데이터</span>없다. <span class="font-mono text-xs">#ego=&lt;id&gt;</span>·<span class="font-mono text-xs">#view=cloudmax</span>·<span class="font-mono text-xs">#view=about</span> 딥링크가 이미 있으니 <strong>시퀀스와 타이밍만</strong> 얹으면 된다.</p>
+        <p><span class="lbl text-slate-500 block">왜 센가</span>산출물이 아니라 <strong>산출물들을 하나로 묶는 실</strong>이다. 무대에서 발표자가 클릭 실수로 흐름을 깨는 위험이 사라진다. 다른 후보를 뭘 고르든 마지막에 이게 필요해진다.</p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>발표회</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- I -->
+  <article id="c-i" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">I · 파이프라인 해부</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-emerald-50 px-2 py-1 text-emerald-800 border border-emerald-200">데이터 있음</span>
+        <span class="lbl rounded bg-slate-500 px-2 py-1 text-white">M</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">archive/template.html:1889-1940 — 현재 벡터 히트맵은 실벡터가 아니라 연출</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="원문에서 벡터를 거쳐 지도로 가는 3단 해부 스케치">
+          <rect x="14" y="34" width="66" height="60" rx="3" fill="#fff" stroke="#e2e8f0" />
+          <g fill="#e2e8f0"><rect x="22" y="44" width="50" height="4" /><rect x="22" y="53" width="44" height="4" /><rect x="22" y="62" width="52" height="4" /><rect x="22" y="71" width="36" height="4" /><rect x="22" y="80" width="46" height="4" /></g>
+          <text x="20" y="108" font-size="8" fill="#94a3b8" font-family="monospace">회고 원문</text>
+          <g>
+            <rect x="106" y="52" width="88" height="14" fill="#f1f5f9" />
+            <rect x="106" y="52" width="6" height="14" fill="#0f172a" /><rect x="118" y="52" width="6" height="14" fill="#94a3b8" /><rect x="130" y="52" width="6" height="14" fill="#cbd5e1" /><rect x="142" y="52" width="6" height="14" fill="#334155" /><rect x="154" y="52" width="6" height="14" fill="#e2e8f0" /><rect x="166" y="52" width="6" height="14" fill="#64748b" /><rect x="178" y="52" width="6" height="14" fill="#0f172a" />
+          </g>
+          <text x="106" y="82" font-size="8" fill="#94a3b8" font-family="monospace">벡터 (실제 수치)</text>
+          <g fill="#0f172a"><circle cx="240" cy="48" r="4" /><circle cx="262" cy="62" r="5" /><circle cx="234" cy="74" r="3.5" /><circle cx="264" cy="88" r="3" /></g>
+          <g stroke="#cbd5e1" stroke-width=".8"><path d="M240 48 L262 62 M262 62 L234 74 M262 62 L264 88" /></g>
+          <text x="228" y="112" font-size="8" fill="#94a3b8" font-family="monospace">지도</text>
+          <g stroke="#94a3b8" stroke-width="1" fill="none" marker-end="url(#ah2)"><path d="M84 64 L102 60" /><path d="M198 60 L218 58" /></g>
+          <defs><marker id="ah2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#94a3b8" /></marker></defs>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>이 지도를 왜 믿어야 하나. 내 글이 어떻게 점이 됐나.</p>
+        <div class="rounded border border-red-400 bg-red-50 p-3">
+          <p class="lbl text-red-800">현재 화면의 문제</p>
+          <p class="mt-1 text-slate-800">지금 "How it Works" 오버레이의 벡터 히트맵은 <strong>이름 charCode를 시드로 만든 난수</strong>다(<span class="font-mono text-xs">template.html:1889-1940</span>, <span class="font-mono text-xs">getBasePattern</span>·<span class="font-mono text-xs">getMutatedPattern</span>). 유사도 수치는 진짜지만 그림은 연출이다. 그런데 화면 문구는 "이 화면에 실제로 쓰인 데이터입니다"라고 말한다(<span class="font-mono text-xs">:717</span>). <strong>발표회에서 누가 파고들면 아픈 지점이다.</strong></p>
+        </div>
+        <p><span class="lbl text-slate-500 block">할 일</span>실벡터를 그리도록 고치거나(<span class="font-mono text-xs">build_about()</span>이 이미 실벡터를 주입하고 있는데 화면이 안 읽는다), 문구를 사실에 맞춘다. 둘 중 하나는 해야 한다.</p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>발표회 · 상시</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- J -->
+  <article id="c-j" class="rounded border border-slate-200 bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <h3 class="font-serif text-2xl">J · 질문 카드</h3>
+      <div class="flex gap-2">
+        <span class="lbl rounded bg-amber-50 px-2 py-1 text-amber-800 border border-amber-200">해석층</span>
+        <span class="lbl rounded bg-slate-900 px-2 py-1 text-white">S</span>
+      </div>
+    </div>
+    <p class="mt-1 font-mono text-xs text-slate-500">확산도·gap에서 기계적으로 뽑는 아젠다 — 답이 아니라 질문만</p>
+    <div class="mt-5 grid gap-6 md:grid-cols-2">
+      <div>
+        <p class="lbl text-slate-500">스케치</p>
+        <svg class="sk mt-2 rounded border border-slate-200" viewBox="0 0 300 160" aria-label="질문 카드 세 장이 겹쳐 쌓인 스케치">
+          <g fill="#fff" stroke="#0f172a" stroke-width="1">
+            <rect x="34" y="26" width="196" height="44" rx="4" />
+            <rect x="46" y="60" width="196" height="44" rx="4" />
+            <rect x="58" y="94" width="196" height="44" rx="4" />
+          </g>
+          <g fill="#e2e8f0">
+            <rect x="44" y="38" width="140" height="5" /><rect x="44" y="50" width="96" height="5" />
+            <rect x="56" y="72" width="150" height="5" /><rect x="56" y="84" width="82" height="5" />
+            <rect x="68" y="106" width="128" height="5" /><rect x="68" y="118" width="110" height="5" />
+          </g>
+          <text x="212" y="42" font-size="9" fill="#0f172a" font-family="monospace">?</text>
+          <text x="224" y="76" font-size="9" fill="#0f172a" font-family="monospace">?</text>
+          <text x="236" y="110" font-size="9" fill="#0f172a" font-family="monospace">?</text>
+        </svg>
+      </div>
+      <div class="space-y-3 text-sm text-slate-700">
+        <p><span class="lbl text-slate-500 block">답하는 질문</span>그림은 봤는데, <strong>그래서 뭘 논의하나.</strong></p>
+        <p><span class="lbl text-slate-500 block">만드는 법</span>규칙 몇 개면 된다. 확산도 최상위 → "전 팀이 말한 이건 왜 아직 안 되고 있나". 확산도 1 → "한 명만 본 이건 선견인가 예외인가". <span class="font-mono text-xs">capability_gap</span>과 <span class="font-mono text-xs">capability_have</span>가 충돌 → "누가 되고 누가 안 되나".</p>
+        <p><span class="lbl text-slate-500 block">왜 센가</span>워크숍이 그림 감상으로 끝나는 걸 막는다. 화면 넷보다 질문 열 개가 회의를 굴린다. <strong>비용이 제일 싸고 효과 예측이 제일 쉽다.</strong></p>
+        <p><span class="lbl text-slate-500 block">쓰이는 곳</span>워크숍</p>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ─────────────── 조합 ─────────────── -->
+<section>
+  <p class="lbl text-slate-500">조합</p>
+  <h2 class="mt-2 font-serif text-3xl">다 만들 필요 없다 — 세 갈래</h2>
+  <p class="mt-2 max-w-3xl text-slate-700">용도가 셋(발표회 · 워크숍 · 상시)이라 묶음도 셋으로 갈린다. 한 묶음만 골라도 각 자리는 채워진다.</p>
+
+  <div class="mt-5 grid gap-4 md:grid-cols-3">
+    <div class="rounded border border-slate-200 bg-white p-5">
+      <p class="lbl text-slate-500">묶음 1 — 무대</p>
+      <p class="mt-2 font-serif text-xl">A + F + I + H</p>
+      <p class="mt-3 text-sm text-slate-700">있는 은하수에 <strong>AX 렌즈</strong>를 얹고, 해부 화면의 거짓 문구를 고치고, 항해로 순서를 고정한다. 새 화면 0개. 발표회만 노린다면 이게 가장 짧다.</p>
+      <p class="mt-3 font-mono text-xs text-slate-500">비용 S·S·M·S</p>
+    </div>
+    <div class="rounded border border-slate-200 bg-white p-5">
+      <p class="lbl text-slate-500">묶음 2 — 회의</p>
+      <p class="mt-2 font-serif text-xl">B + C + J + G</p>
+      <p class="mt-3 text-sm text-slate-700">주제 지도와 그 뒷면(빈 하늘)을 만들고, 거기서 질문을 뽑아, 보드에서 사람이 옮긴다. <strong>워크숍 하루가 통째로 굴러가는</strong> 유일한 묶음.</p>
+      <p class="mt-3 font-mono text-xs text-slate-500">비용 M·S·S·M</p>
+    </div>
+    <div class="rounded border border-slate-200 bg-white p-5">
+      <p class="lbl text-slate-500">묶음 3 — 남는 것</p>
+      <p class="mt-2 font-serif text-xl">A + D + E</p>
+      <p class="mt-3 text-sm text-slate-700">발표 다음 날에도 열리는 물건. <strong>개인 카드</strong>가 재방문을 만들고, 부서 단면이 조직장들의 재방문을 만든다.</p>
+      <p class="mt-3 font-mono text-xs text-slate-500">비용 S·S·S</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 추천 ─────────────── -->
+<section>
+  <p class="lbl text-slate-500">추천</p>
+  <div class="mt-2 rounded border-2 border-slate-900 bg-white p-7">
+    <h2 class="font-serif text-3xl">B + C를 한 화면으로. 그 위에 F.</h2>
+    <p class="mt-4 text-slate-800 leading-relaxed">
+      <strong>성좌(B)와 빈 하늘(C)은 같은 지도의 앞뒤다.</strong> 좌표계를 한 번 계산하면 둘 다 나온다 —
+      별이 몰린 곳이 성좌고, 안 몰린 곳이 빈 하늘이다. 따로 만들 이유가 없다.
+      여기에 <strong>AX 렌즈(F)</strong>는 필터 하나라 사실상 공짜로 얹힌다.
+    </p>
+    <p class="mt-4 text-slate-800 leading-relaxed">
+      이걸 먼저 고르는 이유는 <strong>기존 은하수가 못 넘는 벽이 정확히 여기</strong>이기 때문이다.
+      A는 "누가 비슷한가"까지만 답하고 색은 팀이라 조직도를 반복한다. B는 "무엇을 말했나"를 답하고,
+      워크숍(G·J)도 로드맵도 발표 스토리도 전부 <strong>이 지도에서 갈라져 나온다</strong>.
+      A를 대체하지도 않는다 — 팀원들이 "별"이라 부른 그 화면은 그대로 두고, <strong>두 번째 하늘</strong>을 여는 것이다.
+    </p>
+    <div class="mt-5 grid gap-3 sm:grid-cols-2 text-sm text-slate-700">
+      <p>✦ 없는 데이터가 <strong>2D 좌표 하나</strong>뿐이다 — facet 임베딩은 <span class="font-mono text-xs">td_index.py</span>에 이미 있다</p>
+      <p>✦ 용도 세 곳(발표·워크숍·상시)을 <strong>혼자 다 커버</strong>하는 유일한 후보</p>
+      <p>✦ <span class="font-mono text-xs">ax_mentioned</span>가 처음으로 화면에 나온다 — 아무도 아직 못 본 그림</p>
+      <p>✦ 기존 은하수를 한 줄도 안 건드린다 — 발표 전 리스크가 늘지 않는다</p>
+    </div>
+    <div class="mt-5 rounded border border-amber-300 bg-amber-50 p-4">
+      <p class="lbl text-amber-800">먼저 정해야 할 것</p>
+      <p class="mt-1 text-slate-800 text-sm">
+        <strong>2D 투영 방법.</strong> UMAP·t-SNE는 의존성이 늘고(<span class="font-mono text-xs">requirements.txt</span> 4줄짜리 리포다),
+        결과가 실행마다 흔들려 "왜 저기 있냐"에 답을 못 한다.
+        카테고리 중심 배치 + 카테고리 내부만 유사도로 미는 <strong>결정적 레이아웃</strong>이면 의존성 0에 설명도 된다.
+        은하수 물리(<span class="font-mono text-xs">template.html:1005-1090</span>)가 이미 그 방식이다.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 고를 때 물을 것 ─────────────── -->
+<section>
+  <p class="lbl text-slate-500">고르기 전에</p>
+  <h2 class="mt-2 font-serif text-2xl">이 셋은 사람이 답해야 한다</h2>
+  <div class="mt-4 space-y-3">
+    <div class="rule bg-white p-4 border border-slate-200">
+      <p class="font-serif text-lg">1 · 발표회가 언제인가</p>
+      <p class="mt-1 text-sm text-slate-700">날짜가 가까우면 묶음 1(무대)만 하고 B는 그 뒤로 민다. 새 화면 한 벌은 무대 직전에 올릴 물건이 아니다.</p>
+    </div>
+    <div class="rule bg-white p-4 border border-slate-200">
+      <p class="font-serif text-lg">2 · 지금 은하수가 실데이터에서 뭉쳐 보이나</p>
+      <p class="mt-1 text-sm text-slate-700">실 코사인이 0.93~0.97에 몰린다는 건 <span class="font-mono text-xs">todos/009</span>에 기록돼 있고 정규화는 미적용이다. 뭉쳐 있으면 A 계열 후보는 전부 그것부터 고쳐야 한다. <strong>나는 실데이터를 못 보므로 opencode가 확인해야 한다.</strong></p>
+    </div>
+    <div class="rule bg-white p-4 border border-slate-200">
+      <p class="font-serif text-lg">3 · 죽은 태그를 어떻게 할 것인가</p>
+      <p class="mt-1 text-sm text-slate-700">지금 화면의 태그 칩·필터·엣지 라벨이 더미 위에 서 있다. <span class="font-mono text-xs">freq.json</span> 상위 명사로 갈아끼우면 LLM 0회로 되살아나고(<span class="font-mono text-xs">todos/009</span> B안), 그냥 끄는 것도 <span class="font-mono text-xs">build.py</span> 한 줄이다. <strong>상시 공개할 물건이면 둘 중 하나는 해야 한다.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 푸터 ─────────────── -->
+<footer class="border-t border-slate-300 pt-6 text-sm text-slate-600">
+  <p class="lbl text-slate-500">쓴 어휘</p>
+  <p class="mt-2 font-mono text-xs leading-relaxed">
+    facet · 축(future_task · capability_have · capability_gap · direction) · 카테고리 · 확산도(pjt_spread · cl_spread) · ax_mentioned · pjt · cl_level
+  </p>
+  <p class="mt-4">
+    <span class="lbl text-slate-500">안 다룬 것</span><br />
+    실데이터 수치·실명·실제 카테고리명은 이 문서에 없다(<span class="font-mono text-xs">CLAUDE.md</span> 규칙).
+    스케치의 라벨은 전부 가상이다. 구현 계획·일정·담당은 후보를 고른 뒤에 따로 쓴다.
+  </p>
+  <p class="mt-4 font-mono text-xs text-slate-500">2026-08-28 · q2-gathering · docs/deliverable-candidates-2026-08-28.html</p>
+</footer>
+
+</main>
+</body>
+</html>
