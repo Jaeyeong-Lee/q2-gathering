@@ -1,4 +1,4 @@
-.PHONY: help pipeline embed freq similarity extract build clean test td td-sample td-sample-peek
+.PHONY: help pipeline embed freq similarity extract build clean test td td-sample td-sample-peek td-sample-fake td-screens
 
 help:
 	@echo "📦 Heritage Archive — 파이프라인 명령어"
@@ -17,6 +17,8 @@ help:
 	@echo "task-discovery:"
 	@echo "  make td-sample             합성 코퍼스로 산출물 한 벌 → data/td_sample/ (실데이터 무접촉)"
 	@echo "  make td-sample-peek        샘플 산출물 상태 확인"
+	@echo "  make td-sample-fake        LLM 0회로 산출물+화면 5종 (키 불필요)"
+	@echo "  make td-screens            샘플 산출물로 화면 5종만 재빌드"
 	@echo ""
 	@echo "유틸:"
 	@echo "  make test                  pytest 실행"
@@ -60,6 +62,17 @@ td-sample:
 
 td-sample-peek:
 	TD_OUT_DIR=$(TD_SAMPLE_DIR) python3 scripts/td_peek.py $(TD_SAMPLE_DIR)/task_discovery
+
+# LLM 0회로 샘플 산출물 + 화면 5종. 키 없이 화면을 개발·회귀 비교할 때 쓴다.
+td-sample-fake:
+	TD_OUT_DIR=$(TD_SAMPLE_DIR) python3 scripts/td_sample_build.py
+	$(MAKE) td-screens
+
+td-screens:
+	@for s in constellation heatmap questions onepager consensus; do \
+	  TD_OUT_DIR=$(TD_SAMPLE_DIR) python3 scripts/td_$$s.py \
+	    $(TD_SAMPLE_DIR)/task_discovery $(TD_SAMPLE_DIR)/task_discovery/$$s.html; \
+	done
 
 td-codebook:
 	GEMINI_API_KEY=${GEMINI_API_KEY} python3 scripts/td_pipeline.py --codebook data/task_discovery/codebook.json $(SOURCES:%=--sources %)

@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 
 import td_cards
+import td_render_common
 from pipeline_log import OUT_DIR
 from td_common import load_json, reject_public_path
 
@@ -187,24 +188,14 @@ def build_payload(cards, categories):
             "bands": list(BANDS)}
 
 
-def _embed(payload):
-    return (json.dumps(payload, ensure_ascii=False)
-            .replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
-
-
 def render_html(payload, *, live=False):
     """live=True면 화면이 서버(/state·/vote)와 이야기한다. 정적 파일은 False —
     workshop_server가 같은 템플릿을 live로 렌더해 그대로 서빙한다."""
-    return (_TEMPLATE.replace("__PAYLOAD__", _embed(payload))
-            .replace("__LIVE__", "true" if live else "false"))
+    return td_render_common.render(_TEMPLATE, payload, live="true" if live else "false")
 
 
 def write(cards, categories, *, out_path):
-    reject_public_path(out_path)
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(render_html(build_payload(cards, categories)), encoding="utf-8")
-    return out_path
+    return td_render_common.write_html(render_html(build_payload(cards, categories)), out_path)
 
 
 # ponytail: HTML을 파이썬 문자열 상수로 들고 있다(td_inspect도 같다). build.py는
@@ -722,10 +713,7 @@ def main(*argv):
 
       td_roadmap.py [데이터디렉터리] [출력경로] [--anonymize]
     """
-    args = [a for a in argv if a != "--anonymize"]
-    anonymize = "--anonymize" in argv
-    d = Path(args[0]) if len(args) > 0 else OUT_DIR / "task_discovery"
-    out = Path(args[1]) if len(args) > 1 else d / "roadmap.html"
+    d, out, anonymize = td_render_common.parse_args(argv, "roadmap.html")
 
     cards = td_cards.build(d / "assignments.json", d / "extracted.json", anonymize=anonymize)
     res = write(cards, load_categories(d), out_path=out)

@@ -1,7 +1,7 @@
 ---
 id: 013
 title: 빈 하늘 — 성좌 지도의 뒷면 토글
-status: ready
+status: done # constellation #mode=empty. 합성 데이터(LLM 0회)로 빌드·헤드리스 검증 완료. 실호출 샘플로 재확인 필요
 blocked_by: [012]
 labels: [ready-for-agent]
 ---
@@ -23,7 +23,7 @@ docs/deliverable-candidates-2026-08-28.html 후보 C · docs/deliverable-candida
 
 ## Acceptance criteria
 
-- [ ] 앞면과 뒷면이 같은 좌표를 쓴다 (토글 시 별이 이동하지 않는다)
-- [ ] 확산도가 낮은 카테고리와 배정이 희박한 앵커가 시각적으로 구별된다
-- [ ] "말이 안 나온 영역 ≠ 안 중요한 영역" 취지의 문구가 뒷면에서 상시 보인다
-- [ ] 헤드리스 크롬 스크린샷 2장(앞면·뒷면)으로 확인 + pytest 통과
+- [x] 앞면과 뒷면이 같은 좌표를 쓴다 (토글 시 별이 이동하지 않는다)
+- [x] 확산도가 낮은 카테고리와 배정이 희박한 앵커가 시각적으로 구별된다
+- [x] "말이 안 나온 영역 ≠ 안 중요한 영역" 취지의 문구가 뒷면에서 상시 보인다
+- [x] 헤드리스 크롬 스크린샷 2장(앞면·뒷면)으로 확인 + pytest 통과

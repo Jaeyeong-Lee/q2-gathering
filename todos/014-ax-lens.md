@@ -1,7 +1,7 @@
 ---
 id: 014
 title: AX 렌즈 — 언급 표시를 지도 위 필터로
-status: ready
+status: done # constellation #mode=ax. 합성 데이터(LLM 0회)로 빌드·헤드리스 검증 완료. 실호출 샘플로 재확인 필요
 blocked_by: [012]
 labels: [ready-for-agent]
 ---
@@ -23,7 +23,7 @@ docs/deliverable-candidates-2026-08-28.html 후보 F · docs/deliverable-candida
 
 ## Acceptance criteria
 
-- [ ] 렌즈를 켜면 언급 표시가 붙은 과제만 강조되고, 끄면 원래 상태로 돌아온다
-- [ ] 화면 라벨과 범례가 "언급"임을 명시하고 판정으로 읽히는 표현을 쓰지 않는다
-- [ ] 렌즈 상태가 빈 하늘 토글과 독립적으로 동작한다 (서로 상태를 깨지 않는다)
-- [ ] 헤드리스 크롬 스크린샷 + pytest 통과
+- [x] 렌즈를 켜면 언급 표시가 붙은 과제만 강조되고, 끄면 원래 상태로 돌아온다
+- [x] 화면 라벨과 범례가 "언급"임을 명시하고 판정으로 읽히는 표현을 쓰지 않는다
+- [x] 렌즈 상태가 빈 하늘 토글과 독립적으로 동작한다 (서로 상태를 깨지 않는다)
+- [x] 헤드리스 크롬 스크린샷 + pytest 통과

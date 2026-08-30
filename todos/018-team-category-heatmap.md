@@ -1,7 +1,7 @@
 ---
 id: 018
 title: 부서 단면 — 팀 × 카테고리 히트맵
-status: ready
+status: done # scripts/td_heatmap.py. 합성 데이터(LLM 0회)로 빌드·헤드리스 검증 완료. 실호출 샘플로 재확인 필요
 blocked_by: [010, 012]
 labels: [ready-for-agent]
 ---
@@ -20,7 +20,7 @@ docs/deliverable-candidates-2026-08-28.html 후보 E
 
 ## Acceptance criteria
 
-- [ ] 팀 × 카테고리 격자가 배정 건수를 반영해 렌더된다
-- [ ] 가로줄·세로칸을 어떻게 읽는지가 화면에 문장으로 적혀 있다
-- [ ] 색만으로 구분되지 않도록 수치 또는 라벨이 함께 표시된다
-- [ ] 헤드리스 크롬 스크린샷 + pytest 통과
+- [x] 팀 × 카테고리 격자가 배정 건수를 반영해 렌더된다
+- [x] 가로줄·세로칸을 어떻게 읽는지가 화면에 문장으로 적혀 있다
+- [x] 색만으로 구분되지 않도록 수치 또는 라벨이 함께 표시된다
+- [x] 헤드리스 크롬 스크린샷 + pytest 통과

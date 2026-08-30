@@ -18,6 +18,7 @@ from pathlib import Path
 
 import td_assign
 import td_cards
+import td_render_common
 import td_render
 from pipeline_log import OUT_DIR
 from td_common import load_json, reject_public_path
@@ -78,26 +79,15 @@ def build_payload(aggregates, persons, assignments, taxonomy=None, *,
     }
 
 
-def _embed(payload):
-    """</script>가 데이터에 있어도 HTML이 깨지지 않게 이스케이프. JSON 문자열 안에서
-    \\u003c는 <와 같으므로 파서에는 영향이 없고, HTML 파서만 태그로 오인하지 않게 된다."""
-    return (json.dumps(payload, ensure_ascii=False)
-            .replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
-
-
 def render_html(payload):
-    return _TEMPLATE.replace("__PAYLOAD__", _embed(payload))
+    return td_render_common.render(_TEMPLATE, payload)
 
 
 def write(aggregates, persons, assignments, taxonomy=None, *, out_path,
           sources=None, anonymize=False):
-    reject_public_path(out_path)
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
     payload = build_payload(aggregates, persons, assignments, taxonomy,
                             sources=sources, anonymize=anonymize)
-    out_path.write_text(render_html(payload), encoding="utf-8")
-    return out_path
+    return td_render_common.write_html(render_html(payload), out_path)
 
 
 # ponytail: HTML을 파이썬 문자열 상수로 들고 있다. build.py는 archive/template.html을
@@ -543,10 +533,7 @@ def main(*argv):
 
       td_inspect.py [데이터디렉터리] [출력경로] [--anonymize]
     """
-    args = [a for a in argv if a != "--anonymize"]
-    anonymize = "--anonymize" in argv
-    d = Path(args[0]) if len(args) > 0 else OUT_DIR / "task_discovery"
-    out = Path(args[1]) if len(args) > 1 else d / "inspect.html"
+    d, out, anonymize = td_render_common.parse_args(argv, "inspect.html")
     taxonomy = d / "taxonomy.json"
     # 원문은 추출 입력에만 있다. 합성이면 sources.json, 실데이터면 persons.json.
     sources = next((p for p in (d / "sources.json", d.parent / "persons.json") if p.exists()), None)
