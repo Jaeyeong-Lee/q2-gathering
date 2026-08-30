@@ -41,6 +41,10 @@ guarantee — it can be bypassed through Bash. **Honor this as a rule, not as a 
   its output.
 - **Reproduce and debug against the synthetic corpus.** `td_sources.py` generates fake data with
   the same schema — that is exactly what it exists for. Every test injects a fake `call`.
+- **`data/td_sample/` is the one td output directory you may open.** `make td-sample` runs the
+  whole pipeline on the synthetic corpus and writes artifacts, logs, and call dumps there —
+  input is fake, so nothing in it is real. Read it freely when building screens. Everything
+  outside that directory stays off limits, including `data/task_discovery/`.
 - **Root-cause analysis is your job.** opencode hands you facts like "batch 12, parse failed at
   20.6kb response". Why that happens is for you to determine **by reading the code**.
 - If you truly need the raw text of a failed call, it is in

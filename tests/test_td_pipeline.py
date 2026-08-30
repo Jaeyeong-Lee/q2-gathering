@@ -1,5 +1,6 @@
 import json
 from collections import Counter
+from pathlib import Path
 
 import pytest
 
@@ -128,3 +129,19 @@ def test_partial_assign_resumes_via_run_all_instead_of_being_skipped(tmp_path):
     assert calls["assign"] == 8  # 4개는 스킵(이미 완료), 나머지 8개만 재호출 — 게이트가 완료율 기반
     md = (tmp_path / "workshop-input.md").read_text(encoding="utf-8")
     assert "합성역량" in md
+
+
+def test_sample_run_writes_nothing_beside_its_own_dir(tmp_path):
+    """샘플 실행(#010)의 산출물은 주어진 디렉터리 안에서 끝나야 한다 — 실데이터는
+    그 부모(data/)에 있으므로, 형제 자리에 파일을 하나라도 흘리면 합성과 실데이터가
+    같은 트리에서 섞인다."""
+    parent = tmp_path / "data"
+    sample = parent / "td_sample"
+    calls, ex, tx, asg, nr = _fakes()
+
+    res = td_pipeline.run_all(sample, extract_call=ex, taxo_call=tx, assign_call=asg,
+                              narrate_call=nr, n=12, seed=0, sleep=NOOP)
+
+    assert list(parent.iterdir()) == [sample]        # 부모에 생긴 건 샘플 디렉터리 하나뿐
+    for path in map(Path, res.values()):
+        assert sample == path or sample in path.parents

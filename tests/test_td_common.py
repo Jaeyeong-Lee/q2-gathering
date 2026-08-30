@@ -179,3 +179,21 @@ def test_retry_json_final_failure_logs_full_prompt_and_response(caplog):
     assert final.ecs["http.request.body"] == "내 프롬프트"
     assert final.ecs["http.response.body"] == "여전히 JSON 아님"
     assert final.ecs["error.type"] == "ValueError"
+
+
+def test_calls_dir_follows_td_out_dir(tmp_path, monkeypatch):
+    """콜 덤프엔 프롬프트 원문이 통째로 들어간다. 샘플 실행(#010)이 자급자족하려면
+    산출물뿐 아니라 이 덤프도 TD_OUT_DIR 안으로 따라와야 한다 — 안 그러면 합성 프롬프트가
+    실데이터 트리에 섞인다. 모듈 상수라 재로드로 확인."""
+    import importlib
+
+    monkeypatch.setenv("TD_OUT_DIR", str(tmp_path))
+    import pipeline_log
+    importlib.reload(pipeline_log)
+    reloaded = importlib.reload(c)
+    try:
+        assert reloaded.CALLS_DIR == tmp_path / "task_discovery" / "calls"
+    finally:
+        monkeypatch.delenv("TD_OUT_DIR")
+        importlib.reload(pipeline_log)
+        importlib.reload(c)
