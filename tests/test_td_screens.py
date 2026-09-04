@@ -8,6 +8,7 @@ import json
 import pytest
 
 import td_consensus
+import td_gallery
 import td_constellation
 import td_fake_llm
 import td_heatmap
@@ -221,3 +222,35 @@ def test_fake_assign_returns_quote_from_the_item():
     parsed = json.loads(td_fake_llm.assign(f"지시\n\n항목:\n{item}"))
     assert parsed["quote"] in item
     assert parsed["category"] in {n for n, _ in td_fake_llm.CATEGORIES}
+
+
+# ─────────────── 갤러리 (사용자 피드백: 5개 파일 흩어진 게 별로다) ───────────────
+
+def test_gallery_embeds_all_five_views_intact():
+    """다섯 화면을 이어붙이지 않고 iframe으로 격리한다 — 원문 그대로 이어붙이면
+    top-level const 재선언·id 충돌로 깨진다는 게 이 화면의 존재 이유다."""
+    cards = [_card(1, "A"), _card(2, "B")]
+    payload = td_gallery.build_payload(cards, [], _agg(["A", "B"]), [])
+    assert {v["id"] for v in payload["views"]} == {
+        "constellation", "heatmap", "questions", "onepager", "consensus"}
+    # 각 화면 렌더가 자기 자신의 제목/서명을 그대로 담고 있어야 재사용이 성립한다
+    assert "성좌 지도" in payload["html"]["constellation"]
+    assert "__PAYLOAD__" not in payload["html"]["constellation"]  # 내부 렌더는 이미 치환 완료
+
+
+def test_gallery_shell_declares_no_view_globals():
+    """다섯 화면 각각이 top-level `const D`/`const DATA`를 쓰므로, 셸 자신의 스크립트가
+    같은 이름을 선언하면 원문 그대로 이어붙인 것과 같은 충돌이 재현된다. 셸은 GALLERY 하나만
+    선언해야 한다 — 화면 본문은 iframe.srcdoc으로만 들어가고 셸 스코프에 섞이지 않는다."""
+    assert "const D " not in td_gallery._TEMPLATE and "const DATA" not in td_gallery._TEMPLATE
+    assert "const GALLERY" in td_gallery._TEMPLATE
+
+
+def test_gallery_write_renders_and_guards(tmp_path):
+    out = td_gallery.write([_card(1, "A")], [], _agg(["A"]), [], out_path=tmp_path / "g.html")
+    html = out.read_text(encoding="utf-8")
+    assert "__PAYLOAD__" not in html
+    assert "task-discovery 갤러리" in html
+    with pytest.raises(ValueError):
+        td_gallery.write([_card(1, "A")], [], _agg(["A"]), [],
+                         out_path=tmp_path / "dist" / "g.html")

@@ -69,7 +69,7 @@ td-sample-fake:
 	$(MAKE) td-screens
 
 td-screens:
-	@for s in constellation heatmap questions onepager consensus; do \
+	@for s in constellation heatmap questions onepager consensus gallery; do \
 	  TD_OUT_DIR=$(TD_SAMPLE_DIR) python3 scripts/td_$$s.py \
 	    $(TD_SAMPLE_DIR)/task_discovery $(TD_SAMPLE_DIR)/task_discovery/$$s.html; \
 	done
