@@ -48,7 +48,7 @@ gh 없이 파일 기반으로 운영하는 이슈 트래커. 이슈 1개 = 파�
 | ✅ [018](018-team-category-heatmap.md) | 부서 단면 — 팀 × 카테고리 히트맵 | 010, 012 |
 | ✅ [019](019-question-cards.md) | 질문 카드 — 집계에서 워크숍 아젠다 | 010 |
 | ✅ [020](020-executive-one-pager.md) | 임원 한 장 — 인터랙션 없는 정물 | 012 |
-| [021](021-voyage-autopilot.md) | 항해 — 딥링크 자동 시퀀스 | 012 |
+| ✅ [021](021-voyage-autopilot.md) | 항해 — 딥링크 자동 시퀀스 | 012 |
 | [022](022-higher-lower-quiz.md) | Higher/Lower 퀴즈 (발표 형식 확정 후 착수) | 016 |
 | ✅ [023](023-consensus-weight.md) | 합의의 무게 — 사람의 결정이 지도에 | 012 |
 | ✅ [024](024-decision-record.md) | 결정 기록 — 고른 것·미룬 것·이견 | 023 |

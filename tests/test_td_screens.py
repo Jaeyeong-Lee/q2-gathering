@@ -254,3 +254,36 @@ def test_gallery_write_renders_and_guards(tmp_path):
     with pytest.raises(ValueError):
         td_gallery.write([_card(1, "A")], [], _agg(["A"]), [],
                          out_path=tmp_path / "dist" / "g.html")
+
+
+# ─────────────── 항해 (#021) — 캡션은 지어낸 서사가 아니라 실측 수치여야 한다 ───────────────
+
+def test_tour_captions_cite_real_counts_not_canned_narrative():
+    """가짜 narrate 스텁은 모든 카테고리에 같은 문장을 복붙한다(실측 확인됨) — 항해 캡션은
+    그 문장을 절대 쓰지 않고, 이 화면이 이미 계산해 둔 숫자만 인용해야 한다."""
+    cards = [_card(1, "A", ax=True, pjt="X"), _card(2, "B", pjt="Y")]
+    agg = _agg(["A", "B"])
+    scenes = td_gallery._tour_scenes(cards, agg, [])
+    assert len(scenes) == 7
+    assert all("합성 코퍼스 기반 서사" not in s["caption"] for s in scenes)
+    assert "2명" in scenes[0]["caption"] and "2개 카테고리" in scenes[0]["caption"]
+    assert scenes[2]["caption"] == "AX를 언급한 과제는 1개."
+
+
+def test_tour_captions_degrade_gracefully_when_nothing_to_report():
+    """빈 하늘 0개, AX 0개, 투표 0건인 정상 상태에서도 문장이 어색하지 않아야 한다."""
+    scenes = td_gallery._tour_scenes([_card(1, "A")], _agg(["A"]), [])
+    assert scenes[1]["caption"] == "모든 카테고리가 두 조직 이상에서 나왔다 — 희박한 영역 없음."
+    assert scenes[2]["caption"] == "AX를 언급한 과제가 아직 없다."
+    assert scenes[6]["caption"] == "아직 투표 전 — 관찰만 있는 상태다."
+
+
+def test_tour_scene_targets_are_known_views():
+    scenes = td_gallery._tour_scenes([_card(1, "A")], _agg(["A"]), [])
+    view_ids = {v[0] for v in td_gallery.VIEWS}
+    assert all(s["view"] in view_ids for s in scenes)
+
+
+def test_gallery_payload_includes_tour():
+    payload = td_gallery.build_payload([_card(1, "A")], [], _agg(["A"]), [])
+    assert len(payload["tour"]) == 7
