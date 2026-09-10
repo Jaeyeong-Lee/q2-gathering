@@ -485,8 +485,25 @@
         caps = new Map(arr(D.capabilities).map((c) => [String(c.id), c])),
         links = arr(D.links);
       const decisions = Object.create(null),
-        corrections = new Map(),
+        corrections = new Map(
+          arr(D.applied_corrections?.persons).map((e) => [
+            String(e.person_id),
+            e,
+          ]),
+        ),
         drafts = new Map();
+      const inheritedCorrections = new Map(corrections);
+      const originalAssignments = new Map(
+        arr(D.original_assignments || D.assignments).map((a) => [
+          String(a.task_id),
+          a,
+        ]),
+      );
+      function resetCorrection(id) {
+        if (inheritedCorrections.has(id))
+          corrections.set(id, inheritedCorrections.get(id));
+        else corrections.delete(id);
+      }
       const correctionEntries = arr(D.corrections_template?.persons);
       tasks.forEach((t) => {
         const r = D.review?.[t.id];
@@ -651,9 +668,7 @@
         );
         categorySelect.onchange = () => {
           const value = categorySelect.value || null;
-          if (value === (a?.category_id ?? null))
-            delete decisions[t.id].category_id;
-          else decisions[t.id].category_id = value;
+          decisions[t.id].category_id = value;
           changed();
         };
       }
@@ -711,7 +726,7 @@
                     "tasks, capabilities, links 배열이 필요합니다.",
                   );
                 if (JSON.stringify(value) === JSON.stringify(entry.extraction))
-                  corrections.delete(String(entry.person_id));
+                  resetCorrection(String(entry.person_id));
                 else
                   corrections.set(String(entry.person_id), {
                     person_id: entry.person_id,
@@ -728,7 +743,7 @@
               }
             }),
             button("정정 취소", () => {
-              corrections.delete(String(entry.person_id));
+              resetCorrection(String(entry.person_id));
               drafts.delete(String(entry.person_id));
               edit.value = JSON.stringify(entry.extraction, null, 2);
               feedback.textContent = "원래 추출 결과로 되돌렸습니다.";
@@ -760,7 +775,7 @@
           (t) =>
             Object.hasOwn(decisions[t.id], "category_id") &&
             decisions[t.id].category_id !==
-              (assignments.get(String(t.id))?.category_id ?? null) &&
+              (originalAssignments.get(String(t.id))?.category_id ?? null) &&
             !decisions[t.id].note.trim(),
         );
         if (invalid) {

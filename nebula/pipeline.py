@@ -14,7 +14,7 @@ from .model import (
     need,
     ValidationError,
 )
-from .storage import Store, write_json, output_lock
+from .storage import Store, write_json, output_lock, begin_run, mark_failed
 from .network import normalize_network
 
 
@@ -34,18 +34,47 @@ def batches(items, size, max_chars):
 
 
 def run(
-    source, out, client, batch_size=24, max_chars=24000, corrections=None, network=None
+    source,
+    out,
+    client,
+    batch_size=24,
+    max_chars=24000,
+    corrections=None,
+    network=None,
+    reset_corrections=False,
 ):
     with output_lock(out):
-        return _run(source, out, client, batch_size, max_chars, corrections, network)
+        begin_run(out)
+        try:
+            return _run(
+                source,
+                out,
+                client,
+                batch_size,
+                max_chars,
+                corrections,
+                network,
+                reset_corrections,
+            )
+        except Exception:
+            mark_failed(out)
+            raise
 
 
-def _run(source, out, client, batch_size, max_chars, corrections, network):
+def _run(
+    source, out, client, batch_size, max_chars, corrections, network, reset_corrections
+):
     need(type(batch_size) is int and batch_size > 0, "batch size must be positive")
     need(type(max_chars) is int and max_chars > 0, "max chars must be positive")
     ps = persons(source)
     normalized_network = normalize_network(network, ps) if network is not None else None
-    corrections = corrections or {"persons": []}
+    state_path = Path(out) / "applied-corrections.json"
+    saved = (
+        json.loads(state_path.read_text())
+        if state_path.exists() and not reset_corrections
+        else {}
+    )
+    corrections = corrections if corrections is not None else {"persons": []}
     need(
         isinstance(corrections, dict) and set(corrections) <= {"persons", "taxonomies"},
         "corrections fields invalid",
@@ -56,6 +85,12 @@ def _run(source, out, client, batch_size, max_chars, corrections, network):
     )
     overrides = {}
     source_by_id = {p["id"]: p for p in ps}
+    active_persons = {
+        e["person_id"]: e
+        for e in saved.get("persons", [])
+        if e["person_id"] in source_by_id
+        and e["source_hash"] == digest(source_by_id[e["person_id"]]["text"])
+    }
     for entry in corrections.get("persons", []):
         need(
             isinstance(entry, dict)
@@ -72,6 +107,8 @@ def _run(source, out, client, batch_size, max_chars, corrections, network):
             "correction source changed; inspect current text",
         )
         overrides[pid] = entry["extraction"]
+        active_persons[pid] = entry
+    overrides = {pid: e["extraction"] for pid, e in active_persons.items()}
     taxonomy_overrides = {}
     need(
         isinstance(corrections.get("taxonomies", []), list),
@@ -89,14 +126,6 @@ def _run(source, out, client, batch_size, max_chars, corrections, network):
         )
         taxonomy_overrides[entry["pjt"]] = entry
     store = Store(out)
-    # Retain last HTML with an explicit previous filename, never at the current path.
-    for name in ("matrix", "review"):
-        current = store.out / (name + ".html")
-        if current.exists():
-            current.replace(store.out / (name + ".previous.html"))
-    write_json(
-        store.out / "status.json", {"state": "running", "input_hash": digest(ps)}
-    )
     try:
         extracted, correction_entries = [], []
         for i, p in enumerate(ps):
@@ -142,6 +171,8 @@ def _run(source, out, client, batch_size, max_chars, corrections, network):
             set(taxonomy_overrides) <= set(groups),
             "taxonomy correction has no task-bearing PJT",
         )
+        active_taxonomies = {}
+        saved_taxonomies = {e["pjt"]: e for e in saved.get("taxonomies", [])}
         categories, assigned, taxonomy_templates = [], [], []
         for pjt in sorted(groups):
             local: list[dict[str, Any]] = []
@@ -154,6 +185,13 @@ def _run(source, out, client, batch_size, max_chars, corrections, network):
                 store.out / "task-inputs" / (digest(pjt)[:24] + ".json"),
                 {"pjt": pjt, "input_hash": task_hash, "tasks": minimal},
             )
+            inherited = saved_taxonomies.get(pjt)
+            if (
+                pjt not in taxonomy_overrides
+                and inherited
+                and inherited["input_hash"] == task_hash
+            ):
+                taxonomy_overrides[pjt] = inherited
             if pjt in taxonomy_overrides:
                 override = taxonomy_overrides[pjt]
                 need(
@@ -161,6 +199,7 @@ def _run(source, out, client, batch_size, max_chars, corrections, network):
                     "taxonomy correction tasks changed; inspect current tasks",
                 )
                 local = taxonomy({"additions": override["categories"]}, pjt, [])
+                active_taxonomies[pjt] = override
             else:
                 for batch in batches(minimal, batch_size, max_chars):
                     payload = {"pjt": pjt, "existing": local, "tasks": batch}
@@ -259,13 +298,21 @@ def _run(source, out, client, batch_size, max_chars, corrections, network):
             "provider": client.cache_identity,
             "review": {},
             "network": normalized_network,
+            "applied_corrections": {
+                "persons": list(active_persons.values()),
+                "taxonomies": list(active_taxonomies.values()),
+            },
             "corrections_template": {
                 "persons": correction_entries,
                 "taxonomies": taxonomy_templates,
             },
         }
         data["run_id"] = digest(data)
+        write_json(
+            store.out / "corrections-template.json", data["corrections_template"]
+        )
         write_json(store.out / "result.json", data)
+        write_json(state_path, data["applied_corrections"])
         write_json(
             store.out / "status.json",
             {
@@ -340,5 +387,6 @@ def with_review(data, review):
     return {
         **data,
         "review": decisions,
+        "original_assignments": data["assignments"],
         "assignments": list(assignments_by_id.values()),
     }

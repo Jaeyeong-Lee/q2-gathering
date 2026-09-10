@@ -3,9 +3,12 @@
 import json
 import os
 import tempfile
+import threading
 from pathlib import Path
 from .model import digest
 from contextlib import contextmanager
+
+_held = threading.local()
 
 
 def write_text(path, text):
@@ -33,15 +36,22 @@ def output_lock(out):
     import fcntl
     from .model import ValidationError
 
-    root = Store(out).out
+    root = Store(out).out.resolve()
+    held: set[Path] = getattr(_held, "paths", set())
+    if root in held:
+        yield
+        return
     with (root / ".run.lock").open("a") as stream:
         try:
             fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             raise ValidationError("output directory is in use by another run") from None
+        _held.paths = held
+        held.add(root)
         try:
             yield
         finally:
+            held.remove(root)
             fcntl.flock(stream, fcntl.LOCK_UN)
 
 
@@ -87,3 +97,19 @@ class Store:
         write_json(path, raw)
         self.calls += 1
         return result
+
+
+def begin_run(out):
+    root = Store(out).out
+    for name in ("matrix", "review"):
+        current = root / (name + ".html")
+        if current.exists():
+            current.replace(root / (name + ".previous.html"))
+    write_json(root / "status.json", {"state": "running", "stage": "input"})
+
+
+def mark_failed(out):
+    root = Store(out).out
+    status = json.loads((root / "status.json").read_text())
+    status["state"] = "failed"
+    write_json(root / "status.json", status)

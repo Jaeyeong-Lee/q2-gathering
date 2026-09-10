@@ -80,3 +80,13 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 - `scripts/build.py` `ABOUT_ANCHOR_ID` — 설명 오버레이의 표본 인물 (실데이터 전환 시 PPT/md 주인공 id로)
 - `archive/about/ppt.png`, `archive/about/sample.md` — 넣고 재빌드하면 설명 오버레이에 자동 인라인
 - `GEMINI_API_KEY` 환경변수 — embed/태그 추출 스크립트용 (빌드 자체엔 불필요)
+
+## 미래 과제 × 역량 지도 (Nebula)
+
+사람별 텍스트와 기존 유사도 네트워크에서 PJT별 미래 과제·시간·보유/필요 역량을 추출하고 검토하는 별도 파이프라인입니다. 기존 Archive와 `td_*` 산출물을 변경하지 않습니다.
+
+```sh
+python3 -m nebula demo --out data/nebula-demo
+```
+
+`matrix.html`과 `review.html`을 로컬에서 엽니다. 실제 내부 모델 연결, 입력 계약, 실패 재개, 수정과 승인 빌드는 [내부망 실행 가이드](docs/nebula-internal-runbook.md)를 먼저 읽으세요. 구현 범위와 해석 기준은 [기능 명세](docs/nebula-spec.md)에 있습니다. Python 3.10+ Linux/macOS, 런타임 추가 패키지 없음.

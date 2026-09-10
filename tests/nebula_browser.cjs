@@ -123,9 +123,38 @@ function cli(args, code = 0) {
   await page.goto(url("matrix.html"));
   const approved = await page.locator("#payload").textContent();
   assert.equal(JSON.parse(approved).tasks.length, 1);
+  // Reopen an already corrected category and choose baseline then corrected again.
+  await page.goto(url("review.html"));
+  const reopened = page.locator("#detail select");
+  const baselineOption = await reopened
+    .locator("option")
+    .nth(1)
+    .getAttribute("value");
+  await reopened.selectOption(baselineOption);
+  await reopened.selectOption("");
+  const againDownload = page.waitForEvent("download");
+  await page.locator("#export").click();
+  const againFile = path.join(temp, "review-again.json");
+  await (await againDownload).saveAs(againFile);
+  assert.equal(
+    JSON.parse(fs.readFileSync(againFile)).decisions[
+      Object.keys(review.decisions)[0]
+    ].category_id,
+    null,
+  );
+  cli(["build", "--out", out, "--review", againFile, "--approved-only"]);
   cli(["demo", "--out", out, "--corrections", correctionFile]);
   cli(["build", "--out", out, "--review", reviewFile, "--approved-only"], 1);
   cli(["demo", "--out", out]);
+  const resumed = JSON.parse(fs.readFileSync(path.join(out, "result.json")));
+  assert.ok(resumed.tasks.some((t) => t.label.endsWith(" 검토 정정")));
+  await page.goto(url("review.html"));
+  const inheritedDownload = page.waitForEvent("download");
+  await page.locator("#correction-export").click();
+  const inheritedFile = path.join(temp, "inherited.json");
+  await (await inheritedDownload).saveAs(inheritedFile);
+  assert.equal(JSON.parse(fs.readFileSync(inheritedFile)).persons.length, 1);
+  cli(["demo", "--out", out, "--reset-corrections"]);
   assert.deepEqual(errors, []);
   assert.deepEqual(requests, []);
   await browser.close();

@@ -204,3 +204,144 @@ class RecoveryAndReviewContract(unittest.TestCase):
             self.assertEqual(len(view["bubbles"]), 1)
             self.assertEqual(view["bubbles"][0]["people"], 1)
             self.assertEqual(len(view["bubbles"][0]["task_ids"]), 2)
+
+
+class ReviewRegressions(unittest.TestCase):
+    def test_invalid_rerun_marks_failure_and_retires_old_current_html(self):
+        with tempfile.TemporaryDirectory() as out:
+            run(source()[:2], out, FakeClient())
+            root = Path(out)
+            (root / "matrix.html").write_text("prior result")
+            with self.assertRaises(ValidationError):
+                run(source()[:2], out, FakeClient(), network={"unknown": []})
+            self.assertEqual(
+                json.loads((root / "status.json").read_text())["state"], "failed"
+            )
+            self.assertFalse((root / "matrix.html").exists())
+            self.assertEqual(
+                (root / "matrix.previous.html").read_text(), "prior result"
+            )
+
+    def test_run_publishes_full_correction_template_before_unlocking(self):
+        with tempfile.TemporaryDirectory() as out:
+            result = run(source()[:2], out, FakeClient())
+            persisted = json.loads(
+                (Path(out) / "corrections-template.json").read_text()
+            )
+            self.assertEqual(persisted, result["corrections_template"])
+
+    def test_reviewed_snapshot_retains_immutable_assignment_baseline(self):
+        with tempfile.TemporaryDirectory() as out:
+            result = run(source()[:2], out, FakeClient())
+            task = result["tasks"][0]
+            revised = with_review(
+                result,
+                {
+                    "run_id": result["run_id"],
+                    "decisions": {
+                        task["id"]: {
+                            "status": "approved",
+                            "category_id": None,
+                            "note": "분류 정정",
+                        }
+                    },
+                },
+            )
+            self.assertEqual(revised["original_assignments"], result["assignments"])
+
+    def test_successive_partial_corrections_survive_resume_and_explicit_reset(self):
+        with tempfile.TemporaryDirectory() as out:
+            original = run(source()[:3], out, FakeClient())
+            a, b = copy.deepcopy(original["corrections_template"]["persons"][:2])
+            a["extraction"]["tasks"][0]["label"] += " 첫 정정"
+            b["extraction"]["tasks"][0]["label"] += " 두 번째 정정"
+            run(source()[:3], out, FakeClient(), corrections={"persons": [a]})
+            run(source()[:3], out, FakeClient(), corrections={"persons": [b]})
+            resumed = run(source()[:3], out, FakeClient())
+            self.assertEqual(resumed["corrections_template"]["persons"][:2], [a, b])
+            self.assertEqual(len(resumed["applied_corrections"]["persons"]), 2)
+            reset = run(source()[:3], out, FakeClient(), reset_corrections=True)
+            self.assertEqual(reset["tasks"], original["tasks"])
+            self.assertEqual(reset["applied_corrections"]["persons"], [])
+
+    def test_changed_source_discards_inherited_but_rejects_explicit_stale_patch(self):
+        with tempfile.TemporaryDirectory() as out:
+            inputs = source()[:2]
+            initial = run(inputs, out, FakeClient())
+            patch = copy.deepcopy(initial["corrections_template"]["persons"][0])
+            patch["extraction"]["tasks"][0]["label"] += " 정정"
+            run(inputs, out, FakeClient(), corrections={"persons": [patch]})
+            inputs[0]["text"] += "\n추가 설명."
+            fresh = run(inputs, out, FakeClient())
+            self.assertEqual(fresh["applied_corrections"]["persons"], [])
+            with self.assertRaises(ValidationError):
+                run(inputs, out, FakeClient(), corrections={"persons": [patch]})
+
+    def test_cli_parse_failure_marks_old_output_failed(self):
+        import subprocess
+        import sys
+
+        with tempfile.TemporaryDirectory() as out:
+            run(source()[:2], out, FakeClient())
+            root = Path(out)
+            (root / "matrix.html").write_text("old")
+            (root / "bad.json").write_text("{broken")
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "nebula",
+                    "run",
+                    "--input",
+                    str(root / "bad.json"),
+                    "--out",
+                    out,
+                ],
+                capture_output=True,
+            )
+            self.assertEqual(proc.returncode, 1)
+            self.assertEqual(
+                json.loads((root / "status.json").read_text())["state"], "failed"
+            )
+            self.assertFalse((root / "matrix.html").exists())
+
+    def test_output_lock_blocks_other_process_until_outer_context_exits(self):
+        import subprocess
+        import sys
+        from nebula.storage import output_lock
+
+        with tempfile.TemporaryDirectory() as out:
+            command = [
+                sys.executable,
+                "-c",
+                "import sys\nfrom nebula.storage import output_lock\nwith output_lock(sys.argv[1]): pass",
+                out,
+            ]
+            with output_lock(out):
+                with output_lock(out):
+                    pass
+                blocked = subprocess.run(command, capture_output=True)
+                self.assertNotEqual(blocked.returncode, 0)
+                self.assertIn(b"output directory is in use", blocked.stderr)
+            released = subprocess.run(command, capture_output=True)
+            self.assertEqual(released.returncode, 0, released.stderr)
+
+    def test_taxonomy_override_persists_then_invalidates_when_tasks_change(self):
+        with tempfile.TemporaryDirectory() as out:
+            inputs = source()[:2]
+            initial = run(inputs, out, FakeClient())
+            taxonomy_patch = copy.deepcopy(
+                initial["corrections_template"]["taxonomies"][0]
+            )
+            taxonomy_patch["categories"][0]["definition"] += " 검토 완료"
+            revised = run(
+                inputs, out, FakeClient(), corrections={"taxonomies": [taxonomy_patch]}
+            )
+            resumed = run(inputs, out, FakeClient())
+            self.assertEqual(resumed["run_id"], revised["run_id"])
+            person_patch = copy.deepcopy(resumed["corrections_template"]["persons"][0])
+            person_patch["extraction"]["tasks"][0]["label"] += " 범위 변경"
+            changed = run(
+                inputs, out, FakeClient(), corrections={"persons": [person_patch]}
+            )
+            self.assertEqual(changed["applied_corrections"]["taxonomies"], [])

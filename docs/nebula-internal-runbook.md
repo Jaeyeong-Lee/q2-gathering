@@ -2,6 +2,14 @@
 
 이 문서는 내부망 운영 에이전트용이다. `nebula`는 이전 `td_*` 산출물의 스키마를 덮어쓰지 않는 별도 패키지다. Python 3.10 이상, Linux 또는 macOS에서 실행한다. 런타임은 Python 표준 라이브러리만 사용한다. OS 파일 잠금에 `fcntl`을 사용하므로 Windows 네이티브는 지원하지 않는다.
 
+## 운영 에이전트의 실행 순서와 종료 조건
+
+1. 아래 합성 실행을 완료하고 `status.json`이 complete인지 확인한다. `matrix.html`의 버블에서 원문이 열리고 `review.html`에서 결정 JSON을 내려받을 수 있으면 환경 준비 완료다.
+2. 입력 계약에 맞는 원문·PJT·네트워크를 준비한다. 중복 ID나 모집단 불일치가 있으면 입력을 고친 뒤 진행한다.
+3. 내부 endpoint를 설정해 실입력을 처리한다. 실패하면 상태의 stage/call_key와 해당 단계 가이드를 확인하고 같은 명령으로 재개한다. complete와 최종 HTML이 모두 생성되어야 추출 실행 완료다.
+4. 검토 단계에서 원문·시간·과제 분류·역량 연결을 확인한다. 수정이 필요하면 corrections로 재실행하고, 변경된 run_id에 대한 검토를 새로 저장한다.
+5. 승인 파일로 `--approved-only` 빌드 후 표시 과제와 원문을 확인한다. 내부 검토되지 않은 초안 화면을 실제 결과 검증 완료로 보고하지 않는다. 모델 의미 검증과 오프라인 발표 리허설을 끝낸 뒤 최종 산출물 경로와 run_id를 보고한다.
+
 ## 1. 먼저 합성 자료로 실행
 
 저장소 루트에서 다음 명령을 실행한다. API 키·네트워크가 필요 없다.
@@ -96,7 +104,8 @@ HTTP 408·429·5xx와 연결/타임아웃은 호출당 최대 3회로 제한한�
 
 - `status.json`: running/failed/complete, 실패 단계·호출 키·완료 호출 수·캐시 수 등 상태. 원문 없는 운영 진단에 우선 사용한다.
 - `result.json`: 원문·추출·카테고리·배정·네트워크를 묶은 불변 스냅샷. 직접 수정하지 않는다.
-- `corrections-template.json`: 추출/분류를 수정할 때의 입력 초안.
+- `corrections-template.json`: 추출/분류를 수정할 때의 전체 입력 초안.
+- `applied-corrections.json`: 마지막 성공 실행에 적용한 사람·taxonomy 정정 누적 상태. 직접 편집하지 않고 corrections 입력으로 변경한다.
 - `task-inputs/`, `taxonomy-drafts/`: PJT 단계가 한도에 걸렸을 때 내부 검토에 사용할 중간 결과.
 - `view.json`, `matrix.html`, `review.html`: 실제 내용이 포함된 민감 결과.
 
@@ -121,6 +130,10 @@ python3 -m nebula run \
   --corrections /secure/review/corrections.json \
   --out /secure/runs/nebula-001
 ```
+
+같은 out에서 정정은 누적된다. A를 수정한 다음 B만 포함하는 파일로 재실행해도 A의 정정을 유지한다. `--corrections`를 생략해도 마지막 성공 실행의 정정을 유지한다. 검토 화면의 추출 정정 내보내기는 기존에 적용한 사람 정정도 포함한다. 화면의 정정 취소는 이번 편집을 취소하며 과거에 적용된 정정을 지우지 않는다.
+
+모든 누적 정정을 버리고 모델 추출·분류 기준으로 돌아가려면 같은 run/demo 명령에 `--reset-corrections`를 추가한다. 함께 제공한 새 corrections는 초기화 후 적용한다. 검증된 모델 캐시는 유지하므로 새 모델 호출을 강제하는 옵션은 아니다. 원문 해시가 바뀌거나 사람이 제거되면 해당 사람의 이전 정정은 재사용하지 않는다. PJT 과제 해시가 바뀌면 해당 taxonomy 정정도 재사용하지 않고 새로 분류한다. 명시적으로 제공한 corrections의 해시가 오래되었으면 오류로 중단한다. 실패한 실행은 마지막 성공 정정 상태를 교체하지 않으므로 고친 입력과 정정 파일을 다시 제공한다.
 
 수정되지 않은 사람 추출은 캐시를 사용한다. 바뀐 결과에 의존하는 분류/배정은 재계산한다. 결과 run_id가 바뀌면 과거 review.json은 거부한다.
 
@@ -162,3 +175,21 @@ python3 -m mypy nebula --check-untyped-defs
 ```
 
 HTTP 테스트는 로컬 호환 서버로 수행하며 실제 LLM에 연결하지 않는다. JSON 형태·인증·재시도 계약을 확인한다. 전체 저장소 테스트에는 기존 프로젝트 개발 의존성이 필요하다. 사용자 인터페이스의 브라우저 검사 명령은 `tests/nebula_browser.cjs` 상단을 참조한다.
+
+
+## 12. 코드 수정 지점
+
+| 목적 | 파일 | 유지할 계약 |
+| --- | --- | --- |
+| 명령·옵션·실행 순서 | `nebula/__main__.py` | 한 out의 전체 작업 잠금, 실패 상태 기록 |
+| 추출·분류·재개·정정·승인 | `nebula/pipeline.py` | PJT 독립 분류, 누적 정정, run_id 일치 |
+| 입력·근거·응답 검증 | `nebula/model.py` | 정확한 인용, 안정적인 ID, 누락 배정 거부 |
+| 모델 지침 | `nebula/prompts.py` | 업무·역량 구별, 명시적 시간, 직접 연결 근거 |
+| 내부 모델 HTTP | `nebula/llm.py` | OpenAI 호환 JSON, 제한된 재시도, 비밀정보 제외 |
+| 캐시·잠금·파일 | `nebula/storage.py` | 검증된 응답만 캐시, 파일 단위 원자적 교체 |
+| 기존 네트워크 입력 | `nebula/network.py` | 사람 ID로 결합, 점수·좌표 보존 |
+| 집계·HTML 생성 | `nebula/render.py` | 고유 인원 집계, 안전한 JSON 삽입 |
+| 탐색·검토 UI | `nebula/templates/` | 오프라인 동작, 원문 접근, 정정 내보내기 |
+| 합성 자료 | `nebula/demo.py` | 실제 조직 데이터와 명확히 구별 |
+
+프롬프트를 바꾸면 해당 호출의 캐시 키가 바뀐다. 사람·taxonomy의 기존 수동 정정은 명시적으로 초기화하기 전까지 우선하므로 모델 변경을 비교할 때는 새 out을 사용한다. 입력부터 재개·정정·승인까지의 계약 테스트는 `tests/test_nebula_pipeline.py`, HTTP는 `tests/test_nebula_http.py`, 네트워크는 `tests/test_nebula_network.py`, 실제 파일 내보내기와 재빌드는 `tests/nebula_browser.cjs`에서 확인한다.
