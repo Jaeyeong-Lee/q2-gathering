@@ -82,8 +82,8 @@
 ## 남은 것
 
 - 모바일 폭(≤700px)에서 SVG가 그려지지 않는다. 사용자가 범위 밖으로 결정했다.
-- `clear/` 아래 원본(`build_nebula.py`, `future-nebula.html`, `check_nebula.cjs`)은
-  건드리지 않았다. 워크트리 편입이 끝났으니 이제 지워도 되지만, 지우는 건 사람이 정한다.
+- `clear/` 아래 원본은 참고용으로 `docs/nebula-prototype/`에 보관했다([[nebula-prototype/README]]).
+  빌드되지 않으며 계보 대조용이다. `clear/` 자체를 지우는 건 사람이 정한다.
 - `templates/td_people_atlas.html`과 `scripts/td_people_atlas_demo.py`는 이전 발표
   자료 그대로 두었다. 명세의 "기존 발표 HTML을 변경하지 않는다"에 해당한다.
 - 실제 내부 endpoint 연결과 의미 검증은 여전히 내부망 몫이다.
