@@ -20,7 +20,7 @@ def top_k_neighbors(embeddings, k=K):
     # ponytail: 순수 파이썬 O(n²·d) — 수백 명 규모 빌드 타임엔 충분, 수천 명·고차원이면 numpy로
     for a, i in enumerate(ids):
         scored = [
-            (round(math.sumprod(unit[a], unit[b]), 4), ids[b])
+            (round(sum(x * y for x, y in zip(unit[a], unit[b])), 4), ids[b])
             for b in range(len(ids)) if b != a
         ]
         scored.sort(key=lambda t: (-t[0], t[1]))
