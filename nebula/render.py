@@ -1,7 +1,7 @@
 """Build presentation and review payload, with provenance-preserving aggregates."""
 
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from .model import digest, need
 from .storage import Store, write_json, write_text, output_lock
@@ -75,6 +75,132 @@ def build_view(data, approved_only=False):
     }
 
 
+# Eight hues reused from the previous synthetic atlas; index falls back by modulo
+# so a corpus with more PJTs still renders instead of failing.
+PALETTE = [
+    "#7dcfff", "#a7a4ff", "#f0afce", "#eeb78c",
+    "#e5d688", "#9bd4bd", "#9fb8f0", "#cebcf4",
+]
+
+
+def _seed(value):
+    """Stable 0..1 jitter so a rerun places the same star in the same spot."""
+    return int(digest(value)[:8], 16) / 0xFFFFFFFF
+
+
+def _coordinates(people):
+    """Scale supplied layout into 0..1; the template maps that onto its viewport.
+
+    Coordinates may arrive normalized or in arbitrary pixels, so the range is
+    derived rather than assumed. Absent layout stays absent: the template then
+    says so and falls back to a deterministic ring.
+    """
+    points = [p for p in people if p["x"] is not None]
+    if not points:
+        return
+    for key in ("x", "y"):
+        values = [p[key] for p in points]
+        low, span = min(values), (max(values) - min(values)) or 1
+        for p in points:
+            p[key] = round((p[key] - low) / span, 6)
+
+
+def build_nebula(view):
+    """Reshape build_view output for the five-scene presentation.
+
+    The scenes address people and PJTs by position, so stable ids are indexed
+    here and the original ids ride along for evidence display. Unclassified
+    tasks get a per-PJT placeholder category instead of disappearing.
+    """
+    network = view.get("network") or {}
+    nodes = {n["id"]: n for n in network.get("nodes", [])}
+    pjt_names = sorted({p["pjt"] for p in view["persons"]})
+    pjt_at = {name: i for i, name in enumerate(pjt_names)}
+
+    people, person_at = [], {}
+    for i, person in enumerate(sorted(view["persons"], key=lambda p: p["id"])):
+        person_at[person["id"]] = i
+        node = nodes.get(person["id"], {})
+        people.append(
+            {
+                "id": i,
+                "pid": person["id"],
+                "name": person["name"],
+                "pjt": pjt_at[person["pjt"]],
+                "text": person["text"],
+                "x": node.get("x"),
+                "y": node.get("y"),
+            }
+        )
+    _coordinates(people)
+
+    loose = {t["pjt"] for t in view["tasks"] if not t["category_id"]}
+    by_pjt = defaultdict(list)
+    for category in view["categories"]:
+        by_pjt[category["pjt"]].append(category)
+    categories, category_at = [], {}
+    for name in pjt_names:
+        entries = sorted(by_pjt.get(name, []), key=lambda c: c["name"])
+        if name in loose:
+            entries.append({"id": f"unclassified:{name}", "name": "미분류"})
+        for index, category in enumerate(entries):
+            category_at[category["id"]] = index
+            categories.append(
+                {
+                    "id": category["id"],
+                    "pjt": pjt_at[name],
+                    "name": category["name"],
+                    "definition": category.get("definition", ""),
+                }
+            )
+
+    tasks, written = [], Counter[int]()
+    for task in sorted(view["tasks"], key=lambda t: (t["person_id"], t["id"])):
+        cid = task["category_id"] or f"unclassified:{task['pjt']}"
+        owner = person_at[task["person_id"]]
+        tasks.append(
+            {
+                "id": task["id"],
+                "person": owner,
+                "pjt": pjt_at[task["pjt"]],
+                "category": cid,
+                "cat_index": category_at[cid],
+                "seq": written[owner],
+                "horizon": task["horizon"],
+                "quote": task["quote"],
+                "skills": [
+                    {
+                        "kind": "have" if s["kind"] == "have" else "gap",
+                        "label": s["label"],
+                        "quote": s["relation_quote"],
+                    }
+                    for s in task["skills"]
+                ],
+                "seed": _seed(task["id"]),
+            }
+        )
+        written[owner] += 1
+
+    per_pjt = Counter(p["pjt"] for p in people)
+    return {
+        "run_id": view["run_id"],
+        "synthetic": view["synthetic"],
+        "approved_only": view["approved_only"],
+        "has_layout": bool(network.get("has_layout")),
+        "people": people,
+        "tasks": tasks,
+        "categories": categories,
+        "pjts": [
+            {"name": name, "color": PALETTE[i % len(PALETTE)], "count": per_pjt[i]}
+            for i, name in enumerate(pjt_names)
+        ],
+        "edges": [
+            {"a": person_at[e["a"]], "b": person_at[e["b"]], "w": e["similarity"]}
+            for e in network.get("edges", [])
+        ],
+    }
+
+
 def encoded(data):
     return (
         json.dumps(data, ensure_ascii=False)
@@ -101,9 +227,12 @@ def build(data, out, approved_only=False):
 def _build(data, out, approved_only):
     view = build_view(data, approved_only)
     root = Path(__file__).parent / "templates"
-    html = (root / "matrix.html").read_text().replace("__PAYLOAD__", encoded(view))
-    review = (root / "review.html").read_text().replace("__PAYLOAD__", encoded(data))
-    write_text(out / "matrix.html", html)
-    write_text(out / "review.html", review)
+    for name, payload in (
+        ("nebula", build_nebula(view)),
+        ("matrix", view),
+        ("review", data),
+    ):
+        page = (root / f"{name}.html").read_text()
+        write_text(out / f"{name}.html", page.replace("__PAYLOAD__", encoded(payload)))
     write_json(out / "view.json", view)
-    return out / "matrix.html"
+    return out / "nebula.html"

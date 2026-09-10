@@ -4,7 +4,7 @@
 
 ## 운영 에이전트의 실행 순서와 종료 조건
 
-1. 아래 합성 실행을 완료하고 `status.json`이 complete인지 확인한다. `matrix.html`의 버블에서 원문이 열리고 `review.html`에서 결정 JSON을 내려받을 수 있으면 환경 준비 완료다.
+1. 아래 합성 실행을 완료하고 `status.json`이 complete인지 확인한다. `nebula.html`의 다섯 장면이 모두 그려지고, `matrix.html`의 버블에서 원문이 열리고, `review.html`에서 결정 JSON을 내려받을 수 있으면 환경 준비 완료다.
 2. 입력 계약에 맞는 원문·PJT·네트워크를 준비한다. 중복 ID나 모집단 불일치가 있으면 입력을 고친 뒤 진행한다.
 3. 내부 endpoint를 설정해 실입력을 처리한다. 실패하면 상태의 stage/call_key와 해당 단계 가이드를 확인하고 같은 명령으로 재개한다. complete와 최종 HTML이 모두 생성되어야 추출 실행 완료다.
 4. 검토 단계에서 원문·시간·과제 분류·역량 연결을 확인한다. 수정이 필요하면 corrections로 재실행하고, 변경된 run_id에 대한 검토를 새로 저장한다.
@@ -98,7 +98,7 @@ python3 -m nebula run \
 
 HTTP 408·429·5xx와 연결/타임아웃은 호출당 최대 3회로 제한한다. 401/403 등은 즉시 실패한다. JSON 파싱·스키마·인용 오류는 완료로 저장하지 않는다. 출력 토큰 잘림은 명시적으로 실패하며 `MAX_TOKENS` 또는 배치 크기를 조정한다. 기본 응답은 비스트리밍이므로 서버의 스트리밍 전용 모드는 지원하지 않는다.
 
-동일 출력 디렉터리에 동시 실행하면 잠금 오류로 실패한다. 서로 다른 out은 독립 실행할 수 있다. 재실행을 시작하면 직전 HTML은 `matrix.previous.html`, `review.previous.html`로 보존한다. 새 실행이 실패한 상태를 기존 성공 화면으로 오인하지 않도록 현재 이름의 HTML은 완료 빌드에서만 생성한다.
+동일 출력 디렉터리에 동시 실행하면 잠금 오류로 실패한다. 서로 다른 out은 독립 실행할 수 있다. 재실행을 시작하면 직전 HTML은 `nebula.previous.html`, `matrix.previous.html`, `review.previous.html`로 보존한다. 새 실행이 실패한 상태를 기존 성공 화면으로 오인하지 않도록 현재 이름의 HTML은 완료 빌드에서만 생성한다.
 
 주요 파일:
 
@@ -107,7 +107,8 @@ HTTP 408·429·5xx와 연결/타임아웃은 호출당 최대 3회로 제한한�
 - `corrections-template.json`: 추출/분류를 수정할 때의 전체 입력 초안.
 - `applied-corrections.json`: 마지막 성공 실행에 적용한 사람·taxonomy 정정 누적 상태. 직접 편집하지 않고 corrections 입력으로 변경한다.
 - `task-inputs/`, `taxonomy-drafts/`: PJT 단계가 한도에 걸렸을 때 내부 검토에 사용할 중간 결과.
-- `view.json`, `matrix.html`, `review.html`: 실제 내용이 포함된 민감 결과.
+- `view.json`, `nebula.html`, `matrix.html`, `review.html`: 실제 내용이 포함된 민감 결과.
+- `nebula.html`: 발표용 다섯 장면 화면. `#scene=0`~`#scene=4`로 특정 장면을 직접 열 수 있고, `pjt`·`category`·`task`·`person`도 같은 방식으로 붙는다. 리허설 중단 지점을 그대로 공유할 때 쓴다.
 
 `--batch-size`는 한 요청의 과제 수를 줄인다. `--max-chars`는 문자 기반 가드이며 토큰 계산기가 아니다. 누적 taxonomy를 포함한 요청도 별도로 제한한다. 초과 시 조용히 내용을 자르지 않는다. 큰 PJT는 분류 초안을 검토해 corrections의 taxonomies로 제공하거나, 모델 한도를 확인한 후 가드를 조정한다.
 
@@ -189,7 +190,11 @@ HTTP 테스트는 로컬 호환 서버로 수행하며 실제 LLM에 연결하�
 | 캐시·잠금·파일 | `nebula/storage.py` | 검증된 응답만 캐시, 파일 단위 원자적 교체 |
 | 기존 네트워크 입력 | `nebula/network.py` | 사람 ID로 결합, 점수·좌표 보존 |
 | 집계·HTML 생성 | `nebula/render.py` | 고유 인원 집계, 안전한 JSON 삽입 |
+| 발표 화면 페이로드 | `nebula/render.py` `build_nebula` | 사람·PJT 색인과 원래 ID 병기, 미분류 보존 |
+| 발표 UI | `nebula/templates/nebula.html` | 다섯 장면, 좌표 유무 표기, 장면 딥링크 |
 | 탐색·검토 UI | `nebula/templates/` | 오프라인 동작, 원문 접근, 정정 내보내기 |
 | 합성 자료 | `nebula/demo.py` | 실제 조직 데이터와 명확히 구별 |
+
+발표 화면이 어떤 계약 차이를 넘어 파이프라인에 붙었는지는 [[nebula-handoff-2026-09-11]]에 있다. 템플릿의 색인·중기·미분류·좌표 부재 처리를 건드리기 전에 읽는다.
 
 프롬프트를 바꾸면 해당 호출의 캐시 키가 바뀐다. 사람·taxonomy의 기존 수동 정정은 명시적으로 초기화하기 전까지 우선하므로 모델 변경을 비교할 때는 새 out을 사용한다. 입력부터 재개·정정·승인까지의 계약 테스트는 `tests/test_nebula_pipeline.py`, HTTP는 `tests/test_nebula_http.py`, 네트워크는 `tests/test_nebula_network.py`, 실제 파일 내보내기와 재빌드는 `tests/nebula_browser.cjs`에서 확인한다.

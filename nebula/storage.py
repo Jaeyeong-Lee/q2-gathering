@@ -101,7 +101,7 @@ class Store:
 
 def begin_run(out):
     root = Store(out).out
-    for name in ("matrix", "review"):
+    for name in ("nebula", "matrix", "review"):
         current = root / (name + ".html")
         if current.exists():
             current.replace(root / (name + ".previous.html"))

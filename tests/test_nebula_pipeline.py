@@ -9,7 +9,7 @@ from pathlib import Path
 from nebula.demo import FakeClient, source
 from nebula.model import ValidationError, digest
 from nebula.pipeline import run, with_review
-from nebula.render import build_view
+from nebula.render import build_nebula, build_view
 
 
 class PipelineContract(unittest.TestCase):
@@ -345,3 +345,89 @@ class ReviewRegressions(unittest.TestCase):
                 inputs, out, FakeClient(), corrections={"persons": [person_patch]}
             )
             self.assertEqual(changed["applied_corrections"]["taxonomies"], [])
+
+
+class NebulaPresentation(unittest.TestCase):
+    """The five-scene presentation addresses people and PJTs by position.
+
+    build_view keeps stable string ids; the scenes index into arrays. These
+    tests pin that translation, because a silent mismatch shows an empty sky
+    rather than an error.
+    """
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.out = Path(self.temp.name)
+        self.data = run(source()[:6], self.out, FakeClient())
+        self.view = build_view(self.data)
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def test_every_task_resolves_to_a_person_pjt_and_category_slot(self):
+        payload = build_nebula(self.view)
+        people = {p["id"] for p in payload["people"]}
+        categories = {c["id"] for c in payload["categories"]}
+        self.assertEqual(people, set(range(len(payload["people"]))))
+        self.assertEqual(len(payload["tasks"]), len(self.view["tasks"]))
+        for task in payload["tasks"]:
+            self.assertIn(task["person"], people)
+            self.assertIn(task["category"], categories)
+            self.assertIn(task["pjt"], range(len(payload["pjts"])))
+            self.assertEqual(
+                task["pjt"], payload["people"][task["person"]]["pjt"]
+            )
+        for edge in payload["edges"]:
+            self.assertIn(edge["a"], people)
+            self.assertIn(edge["b"], people)
+
+    def test_unclassified_tasks_get_a_visible_category_instead_of_vanishing(self):
+        loose = copy.deepcopy(self.data)
+        target = loose["assignments"][0]
+        target["category_id"] = None
+        payload = build_nebula(build_view(loose))
+        placeholder = next(
+            c for c in payload["categories"] if c["id"].startswith("unclassified:")
+        )
+        self.assertEqual(placeholder["name"], "미분류")
+        self.assertEqual(
+            len([t for t in payload["tasks"] if t["category"] == placeholder["id"]]), 1
+        )
+
+    def test_supplied_layout_is_normalized_and_absence_is_reported(self):
+        payload = build_nebula(self.view)
+        self.assertFalse(payload["has_layout"])
+        self.assertTrue(all(p["x"] is None for p in payload["people"]))
+        ids = [p["id"] for p in self.view["persons"]]
+        supplied = {
+            "nodes": [
+                {"id": pid, "x": 200 + i * 30, "y": -50 - i * 10}
+                for i, pid in enumerate(ids)
+            ],
+            "edges": [{"a": ids[0], "b": ids[1], "similarity": 0.4}],
+        }
+        placed = run(
+            source()[:6],
+            Path(self.temp.name) / "placed",
+            FakeClient(),
+            network=supplied,
+        )
+        payload = build_nebula(build_view(placed))
+        self.assertTrue(payload["has_layout"])
+        values = [p["x"] for p in payload["people"]] + [p["y"] for p in payload["people"]]
+        self.assertEqual((min(values), max(values)), (0.0, 1.0))
+
+    def test_scene_layout_is_stable_across_reruns(self):
+        again = run(source()[:6], Path(self.temp.name) / "again", FakeClient())
+        first = {t["id"]: t["seed"] for t in build_nebula(self.view)["tasks"]}
+        second = {t["id"]: t["seed"] for t in build_nebula(build_view(again))["tasks"]}
+        self.assertEqual(first, second)
+
+    def test_build_writes_the_presentation_alongside_matrix_and_review(self):
+        from nebula.render import build
+
+        build(self.data, self.out)
+        for name in ("nebula", "matrix", "review"):
+            page = (self.out / f"{name}.html").read_text()
+            self.assertNotIn("__PAYLOAD__", page)
+        self.assertIn(self.data["run_id"], (self.out / "nebula.html").read_text())

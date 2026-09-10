@@ -41,6 +41,34 @@ function cli(args, code = 0) {
   });
   page.on("dialog", (d) => d.accept());
   const url = (name) => pathToFileURL(path.join(out, name)).href;
+
+  // The presentation is the main deliverable: every scene must draw from the
+  // same run, and the deep link is what makes a scene checkable at all.
+  const scenes = ["사람", "과제로 펼치기", "성운으로 모이기", "시간으로 보기", "역량 들여다보기"];
+  for (const [index, name] of scenes.entries()) {
+    await page.goto(url("nebula.html") + "#scene=" + index);
+    await page.reload(); // hash-only goto does not re-run the page
+    await page.waitForFunction(
+      (i) => document.querySelector(".step.active")?.textContent.includes("0" + (i + 1)),
+      index,
+    );
+    assert.equal(await page.locator(".step.active").innerText(), "0" + (index + 1) + "\n" + name);
+    assert.ok(
+      await page.locator("#sky g.task, #sky g.person, #sky g.skill").count(),
+      "scene " + index + " drew nothing",
+    );
+    await page.screenshot({ path: path.join(temp, "nebula-" + index + ".png") });
+  }
+  // 중기 is a horizon the pipeline emits; the prototype only knew short/long.
+  await page.goto(url("nebula.html") + "#scene=3");
+  await page.reload();
+  assert.ok(
+    (await page.locator("#time text").allTextContents()).some((t) => t.includes("중기")),
+    "mid horizon must have its own ring",
+  );
+  await page.locator("#sky g.task").first().click();
+  assert.ok(await page.locator("#panel blockquote").count(), "star must open its quote");
+
   await page.goto(url("matrix.html"));
   assert.ok(await page.locator("#view .bubble").count());
   await page.locator("#view .bubble").first().click();
@@ -159,7 +187,7 @@ function cli(args, code = 0) {
   assert.deepEqual(requests, []);
   await browser.close();
   console.log(
-    "PASS: matrix, network, tasks, evidence, mobile, review/category correction, extraction correction, stale review, offline",
+    "PASS: nebula scenes, matrix, network, tasks, evidence, mobile, review/category correction, extraction correction, stale review, offline",
   );
   console.log("Screenshots: " + temp);
 })().catch((e) => {
