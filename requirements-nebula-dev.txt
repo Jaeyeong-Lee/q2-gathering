@@ -1,0 +1,4 @@
+# Runtime needs Python's standard library only. Existing repo tests need requirements.txt too.
+pytest>=8
+mypy>=1.10
+black>=24

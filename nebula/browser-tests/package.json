@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Optional browser verification for generated offline HTML",
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>미래 과제 · 역량 지도</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      :root {
+        --ink: #172b46;
+        --muted: #5c6e83;
+        --line: #dbe3ed;
+        --blue: #2864ad;
+        --purple: #8060af;
+        --paper: #f4f7fb;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          15px/1.65 -apple-system,
+          BlinkMacSystemFont,
+          "Apple SD Gothic Neo",
+          "Malgun Gothic",
+          sans-serif;
+      }
+      header {
+        padding: 30px 4vw 20px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+      .eyebrow {
+        font:
+          12px ui-monospace,
+          monospace;
+        letter-spacing: 0.16em;
+        color: var(--blue);
+      }
+      h1 {
+        font-size: 32px;
+        letter-spacing: -0.05em;
+        margin: 6px 0;
+      }
+      h2 {
+        font-size: 21px;
+        margin: 0 0 12px;
+      }
+      h3 {
+        font-size: 17px;
+        margin: 0 0 8px;
+      }
+      p {
+        margin: 8px 0;
+      }
+      .muted,
+      small {
+        color: var(--muted);
+      }
+      button,
+      select,
+      input,
+      textarea {
+        font: inherit;
+      }
+      button,
+      select,
+      input {
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        color: var(--ink);
+        padding: 8px 13px;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:hover {
+        background: #eaf0f8;
+      }
+      button.active small {
+        color: #e1eaf7;
+      }
+      button.active,
+      button.primary {
+        background: var(--ink);
+        color: #fff;
+        border-color: var(--ink);
+      }
+      :focus-visible {
+        outline: 3px solid #ce7b22;
+        outline-offset: 3px;
+      }
+      nav,
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      nav {
+        margin-top: 20px;
+      }
+      main {
+        padding: 24px 4vw 40px;
+      }
+      .toolbar {
+        margin-bottom: 18px;
+      }
+      .toolbar label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 370px;
+        gap: 20px;
+        align-items: start;
+      }
+      .surface,
+      aside {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px;
+        min-width: 0;
+      }
+      aside {
+        max-height: 78vh;
+        overflow: auto;
+        position: sticky;
+        top: 15px;
+      }
+      .badge {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 5px;
+        background: #eaf0f8;
+        font-size: 12px;
+        margin: 2px 4px 2px 0;
+      }
+      .badge.need {
+        color: #65458f;
+        background: #f0eafb;
+      }
+      .badge.have {
+        color: #205c9f;
+        background: #e6f0fc;
+      }
+      .notice {
+        padding: 12px 16px;
+        border-left: 3px solid #879db8;
+        background: #edf2f8;
+        margin: 12px 0;
+      }
+      .empty {
+        padding: 35px 16px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .item {
+        padding: 17px 0;
+        border-bottom: 1px solid var(--line);
+        overflow-wrap: anywhere;
+      }
+      .item:last-child {
+        border: 0;
+      }
+      blockquote,
+      pre.source {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        margin: 8px 0 14px;
+        padding: 12px 14px;
+        background: #f4f7fb;
+        border-left: 2px solid #9cafc8;
+        font: inherit;
+      }
+      details {
+        margin: 12px 0;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+        padding: 8px 0;
+      }
+      .stack {
+        display: grid;
+        gap: 10px;
+      }
+      .wide {
+        width: 100%;
+        text-align: left;
+      }
+      .chart {
+        overflow: auto;
+      }
+      svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        min-width: 640px;
+      }
+      svg text {
+        font-family: inherit;
+        fill: var(--ink);
+      }
+      svg .bubble {
+        cursor: pointer;
+        stroke-width: 2;
+        transition: opacity 0.15s;
+      }
+      svg .bubble:hover {
+        opacity: 0.75;
+      }
+      svg .bubble:focus {
+        outline: none;
+        stroke: #172b46;
+        stroke-width: 4;
+      }
+      .cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+        padding: 12px 0;
+      }
+      .orb {
+        border-radius: 50%;
+        width: 116px;
+        height: 116px;
+        background: #e9f1fc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow-wrap: anywhere;
+        font-size: 13px;
+        text-align: center;
+        padding: 14px;
+      }
+      .orb strong {
+        font-size: 23px;
+      }
+      .group {
+        padding: 20px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      textarea {
+        display: block;
+        width: 100%;
+        min-height: 110px;
+        border: 1px solid #afbdd0;
+        border-radius: 8px;
+        padding: 12px;
+        color: var(--ink);
+        background: white;
+      }
+      label.field {
+        display: block;
+        margin: 15px 0;
+      }
+      label.field input,
+      label.field select {
+        display: block;
+        width: 100%;
+        margin-top: 5px;
+      }
+      .status {
+        min-height: 26px;
+        color: var(--blue);
+      }
+      .review-grid {
+        display: grid;
+        grid-template-columns: 290px minmax(0, 1fr);
+        gap: 22px;
+      }
+      .task-list {
+        max-height: 78vh;
+        overflow: auto;
+      }
+      .task-list button {
+        margin-bottom: 8px;
+      }
+      .review-detail {
+        max-width: 950px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 14px 0;
+      }
+      .run {
+        overflow-wrap: anywhere;
+        font:
+          12px ui-monospace,
+          monospace;
+      }
+      .legend {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        margin: 12px 0;
+      }
+      header {
+        padding-top: 18px;
+        padding-bottom: 14px;
+      }
+      header h1 {
+        font-size: 28px;
+        margin: 3px 0;
+      }
+      header .run {
+        display: none;
+      }
+      header nav {
+        margin-top: 12px;
+      }
+      main {
+        padding-top: 16px;
+      }
+      .notice {
+        margin: 8px 0 12px;
+        font-size: 13px;
+      }
+      .surface {
+        padding: 18px;
+      }
+      @media (max-width: 1000px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          position: static;
+          max-height: none;
+        }
+      }
+      @media (max-width: 700px) {
+        header {
+          padding: 22px 18px;
+        }
+        main {
+          padding: 18px;
+        }
+        h1 {
+          font-size: 27px;
+        }
+        .surface,
+        aside {
+          padding: 16px;
+        }
+        .review-grid {
+          grid-template-columns: 1fr;
+        }
+        .task-list {
+          max-height: 250px;
+        }
+        .toolbar label {
+          width: 100%;
+          justify-content: space-between;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">NEBULA / FUTURE TASK ATLAS</div>
+      <h1>미래 과제, 연결된 역량</h1>
+      <p class="muted">사람의 기록에서 과제로, 과제에서 필요한 역량으로.</p>
+      <div id="meta"></div>
+      <p class="run" id="run"></p>
+      <nav aria-label="보기 선택" role="tablist">
+        <button id="tab-people" role="tab" aria-controls="view">사람</button
+        ><button id="tab-tasks" role="tab" aria-controls="view">과제</button
+        ><button id="tab-matrix" role="tab" aria-controls="view">
+          매트릭스
+        </button>
+      </nav>
+    </header>
+    <main>
+      <div class="toolbar">
+        <label
+          >PJT
+          <select id="pjt" aria-label="PJT"></select></label
+        ><label
+          >과제 범주
+          <select id="category" aria-label="과제 범주"></select></label
+        ><span id="count" aria-live="polite"></span>
+      </div>
+      <p class="notice">
+        보유·필요는 원문에 나타난 역량 언급입니다. 숙련도나 측정된 역량 수준이
+        아닙니다. 버블 면적은 해당 집단의 중복 없는 사람 수에 비례합니다.
+      </p>
+      <div class="workspace">
+        <section class="surface" id="view" role="tabpanel"></section>
+        <aside id="inspector" aria-label="선택한 항목의 근거">
+          <h2>근거 살펴보기</h2>
+          <p class="muted">
+            사람, 과제 또는 버블을 선택하면 연결된 기록과 정확한 인용문을 볼 수
+            있습니다.
+          </p>
+        </aside>
+      </div>
+      <section class="surface" style="margin-top: 20px">
+        <h2>연결되지 않은 기록</h2>
+        <p class="muted">
+          연결이 없어도 기록은 남습니다. 아래 목록은 현재 PJT·범주 필터를
+          따릅니다.
+        </p>
+        <div id="unlinked"></div>
+      </section>
+    </main>
+    <script type="application/json" id="payload">
+      __PAYLOAD__
+    </script>
+    <script>
+      const D = JSON.parse(document.getElementById("payload").textContent);
+      const arr = (v) => (Array.isArray(v) ? v : []);
+      const $ = (id) => document.getElementById(id);
+      const H = {
+          short: "단기",
+          mid: "중기",
+          long: "장기",
+          unknown: "시점 미정",
+        },
+        K = { have: "보유 언급", need: "필요 언급" },
+        S = { pending: "초안 · 검토 대기", approved: "승인", rejected: "반려" };
+      function el(tag, text, cls) {
+        const n = document.createElement(tag);
+        if (text !== undefined) n.textContent = String(text ?? "");
+        if (cls) n.className = cls;
+        return n;
+      }
+      function add(parent, ...nodes) {
+        parent.append(...nodes);
+        return parent;
+      }
+      function badge(text, cls = "") {
+        return el("span", text, "badge " + cls);
+      }
+      function empty(parent, text) {
+        parent.append(el("p", text, "empty"));
+      }
+      function quote(parent, label, text) {
+        parent.append(
+          el("small", label),
+          el("blockquote", text == null ? "제공되지 않음" : text),
+        );
+      }
+      function button(text, fn, cls = "") {
+        const b = el("button", text, cls);
+        b.type = "button";
+        b.onclick = fn;
+        return b;
+      }
+      function detail(parent, title, text) {
+        const d = el("details");
+        add(d, el("summary", title), el("pre", text, "source"));
+        parent.append(d);
+      }
+      function options(select, rows) {
+        select.replaceChildren();
+        for (const [value, label] of rows) {
+          const o = el("option", label);
+          o.value = value;
+          select.append(o);
+        }
+      }
+      const persons = arr(D.persons),
+        tasks = arr(D.tasks),
+        cats = arr(D.categories),
+        pm = new Map(persons.map((p) => [String(p.id), p])),
+        cm = new Map(cats.map((c) => [String(c.id), c]));
+      const person = (id) => pm.get(String(id)),
+        cat = (id) => cm.get(String(id))?.name || "미분류";
+      function personName(id) {
+        return person(id)?.name || String(id ?? "작성자 미상");
+      }
+      function meta() {
+        add(
+          $("meta"),
+          badge(
+            D.synthetic === true
+              ? "합성 데이터"
+              : D.synthetic === false
+                ? "원본 기반 데이터"
+                : "데이터 유형 미제공",
+          ),
+          badge(D.approved_only ? "승인된 과제만" : "초안 포함"),
+        );
+        $("run").textContent = "RUN " + (D.run_id ?? "미제공");
+      }
+      meta();
+      let tab = "matrix";
+      const pjt = $("pjt"),
+        category = $("category");
+      options(pjt, [
+        ["", "전체 PJT"],
+        ...[
+          ...new Set([
+            ...persons.map((p) => p.pjt),
+            ...tasks.map((t) => t.pjt),
+          ]),
+        ]
+          .filter(Boolean)
+          .sort()
+          .map((v) => [v, v]),
+      ]);
+      function updateCategories() {
+        options(category, [
+          ["", "전체 범주"],
+          ["__none", "미분류"],
+          ...cats
+            .filter((c) => !pjt.value || c.pjt === pjt.value)
+            .map((c) => [String(c.id), c.name]),
+        ]);
+      }
+      if (pjt.options.length > 1) pjt.selectedIndex = 1;
+      updateCategories();
+      function filtered() {
+        return tasks.filter(
+          (t) =>
+            (!pjt.value || t.pjt === pjt.value) &&
+            (!category.value ||
+              (category.value === "__none"
+                ? t.category_id == null
+                : String(t.category_id) === category.value)),
+        );
+      }
+      function eligiblePeople(ts) {
+        return persons.filter(
+          (p) =>
+            (!pjt.value || p.pjt === pjt.value) &&
+            (!category.value ||
+              ts.some((t) => String(t.person_id) === String(p.id))),
+        );
+      }
+      function taskCard(t, parent) {
+        const card = el("article", undefined, "item");
+        add(
+          card,
+          el("h3", t.label),
+          badge(personName(t.person_id)),
+          badge(t.pjt),
+          badge(H[t.horizon] || H.unknown),
+          badge(S[t.review?.status] || S.pending),
+          el("p", cat(t.category_id)),
+        );
+        quote(
+          card,
+          "과제 원문 · 등장 " + (t.occurrence ?? 1) + "회차",
+          t.quote,
+        );
+        quote(card, "시점 근거", t.time_quote);
+        detail(card, "범주 배정 이유", t.reason || "제공되지 않음");
+        const skills = arr(t.skills);
+        if (!skills.length)
+          card.append(el("p", "연결된 역량이 없습니다.", "muted"));
+        for (const c of skills) {
+          add(card, el("h3", c.label), badge(K[c.kind] || c.kind, c.kind));
+          quote(card, "역량 원문 · " + personName(c.person_id), c.quote);
+          quote(card, "과제 ↔ 역량 관계 원문", c.relation_quote);
+        }
+        if (t.review?.note) quote(card, "검토 메모", t.review.note);
+        detail(
+          card,
+          "작성자 전체 원문 · " + personName(t.person_id),
+          person(t.person_id)?.text || "원문이 제공되지 않았습니다.",
+        );
+        parent.append(card);
+      }
+      function inspect(title, ts) {
+        const box = $("inspector");
+        box.replaceChildren(
+          el("h2", title),
+          el("p", ts.length + "개 과제", "muted"),
+        );
+        if (!ts.length) empty(box, "현재 필터에 해당하는 과제가 없습니다.");
+        ts.forEach((t) => taskCard(t, box));
+      }
+      function svgEl(tag, attrs = {}, text) {
+        const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (const [k, v] of Object.entries(attrs))
+          n.setAttribute(k, String(v));
+        if (text !== undefined) n.textContent = String(text);
+        return n;
+      }
+      function bubble(svg, x, y, r, label, kind, fn) {
+        const g = svgEl("g", {
+          class: "bubble",
+          role: "button",
+          tabindex: 0,
+          "aria-label": label,
+        });
+        g.append(
+          svgEl("circle", {
+            cx: x,
+            cy: y,
+            r,
+            fill: kind === "need" ? "#e6daf6" : "#d3e6fa",
+            stroke: kind === "need" ? "#8060af" : "#2864ad",
+          }),
+          svgEl("title", {}, label),
+        );
+        g.onclick = fn;
+        g.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            fn();
+          }
+        };
+        svg.append(g);
+        return g;
+      }
+      function matrix(ts) {
+        const v = $("view");
+        add(
+          v,
+          el("h2", "시간 × 역량 언급"),
+          el(
+            "p",
+            "X는 단기·중기·장기·미정의 범주입니다. 칸 안의 위치에는 수치적 의미가 없습니다.",
+            "muted",
+          ),
+        );
+        const groups = new Map();
+        for (const t of ts)
+          for (const kind of ["have", "need"])
+            if (arr(t.skills).some((s) => s.kind === kind)) {
+              const h = H[t.horizon] ? t.horizon : "unknown",
+                key = JSON.stringify([t.pjt, t.category_id, h, kind]);
+              if (!groups.has(key))
+                groups.set(key, {
+                  pjt: t.pjt,
+                  cid: t.category_id,
+                  h,
+                  kind,
+                  ts: [],
+                });
+              groups.get(key).ts.push(t);
+            }
+        if (!groups.size) {
+          empty(
+            v,
+            "연결된 역량이 있는 과제가 없습니다. 아래 연결되지 않은 기록을 확인하세요.",
+          );
+          return;
+        }
+        const gs = [...groups.values()].sort((a, b) =>
+          JSON.stringify([a.pjt, a.cid, a.h, a.kind]).localeCompare(
+            JSON.stringify([b.pjt, b.cid, b.h, b.kind]),
+          ),
+        );
+        let maxCell = 1;
+        for (const h of Object.keys(H))
+          for (const k of ["have", "need"])
+            maxCell = Math.max(
+              maxCell,
+              gs.filter((g) => g.h === h && g.kind === k).length,
+            );
+        const columns = Math.max(2, Math.ceil(Math.sqrt(maxCell))),
+          rows = Math.ceil(maxCell / columns),
+          band = 220,
+          width = 1040,
+          height = 500,
+          cellWidth = 224 / columns,
+          cellHeight = 200 / rows,
+          maxRadius = Math.min(36, cellWidth * 0.32, cellHeight * 0.27),
+          showLabels = maxCell <= 6;
+        const svg = svgEl("svg", {
+          viewBox: `0 0 ${width} ${height}`,
+          role: "group",
+          "aria-label": "시간 범주와 보유 필요 언급별 과제 버블",
+        });
+        const horizons = Object.keys(H);
+        horizons.forEach((h, i) => {
+          svg.append(
+            svgEl(
+              "text",
+              {
+                x: 180 + i * 240,
+                y: 27,
+                "text-anchor": "middle",
+                "font-size": 16,
+              },
+              H[h],
+            ),
+          );
+          for (let k = 0; k < 2; k++)
+            svg.append(
+              svgEl("rect", {
+                x: 65 + i * 240,
+                y: 45 + k * band,
+                width: 232,
+                height: band - 8,
+                rx: 12,
+                fill: k ? "#f7f3fb" : "#f1f6fc",
+              }),
+            );
+        });
+        ["have", "need"].forEach((k, i) =>
+          svg.append(
+            svgEl(
+              "text",
+              { x: 10, y: 70 + i * band, "font-size": 13 },
+              k === "have" ? "보유" : "필요",
+            ),
+          ),
+        );
+        const maxPeople = Math.max(
+          ...gs.map((g) => new Set(g.ts.map((t) => String(t.person_id))).size),
+        );
+        for (const h of horizons)
+          for (const kind of ["have", "need"])
+            gs.filter((g) => g.h === h && g.kind === kind).forEach((g, i) => {
+              const n = new Set(g.ts.map((t) => String(t.person_id))).size,
+                x =
+                  69 +
+                  horizons.indexOf(h) * 240 +
+                  ((i % columns) + 0.5) * cellWidth,
+                y =
+                  54 +
+                  (kind === "need" ? band : 0) +
+                  (Math.floor(i / columns) + 0.38) * cellHeight,
+                r = maxRadius * Math.sqrt(n / maxPeople),
+                label = `${g.pjt} · ${cat(g.cid)} · ${H[h]} · ${K[kind]} · ${n}명 · ${g.ts.length}개 과제`;
+              bubble(svg, x, y, r, label, kind, () => inspect(label, g.ts));
+              if (showLabels)
+                svg.append(
+                  svgEl(
+                    "text",
+                    {
+                      x,
+                      y: y + maxRadius + 16,
+                      "text-anchor": "middle",
+                      "font-size": 12,
+                    },
+                    cat(g.cid).slice(0, 9),
+                  ),
+                  svgEl(
+                    "text",
+                    {
+                      x,
+                      y: y + maxRadius + 31,
+                      "text-anchor": "middle",
+                      "font-size": 11,
+                    },
+                    g.pjt + " · " + n + "명",
+                  ),
+                );
+            });
+        const wrap = el("div", undefined, "chart");
+        wrap.append(svg);
+        v.append(wrap);
+        const d = el("details");
+        d.append(el("summary", "전체 버블 목록 · " + gs.length + "개"));
+        gs.forEach((g) =>
+          d.append(
+            button(
+              `${g.pjt} / ${cat(g.cid)} / ${H[g.h]} / ${K[g.kind]} · ${new Set(g.ts.map((t) => String(t.person_id))).size}명`,
+              () => inspect(cat(g.cid), g.ts),
+              "wide",
+            ),
+          ),
+        );
+        v.append(d);
+      }
+      function peopleView(ts) {
+        const v = $("view"),
+          ps = eligiblePeople(ts).sort((a, b) =>
+            String(a.id).localeCompare(String(b.id)),
+          );
+        v.append(el("h2", "사람에서 시작하기"));
+        const net = D.network,
+          hasNet = net && Array.isArray(net.nodes) && Array.isArray(net.edges);
+        const nodes = new Map(arr(net?.nodes).map((n) => [String(n.id), n]));
+        const supplied =
+          hasNet &&
+          net.has_layout !== false &&
+          ps.length > 0 &&
+          ps.every(
+            (p) =>
+              Number.isFinite(nodes.get(String(p.id))?.x) &&
+              Number.isFinite(nodes.get(String(p.id))?.y),
+          );
+        v.append(
+          el(
+            "p",
+            !hasNet
+              ? "유사도 네트워크가 제공되지 않았습니다. 연결선을 생성하지 않습니다."
+              : "연결선은 제공된 네트워크의 관계만 표시합니다.",
+            "notice",
+          ),
+          el(
+            "p",
+            supplied
+              ? "제공된 좌표를 사용합니다."
+              : "ID 순서에 따른 결정적 원형 배치입니다. 거리와 위치는 유사도를 뜻하지 않습니다.",
+            "muted",
+          ),
+        );
+        if (!ps.length) {
+          empty(v, "현재 필터에 해당하는 사람이 없습니다.");
+          return;
+        }
+        if (ps.length > 35)
+          v.append(
+            el(
+              "p",
+              "이름은 일부만 표시합니다. 원에 마우스를 올리거나 키보드로 초점을 이동하면 이름을 확인할 수 있습니다. 전체 사람 목록도 이용할 수 있습니다.",
+              "muted",
+            ),
+          );
+        const svg = svgEl("svg", {
+            viewBox: "0 0 900 620",
+            role: "group",
+            "aria-label": "사람 네트워크",
+          }),
+          pos = new Map();
+        let minX = 0,
+          minY = 0,
+          scale = 1;
+        if (supplied) {
+          const xs = ps.map((p) => nodes.get(String(p.id)).x),
+            ys = ps.map((p) => nodes.get(String(p.id)).y);
+          minX = Math.min(...xs);
+          minY = Math.min(...ys);
+          scale = Math.min(
+            740 / (Math.max(...xs) - minX || 1),
+            450 / (Math.max(...ys) - minY || 1),
+          );
+        }
+        ps.forEach((p, i) => {
+          const n = nodes.get(String(p.id)),
+            angle = (i / ps.length) * Math.PI * 2 - Math.PI / 2;
+          pos.set(
+            String(p.id),
+            supplied
+              ? [80 + (n.x - minX) * scale, 75 + (n.y - minY) * scale]
+              : ps.length === 1
+                ? [450, 300]
+                : [450 + 330 * Math.cos(angle), 300 + 225 * Math.sin(angle)],
+          );
+        });
+        for (const e of hasNet ? net.edges : []) {
+          const a = pos.get(String(e.a)),
+            b = pos.get(String(e.b));
+          if (!a || !b) continue;
+          const line = svgEl("line", {
+            x1: a[0],
+            y1: a[1],
+            x2: b[0],
+            y2: b[1],
+            stroke: "#c0cbd9",
+            "stroke-width": 1.5,
+          });
+          line.append(
+            svgEl(
+              "title",
+              {},
+              `${personName(e.a)} ↔ ${personName(e.b)} · 유사도 ${e.similarity ?? "미제공"}`,
+            ),
+          );
+          svg.append(line);
+        }
+        function show(p) {
+          inspect(
+            personName(p.id),
+            ts.filter((t) => String(t.person_id) === String(p.id)),
+          );
+          detail($("inspector"), "작성자 전체 원문", p.text || "원문 미제공");
+          const edges = hasNet
+            ? net.edges.filter(
+                (e) =>
+                  String(e.a) === String(p.id) || String(e.b) === String(p.id),
+              )
+            : [];
+          if (edges.length) {
+            $("inspector").append(el("h3", "제공된 네트워크 관계"));
+            edges.forEach((e) =>
+              $("inspector").append(
+                el(
+                  "p",
+                  `${personName(e.a)} ↔ ${personName(e.b)} · 유사도 ${e.similarity ?? "미제공"}`,
+                ),
+              ),
+            );
+          }
+        }
+        ps.forEach((p) => {
+          const [x, y] = pos.get(String(p.id));
+          bubble(svg, x, y, 20, p.name + " · " + p.pjt, "have", () => show(p));
+          const label = svgEl(
+              "text",
+              {
+                x,
+                y: y + 38,
+                "text-anchor": "middle",
+                "font-size": 13,
+                "pointer-events": "none",
+              },
+              p.name,
+            ),
+            sparse =
+              ps.length > 35 && ps.indexOf(p) % Math.ceil(ps.length / 24) !== 0;
+          label.style.visibility = sparse ? "hidden" : "visible";
+          svg.append(label);
+          if (sparse) {
+            const node = svg.querySelector("g:last-of-type");
+            node.onmouseenter = () => {
+              label.style.visibility = "visible";
+            };
+            node.onmouseleave = () => {
+              if (document.activeElement !== node)
+                label.style.visibility = "hidden";
+            };
+            node.onfocus = () => {
+              label.style.visibility = "visible";
+            };
+            node.onblur = () => {
+              label.style.visibility = "hidden";
+            };
+          }
+        });
+        const wrap = el("div", undefined, "chart");
+        wrap.append(svg);
+        v.append(wrap);
+        const list = el("details");
+        list.append(el("summary", "사람 목록 · " + ps.length + "명"));
+        ps.forEach((p) =>
+          list.append(button(p.name + " · " + p.pjt, () => show(p), "wide")),
+        );
+        v.append(list);
+      }
+      function tasksView(ts) {
+        const v = $("view");
+        add(
+          v,
+          el("h2", "PJT 안의 과제 범주"),
+          el(
+            "p",
+            "원을 선택해 과제 근거를 읽거나 시간 매트릭스로 이동하세요.",
+            "muted",
+          ),
+        );
+        if (!ts.length) empty(v, "현재 필터에 해당하는 과제가 없습니다.");
+        const groups = new Map();
+        ts.forEach((t) => {
+          const key = JSON.stringify([t.pjt, t.category_id]);
+          if (!groups.has(key)) groups.set(key, []);
+          groups.get(key).push(t);
+        });
+        groups.forEach((members) => {
+          const g = el("section", undefined, "group");
+          add(
+            g,
+            el("h3", members[0].pjt + " / " + cat(members[0].category_id)),
+          );
+          const cloud = el("div", undefined, "cloud");
+          members.forEach((t) => {
+            const b = button("", () => inspect(t.label, [t]), "orb");
+            add(
+              b,
+              el("span", t.label),
+              el("small", H[t.horizon] || H.unknown),
+              el("small", S[t.review?.status] || S.pending),
+            );
+            cloud.append(b);
+          });
+          add(
+            g,
+            cloud,
+            button("이 범주를 매트릭스에서 보기", () => {
+              pjt.value = members[0].pjt;
+              updateCategories();
+              category.value = members[0].category_id ?? "__none";
+              setTab("matrix");
+            }),
+          );
+          v.append(g);
+        });
+      }
+      function loose(ts) {
+        const box = $("unlinked");
+        box.replaceChildren();
+        const noSkills = ts.filter((t) => !arr(t.skills).length),
+          d = el("details");
+        d.append(
+          el("summary", "역량 연결 없는 과제 · " + noSkills.length + "개"),
+        );
+        if (!noSkills.length)
+          empty(d, "현재 필터에서 역량 연결 없는 과제가 없습니다.");
+        noSkills.forEach((t) =>
+          d.append(
+            button(
+              t.label + " · " + personName(t.person_id),
+              () => inspect(t.label, [t]),
+              "wide",
+            ),
+          ),
+        );
+        box.append(d);
+        const caps = arr(D.unlinked_capabilities).filter(
+            (c) => !pjt.value || person(c.person_id)?.pjt === pjt.value,
+          ),
+          u = el("details");
+        u.append(
+          el("summary", "과제 연결 없는 역량 · " + caps.length + "개"),
+          el("p", "과제 범주를 지정할 수 없어 PJT 필터만 적용합니다.", "muted"),
+        );
+        if (!caps.length)
+          empty(u, "현재 PJT에 과제 연결 없는 역량이 없습니다.");
+        caps.forEach((c) => {
+          const row = el("article", undefined, "item");
+          add(
+            row,
+            el("h3", c.label),
+            badge(K[c.kind] || c.kind, c.kind),
+            el("p", personName(c.person_id)),
+          );
+          quote(row, "역량 원문", c.quote);
+          detail(
+            row,
+            "작성자 전체 원문",
+            person(c.person_id)?.text || "원문 미제공",
+          );
+          u.append(row);
+        });
+        box.append(u);
+        const noTaskIds = new Set(arr(D.no_task_person_ids).map(String)),
+          noTaskPeople = persons.filter(
+            (p) =>
+              noTaskIds.has(String(p.id)) &&
+              (!pjt.value || p.pjt === pjt.value),
+          ),
+          peopleList = el("details");
+        peopleList.append(
+          el(
+            "summary",
+            "추출된 과제가 없는 사람 · " + noTaskPeople.length + "명",
+          ),
+          el("p", "원본 추출 결과 기준이며 PJT 필터만 적용합니다.", "muted"),
+        );
+        if (!noTaskPeople.length)
+          empty(
+            peopleList,
+            "현재 PJT에 과제가 없는 사람으로 표시된 기록이 없습니다.",
+          );
+        noTaskPeople.forEach((p) =>
+          detail(peopleList, p.name + " · " + p.pjt, p.text || "원문 미제공"),
+        );
+        box.append(peopleList);
+      }
+      function render() {
+        const ts = filtered();
+        $("view").replaceChildren();
+        $("count").textContent =
+          ts.length +
+          "개 과제 · " +
+          new Set(ts.map((t) => String(t.person_id))).size +
+          "명" +
+          (D.excluded_tasks ? " · 제외된 과제 " + D.excluded_tasks + "개" : "");
+        $("view").setAttribute("aria-labelledby", "tab-" + tab);
+        for (const name of ["people", "tasks", "matrix"]) {
+          const b = $("tab-" + name);
+          b.classList.toggle("active", name === tab);
+          b.setAttribute("aria-selected", String(name === tab));
+          b.tabIndex = name === tab ? 0 : -1;
+        }
+        ({ matrix, people: peopleView, tasks: tasksView })[tab](ts);
+        loose(ts);
+      }
+      function setTab(name) {
+        tab = name;
+        render();
+      }
+      for (const name of ["people", "tasks", "matrix"]) {
+        $("tab-" + name).onclick = () => setTab(name);
+        $("tab-" + name).onkeydown = (e) => {
+          const names = ["people", "tasks", "matrix"];
+          if (["ArrowRight", "ArrowLeft", "Home", "End"].includes(e.key)) {
+            e.preventDefault();
+            const i =
+              e.key === "Home"
+                ? 0
+                : e.key === "End"
+                  ? 2
+                  : (names.indexOf(name) + (e.key === "ArrowRight" ? 1 : 2)) %
+                    3;
+            setTab(names[i]);
+            $("tab-" + names[i]).focus();
+          }
+        };
+      }
+      function clearInspection() {
+        $("inspector").replaceChildren(
+          el("h2", "근거 살펴보기"),
+          el("p", "현재 필터의 항목을 선택하세요.", "muted"),
+        );
+      }
+      pjt.onchange = () => {
+        updateCategories();
+        clearInspection();
+        render();
+      };
+      category.onchange = () => {
+        clearInspection();
+        render();
+      };
+      render();
+    </script>
+  </body>
+</html>
