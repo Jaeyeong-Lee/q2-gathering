@@ -61,6 +61,15 @@ debugging, and that collapses this whole structure.
 Full design: `docs/task-discovery-coldstart.md`. Internal-network operations:
 `docs/task-discovery-internal-run-guide.md`.
 
+### Working on `nebula/`? Read `nebula/CLAUDE.md` first
+
+`nebula` is a **separate package** from task-discovery — future tasks and capabilities extracted
+per person, grouped into PJT-local future-task groups, presented as an offline five-scene HTML.
+Its contracts, its test loop and its own data rules are in `nebula/CLAUDE.md`. Everything on this
+page still applies there; that file adds to it rather than replacing it. The output directory of
+a nebula run (`result.json`, `view.json`, the three HTML files, `cache/**`) is real data — treat
+it exactly like the paths listed above, and reproduce with `python -m nebula demo` instead.
+
 ---
 
 ## General coding guidelines
