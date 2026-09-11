@@ -78,8 +78,14 @@ def build_view(data, approved_only=False):
 # Eight hues reused from the previous synthetic atlas; index falls back by modulo
 # so a corpus with more PJTs still renders instead of failing.
 PALETTE = [
-    "#7dcfff", "#a7a4ff", "#f0afce", "#eeb78c",
-    "#e5d688", "#9bd4bd", "#9fb8f0", "#cebcf4",
+    "#7dcfff",
+    "#a7a4ff",
+    "#f0afce",
+    "#eeb78c",
+    "#e5d688",
+    "#9bd4bd",
+    "#9fb8f0",
+    "#cebcf4",
 ]
 
 
@@ -168,11 +174,15 @@ def build_nebula(view):
                 "seq": written[owner],
                 "horizon": task["horizon"],
                 "quote": task["quote"],
+                "time_quote": task["time_quote"],
+                "review": task["review"],
+                "reason": task["reason"],
                 "skills": [
                     {
                         "kind": "have" if s["kind"] == "have" else "gap",
                         "label": s["label"],
-                        "quote": s["relation_quote"],
+                        "quote": s["quote"],
+                        "relation_quote": s["relation_quote"],
                     }
                     for s in task["skills"]
                 ],

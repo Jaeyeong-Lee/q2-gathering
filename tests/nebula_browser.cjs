@@ -57,6 +57,7 @@ function cli(args, code = 0) {
       await page.locator("#sky g.task, #sky g.person, #sky g.skill").count(),
       "scene " + index + " drew nothing",
     );
+    await page.waitForTimeout(1800); // Capture the settled scene, after its transition.
     await page.screenshot({ path: path.join(temp, "nebula-" + index + ".png") });
   }
   // 중기 is a horizon the pipeline emits; the prototype only knew short/long.
