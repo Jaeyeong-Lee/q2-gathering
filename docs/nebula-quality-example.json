@@ -1,0 +1,128 @@
+{
+  "format_version": 1,
+  "rubric_version": "future-task-quality-v1",
+  "assessment_id": "synthetic-assessment-01",
+  "sample_set_id": "synthetic-sample-01",
+  "assessed_at": "2026-09-11T12:00:00+09:00",
+  "evaluator_id": "synthetic-reviewer",
+  "run": {
+    "run_id": "synthetic-baseline",
+    "result_schema_version": 1,
+    "model_id": "synthetic-manual",
+    "code_commit": "50dfc6a",
+    "state": "complete"
+  },
+  "manifest": [
+    {
+      "person_id": "S01",
+      "pjt": "합성 PJT",
+      "source_hash": "55b667843aced0f4152eb6697c3ff088f887b993a52837ff0dbb1e3c2b512896",
+      "selection_reason": "제목·불릿 양식"
+    },
+    {
+      "person_id": "S02",
+      "pjt": "합성 PJT",
+      "source_hash": "4be35d6e5d2bdb3951bf648b037b0d44bb1d8c901572a0755d2a9ea446bc3952",
+      "selection_reason": "무신호"
+    }
+  ],
+  "evaluations": [
+    {
+      "person_id": "S01",
+      "criteria": {
+        "task_omission": {
+          "status": "pass",
+          "note": "합성 원문과 가상 결과를 대조했으며 해당 항목의 오류를 찾지 못함",
+          "findings": []
+        },
+        "task_invention": {
+          "status": "pass",
+          "note": "합성 원문과 가상 결과를 대조했으며 해당 항목의 오류를 찾지 못함",
+          "findings": []
+        },
+        "time_evidence": {
+          "status": "fail",
+          "note": "목표 계약에 따른 관찰이며 모델 원인 판정이 아님",
+          "findings": [
+            {
+              "target_type": "source",
+              "target_id": null,
+              "source_span": [
+                0,
+                5
+              ],
+              "observation": "단기 목표 제목 아래 과제의 시간 근거가 보존되지 않음"
+            }
+          ]
+        },
+        "capability_omission": {
+          "status": "fail",
+          "note": "목표 계약에 따른 관찰이며 모델 원인 판정이 아님",
+          "findings": [
+            {
+              "target_type": "source",
+              "target_id": null,
+              "source_span": [
+                22,
+                30
+              ],
+              "observation": "원문에 있는 로그 분석 경험이 역량 결과에서 빠짐"
+            }
+          ]
+        },
+        "link_accuracy": {
+          "status": "pass",
+          "note": "합성 원문과 가상 결과를 대조했으며 해당 항목의 오류를 찾지 못함",
+          "findings": []
+        },
+        "task_group_fit": {
+          "status": "fail",
+          "note": "목표 계약에 따른 관찰이며 모델 원인 판정이 아님",
+          "findings": [
+            {
+              "target_type": "category",
+              "target_id": null,
+              "source_span": null,
+              "observation": "가상 과제군 이름 자동화에 검증 절차라는 업무 대상이 드러나지 않음"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "person_id": "S02",
+      "criteria": {
+        "task_omission": {
+          "status": "pass",
+          "note": "합성 원문과 가상 결과를 대조했으며 해당 항목의 오류를 찾지 못함",
+          "findings": []
+        },
+        "task_invention": {
+          "status": "pass",
+          "note": "합성 원문과 가상 결과를 대조했으며 해당 항목의 오류를 찾지 못함",
+          "findings": []
+        },
+        "time_evidence": {
+          "status": "pass",
+          "note": "합성 원문과 가상 결과를 대조했으며 해당 항목의 오류를 찾지 못함",
+          "findings": []
+        },
+        "capability_omission": {
+          "status": "pass",
+          "note": "합성 원문과 가상 결과를 대조했으며 해당 항목의 오류를 찾지 못함",
+          "findings": []
+        },
+        "link_accuracy": {
+          "status": "not_applicable",
+          "note": "원문과 결과에 과제·역량이 없어 평가할 연결 또는 과제군이 없음",
+          "findings": []
+        },
+        "task_group_fit": {
+          "status": "not_applicable",
+          "note": "원문과 결과에 과제·역량이 없어 평가할 연결 또는 과제군이 없음",
+          "findings": []
+        }
+      }
+    }
+  ]
+}

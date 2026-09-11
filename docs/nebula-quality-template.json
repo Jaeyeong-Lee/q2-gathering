@@ -1,0 +1,36 @@
+{
+  "format_version": 1,
+  "rubric_version": "future-task-quality-v1",
+  "assessment_id": null,
+  "sample_set_id": null,
+  "assessed_at": null,
+  "evaluator_id": null,
+  "run": {
+    "run_id": null,
+    "result_schema_version": null,
+    "model_id": null,
+    "code_commit": null,
+    "state": null
+  },
+  "manifest": [
+    {
+      "person_id": null,
+      "pjt": null,
+      "source_hash": null,
+      "selection_reason": null
+    }
+  ],
+  "evaluations": [
+    {
+      "person_id": null,
+      "criteria": {
+        "task_omission": {"status": "not_evaluated", "note": "", "findings": []},
+        "task_invention": {"status": "not_evaluated", "note": "", "findings": []},
+        "time_evidence": {"status": "not_evaluated", "note": "", "findings": []},
+        "capability_omission": {"status": "not_evaluated", "note": "", "findings": []},
+        "link_accuracy": {"status": "not_evaluated", "note": "", "findings": []},
+        "task_group_fit": {"status": "not_evaluated", "note": "", "findings": []}
+      }
+    }
+  ]
+}
