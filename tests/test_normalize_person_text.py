@@ -23,9 +23,9 @@ def test_normalize_all_skips_abnormal_and_already_done(tmp_path):
     (raw_dir / "a.md").write_text("A 원문", encoding="utf-8")
     (raw_dir / "b.md").write_text("B 원문", encoding="utf-8")
     rows = [
-        {"name": "A", "cl_level": "CL3", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
-        {"name": "B", "cl_level": "CL3", "status": "이상", "split_filename": "b.md", "normalized_filename": ""},
-        {"name": "C", "cl_level": "CL3", "status": "정상", "split_filename": "c.md", "normalized_filename": "c.normalized.md"},
+        {"seq": 1, "name": "A", "cl_level": "CL3", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
+        {"seq": 2, "name": "B", "cl_level": "CL3", "status": "이상", "split_filename": "b.md", "normalized_filename": ""},
+        {"seq": 3, "name": "C", "cl_level": "CL3", "status": "정상", "split_filename": "c.md", "normalized_filename": "c.normalized.md"},
     ]
     calls = []
 
@@ -46,8 +46,8 @@ def test_normalize_all_retries_only_failed_person(tmp_path):
     (raw_dir / "a.md").write_text("A 원문", encoding="utf-8")
     (raw_dir / "b.md").write_text("B 원문", encoding="utf-8")
     rows = [
-        {"name": "A", "cl_level": "CL3", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
-        {"name": "B", "cl_level": "CL3", "status": "정상", "split_filename": "b.md", "normalized_filename": ""},
+        {"seq": 1, "name": "A", "cl_level": "CL3", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
+        {"seq": 2, "name": "B", "cl_level": "CL3", "status": "정상", "split_filename": "b.md", "normalized_filename": ""},
     ]
     fail_once = ["A 원문"]
 
@@ -70,8 +70,8 @@ def test_normalize_all_exhausted_retry_keeps_batch_alive(tmp_path):
     (raw_dir / "bad.md").write_text("불량 원문", encoding="utf-8")
     (raw_dir / "ok.md").write_text("정상 원문", encoding="utf-8")
     rows = [
-        {"name": "bad", "cl_level": "CL3", "status": "정상", "split_filename": "bad.md", "normalized_filename": ""},
-        {"name": "ok", "cl_level": "CL3", "status": "정상", "split_filename": "ok.md", "normalized_filename": ""},
+        {"seq": 1, "name": "bad", "cl_level": "CL3", "status": "정상", "split_filename": "bad.md", "normalized_filename": ""},
+        {"seq": 2, "name": "ok", "cl_level": "CL3", "status": "정상", "split_filename": "ok.md", "normalized_filename": ""},
     ]
 
     def call(prompt):
@@ -80,7 +80,7 @@ def test_normalize_all_exhausted_retry_keeps_batch_alive(tmp_path):
         return "정리된 결과"
 
     failed = norm.normalize_all(rows, raw_dir, call, retries=1)
-    assert failed == ["bad"]
+    assert failed == [1]          # 실명이 아니라 seq — 로그·반환값에 이름을 안 싣는다
     assert rows[0]["normalized_filename"] == ""
     assert rows[1]["normalized_filename"] == "ok.normalized.md"
 
@@ -92,8 +92,8 @@ def test_normalize_all_picks_prompt_by_cl_level(tmp_path, monkeypatch):
     (raw_dir / "b.md").write_text("B 원문", encoding="utf-8")
     monkeypatch.setattr(norm, "PROMPTS", {"CL2": "주니어용: {raw}", "CL4": "시니어용: {raw}"})
     rows = [
-        {"name": "A", "cl_level": "CL2", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
-        {"name": "B", "cl_level": "CL4", "status": "정상", "split_filename": "b.md", "normalized_filename": ""},
+        {"seq": 1, "name": "A", "cl_level": "CL2", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
+        {"seq": 2, "name": "B", "cl_level": "CL4", "status": "정상", "split_filename": "b.md", "normalized_filename": ""},
     ]
     prompts = []
 
@@ -112,7 +112,7 @@ def test_normalize_all_unknown_cl_level_raises(tmp_path, monkeypatch):
     (raw_dir / "a.md").write_text("A 원문", encoding="utf-8")
     monkeypatch.setattr(norm, "PROMPTS", {"CL2": "주니어용: {raw}"})
     rows = [
-        {"name": "A", "cl_level": "CL9", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
+        {"seq": 1, "name": "A", "cl_level": "CL9", "status": "정상", "split_filename": "a.md", "normalized_filename": ""},
     ]
     try:
         norm.normalize_all(rows, raw_dir, lambda p: "결과", retries=0, delay=0)

@@ -16,4 +16,6 @@ env/
 
 # Env / secrets
 .env
+# 실데이터와 파이프라인 산출물. data/td_sample/(합성, #010)도 여기 포함 — 언제든
+# `make td-sample`로 재생성되고 수 MB라 커밋하지 않는다.
 data/

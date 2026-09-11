@@ -1,6 +1,71 @@
-# CLAUDE.md
+# CLAUDE.md — for Claude Code only
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+> `AGENTS.md` is **for opencode only**. The permission it grants — "you may read real data" —
+> **does not apply to you.** Only opencode (internal Qwen) may read real data, because that
+> model is hosted inside the company network and its context never leaves it.
+>
+> Korean reference copy: `CLAUDE_ko.md` (for humans; may lag behind this file).
+
+## Your role: modify code. You do not get to see real data
+
+| Agent | Real data | Role |
+|---|---|---|
+| opencode (internal Qwen) | May read | Run · observe · report facts |
+| **You (Claude Code)** | **❌ Forbidden** | **Modify code** |
+
+The pipeline *processing* real data and you *reading* it are different things. Whatever enters
+your context leaves the network.
+
+### Never open these — not via `Read`, nor `cat`/`head`/`grep`/`python -c open(...)`
+
+| File | Why |
+|---|---|
+| `data/persons.json` | Real names + retrospective source text |
+| `extracted.json` / `assignments.json` | Real names + verbatim quotations |
+| `taxonomy.json` / `aggregates.json` | **Category names/definitions = internal product code names, tech strategy** |
+| `workshop-input.md`, `interpretation/**` | Both of the above |
+| `calls/**`, `pipeline.ecs.jsonl` | Raw prompts and responses |
+| `$TD_OUT_DIR/**` | All of the above lives here |
+
+**Category names are off limits too.** They are not personal data, but internal code names such
+as `D1b Yield·Test PGM Optimization` land there verbatim — by company standards that can be more
+sensitive than an individual's retrospective.
+
+`.claude/settings.json` carries `deny` rules, but that is a safety net against mistakes, not a
+guarantee — it can be bypassed through Bash. **Honor this as a rule, not as a fence.**
+
+### Do this instead
+
+- **Learn state only from `td_peek.py` output** that opencode gives you. You may run it
+  yourself (`python3 scripts/td_peek.py $TD_OUT_DIR`), but do not look at anything beyond
+  its output.
+- **Reproduce and debug against the synthetic corpus.** `td_sources.py` generates fake data with
+  the same schema — that is exactly what it exists for. Every test injects a fake `call`.
+- **`data/td_sample/` is the one td output directory you may open.** `make td-sample` runs the
+  whole pipeline on the synthetic corpus and writes artifacts, logs, and call dumps there —
+  input is fake, so nothing in it is real. Read it freely when building screens. Everything
+  outside that directory stays off limits, including `data/task_discovery/`.
+- **Root-cause analysis is your job.** opencode hands you facts like "batch 12, parse failed at
+  20.6kb response". Why that happens is for you to determine **by reading the code**.
+- If you truly need the raw text of a failed call, it is in
+  `$TD_OUT_DIR/task_discovery/calls/<stage>/ABNORMAL/` — **ask a human or opencode to check it.**
+  Do not open it yourself.
+
+### Console output is safe to read
+
+Source text has been stripped from logs and exception messages — `seq=`/`id=` instead of names,
+byte counts instead of response bodies. So running a command and reading its output is fine.
+**But do not undo those guards**: it is tempting to put raw text back into logs for easier
+debugging, and that collapses this whole structure.
+
+Full design: `docs/task-discovery-coldstart.md`. Internal-network operations:
+`docs/task-discovery-internal-run-guide.md`.
+
+---
+
+## General coding guidelines
+
+Behavioral guidelines to reduce common LLM coding mistakes.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
@@ -58,8 +123,10 @@ For multi-step tasks, state a brief plan:
 3. [Step] → verify: [check]
 ```
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+Strong success criteria let you loop independently. Weak criteria ("make it work") require
+constant clarification.
 
 ---
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to
+overcomplication, and clarifying questions come before implementation rather than after mistakes.

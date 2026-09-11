@@ -24,13 +24,13 @@ def test_build_persons_skips_unnormalized_and_assigns_sequential_ids(tmp_path):
     (raw_dir / "a.md").write_text("A 원문 그대로", encoding="utf-8")
     (raw_dir / "a.normalized.md").write_text("# 근원경쟁력\nA 내용", encoding="utf-8")
     rows = [
-        {"name": "A", "pjt": "P1", "part": "품질", "cl_level": "CL4",
+        {"seq": 1, "name": "A", "pjt": "P1", "part": "품질", "cl_level": "CL4",
          "split_filename": "a.md", "normalized_filename": "a.normalized.md"},
-        {"name": "B", "pjt": "P1", "part": "품질", "cl_level": "CL3",
+        {"seq": 2, "name": "B", "pjt": "P1", "part": "품질", "cl_level": "CL3",
          "split_filename": "b.md", "normalized_filename": ""},  # 정제 미완료 → 제외
     ]
     persons, skipped = merge.build_persons(rows, raw_dir)
-    assert skipped == ["B"]
+    assert skipped == [2]          # 실명이 아니라 seq — 콘솔에 이름을 안 흘린다
     assert persons == [{
         "id": 0, "name": "A", "pjt": "P1", "part": "품질", "cl_level": "CL4",
         "text": "A 원문 그대로", "normalized_text": "# 근원경쟁력\nA 내용", "tags": [],

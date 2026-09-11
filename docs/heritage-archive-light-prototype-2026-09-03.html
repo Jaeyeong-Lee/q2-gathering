@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>은하수 — 라이트 톤 프로토타입</title>
+<style>
+  :root{
+    --bg: #faf8f4;
+    --panel: rgba(255,255,255,0.86);
+    --panel-border: #e7e2d8;
+    --ink: #211e1a;
+    --ink-dim: #7a7468;
+    --ink-faint: #aca691;
+    --amber: #a6650f;
+    --amber-soft: rgba(166,101,15,0.10);
+    --mono: ui-monospace, "SF Mono", "Menlo", monospace;
+    --serif: "Georgia", "Noto Serif KR", serif;
+    --sans: "Pretendard Variable", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html, body{ margin:0; height:100%; background:var(--bg); color:var(--ink); font-family:var(--sans); overflow:hidden; }
+  .stage{ position:relative; width:100vw; height:100vh; background:var(--bg); }
+  #graph{ position:absolute; inset:0; width:100%; height:100%; cursor:grab; }
+  canvas.dragging{ cursor:grabbing; }
+
+  .topbar{ position:absolute; top:clamp(18px,3vh,32px); left:50%; transform:translateX(-50%);
+           text-align:center; pointer-events:none; z-index:5; }
+  .topbar h1{ margin:0; font-family:var(--serif); font-size:clamp(19px,2.1vw,27px); font-weight:600;
+              letter-spacing:-0.01em; }
+  .topbar .sub{ margin-top:6px; font-size:clamp(11.5px,1vw,13px); color:var(--ink-dim);
+                display:flex; align-items:center; justify-content:center; gap:10px; }
+  .badge{ display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:100px;
+          font-size:10.5px; font-weight:600; letter-spacing:0.04em; color:#fff; background:var(--amber); }
+  .badge::before{ content:""; width:5px; height:5px; border-radius:50%; background:#fff; opacity:0.75; }
+
+  .panel{ position:absolute; background:var(--panel); border:1px solid var(--panel-border);
+          border-radius:14px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+          box-shadow:0 10px 26px rgba(60,50,30,0.07), 0 1px 2px rgba(60,50,30,0.05); }
+
+  .search-panel{ top:clamp(18px,3vh,32px); left:clamp(18px,3vw,32px); width:min(280px,30vw); padding:10px; z-index:6; }
+  .search-row{ display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:9px; background:#f4f0e8; }
+  .search-row svg{ flex:none; opacity:0.5; }
+  #searchInput{ flex:1; min-width:0; background:none; border:none; outline:none; color:var(--ink);
+                font-family:var(--sans); font-size:14px; }
+  #searchInput::placeholder{ color:var(--ink-faint); }
+  .search-row:focus-within{ box-shadow:0 0 0 2px var(--amber); }
+  .search-results{ max-height:240px; overflow-y:auto; margin-top:6px; }
+  .result-item{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; padding:7px 8px;
+                border-radius:8px; background:none; border:none; color:var(--ink); font-family:var(--sans);
+                font-size:13.5px; cursor:pointer; }
+  .result-item:hover{ background:#f4f0e8; }
+  .dot{ width:8px; height:8px; border-radius:50%; flex:none; }
+  .result-item .team-name{ color:var(--ink-faint); font-size:11px; margin-left:auto; white-space:nowrap; }
+
+  .side-panel{ left:clamp(18px,3vw,32px); bottom:clamp(18px,3vh,28px); padding:14px 16px;
+               display:flex; flex-direction:column; gap:10px; z-index:5; width:min(230px,28vw); }
+  .panel-title{ display:flex; align-items:center; justify-content:space-between; font-size:10px;
+                text-transform:uppercase; letter-spacing:0.09em; color:var(--ink-faint); }
+  .isolate-clear{ background:none; border:none; color:var(--amber); font-family:var(--sans); font-size:10.5px;
+                  font-weight:700; cursor:pointer; letter-spacing:0; text-transform:none; padding:0; }
+  .legend-list{ display:flex; flex-direction:column; gap:2px; }
+  .team-chip{ display:flex; align-items:center; gap:8px; font-size:13.5px; color:#4a453c; background:none;
+              border:none; width:100%; text-align:left; padding:5px 4px; border-radius:7px; cursor:pointer;
+              font-family:var(--sans); }
+  .team-chip:hover{ background:#f4f0e8; }
+  .team-chip.isolated{ color:var(--ink); background:var(--amber-soft); }
+  .team-chip .dot{ width:9px; height:9px; }
+  .team-chip .count{ margin-left:auto; font-family:var(--mono); font-size:11px; color:var(--ink-faint); }
+
+  .reset-btn{ position:absolute; left:50%; bottom:clamp(18px,3vh,28px); z-index:6; padding:10px 16px;
+              border-radius:100px; border:1px solid var(--panel-border); background:#fff; color:var(--ink-dim);
+              font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; opacity:0;
+              transform:translate(-50%,6px); transition:opacity .18s ease, transform .18s ease;
+              box-shadow:0 6px 18px rgba(60,50,30,0.08); }
+  .reset-btn.visible{ opacity:1; transform:translate(-50%,0); color:var(--ink); }
+  .reset-btn:hover{ border-color:#cfc7b4; }
+
+  .detail-panel{ top:clamp(18px,3vh,32px); right:clamp(18px,3vw,32px); width:min(320px,32vw);
+                 max-height:calc(100vh - 100px); overflow-y:auto; padding:20px; z-index:6; opacity:0;
+                 transform:translateX(16px); pointer-events:none; transition:opacity .22s ease, transform .22s ease; }
+  .detail-panel.visible{ opacity:1; transform:translateX(0); pointer-events:auto; }
+  .detail-name{ font-family:var(--serif); font-size:20px; font-weight:600; letter-spacing:-0.01em; }
+  .detail-team{ display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:3px 10px 3px 8px;
+                border-radius:100px; font-size:12px; font-weight:600; background:#f4f0e8; }
+  .detail-flavor{ margin-top:14px; font-size:13px; line-height:1.65; color:var(--ink-dim);
+                   padding-top:12px; border-top:1px solid var(--panel-border); }
+  .detail-flavor .label{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.08em;
+                          color:var(--ink-faint); margin-bottom:5px; }
+  .neighbor-label{ margin-top:16px; padding-top:14px; border-top:1px solid var(--panel-border); font-size:10px;
+                    text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-faint); margin-bottom:10px; }
+  .neighbor-list{ display:flex; flex-direction:column; gap:3px; }
+  .neighbor-item{ display:grid; grid-template-columns:8px 1fr auto; align-items:center; gap:9px; width:100%;
+                   background:none; border:none; padding:7px 6px; border-radius:8px; cursor:pointer;
+                   text-align:left; color:var(--ink); font-family:var(--sans); }
+  .neighbor-item:hover{ background:#f4f0e8; }
+  .neighbor-item .n-name{ font-size:13.5px; }
+  .neighbor-item .n-score{ font-family:var(--mono); font-size:11.5px; color:var(--ink-dim); }
+  .neighbor-item .n-bar-track{ grid-column:1/-1; height:3px; border-radius:2px; background:#eee7d8; margin-top:2px; overflow:hidden; }
+  .neighbor-item .n-bar-fill{ height:100%; border-radius:2px; background:var(--amber); }
+
+  .hover-tip{ position:absolute; z-index:7; pointer-events:none; background:#211e1a; border:1px solid rgba(0,0,0,0.06);
+              border-radius:7px; padding:6px 10px; font-size:12.5px; font-weight:600; color:#faf8f4;
+              transform:translate(-50%,-140%); white-space:nowrap; opacity:0; transition:opacity .12s ease;
+              box-shadow:0 6px 18px rgba(0,0,0,0.18); }
+  .hover-tip.show{ opacity:1; }
+  .hover-tip .pct{ color:#f0c674; font-family:var(--mono); font-weight:700; margin-left:6px; }
+  .hover-tip .team{ color:#b8b2a2; font-weight:500; }
+
+  .footnote{ position:absolute; bottom:clamp(18px,3vh,28px); left:50%; transform:translateX(-50%);
+             font-size:11px; color:var(--ink-faint); z-index:4; pointer-events:none; text-align:center;
+             max-width:520px; line-height:1.6; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:#e2dcc9; border-radius:4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <canvas id="graph"></canvas>
+
+  <div class="topbar">
+    <h1>은하수 — 근원경쟁력 유사도 네트워크</h1>
+    <div class="sub">
+      <span class="badge">라이트 톤 프로토타입</span>
+      <span>더미 데이터 · 물리·인터랙션은 본 화면과 동일</span>
+    </div>
+  </div>
+
+  <div class="panel search-panel">
+    <div class="search-row">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="이름 검색" autocomplete="off" />
+    </div>
+    <div class="search-results" id="searchResults"></div>
+    <div class="search-count" id="searchCount" style="font-size:11px;color:var(--ink-faint);padding:4px 8px 0;"></div>
+  </div>
+
+  <div class="panel side-panel">
+    <div class="panel-title">
+      <span>팀</span>
+      <button class="isolate-clear" id="isolateClearBtn" style="display:none;">전체 보기</button>
+    </div>
+    <div class="legend-list" id="legendList"></div>
+  </div>
+
+  <button class="reset-btn" id="resetBtn">전체 보기로</button>
+
+  <div class="panel detail-panel" id="detailPanel"></div>
+  <div class="hover-tip" id="hoverTip"></div>
+
+  <div class="footnote">
+    Notion 계열 라이트 톤으로 재구성한 미리보기 — 워드클라우드·CL 필터·발표 인트로·설명 오버레이는
+    이 프로토타입에 없음. 방향이 맞으면 archive/template.html 본 파일에 반영.
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------------- 더미 데이터 (순수 시각 데모용, 실데이터 아님) ----------------
+  var TEAMS = ["팀 알파", "팀 베타", "팀 감마", "팀 델타"];
+  var GIVENS = ["민준","서연","도윤","하은","지호","수아","예준","지유","시우","채원","주원","다은","건우","예린","현우","소율"];
+  var SURNAMES = "김이박최정강조윤장임".split("");
+  function seedRandom(seed){
+    return function(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  }
+  var rnd = seedRandom(42);
+  var N = 34;
+  var nodesRaw = [];
+  for (var i = 0; i < N; i++){
+    var team = TEAMS[Math.floor(rnd() * TEAMS.length)];
+    nodesRaw.push({
+      id: i,
+      name: SURNAMES[Math.floor(rnd()*SURNAMES.length)] + GIVENS[Math.floor(rnd()*GIVENS.length)],
+      team: team,
+      flavor: team + " 소속. 최근 업무 경험을 바탕으로 다음 분기 방향을 회고에 담았다.",
+      tags: []
+    });
+  }
+  var neighbors = {};
+  nodesRaw.forEach(function(n){
+    var scored = nodesRaw.filter(function(m){ return m.id !== n.id; })
+      .map(function(m){
+        var base = (m.team === n.team) ? 0.55 : 0.15;
+        return { id: m.id, w: Math.min(0.98, Math.max(0.05, base + rnd() * 0.5)) };
+      })
+      .sort(function(a,b){ return b.w - a.w; });
+    neighbors[n.id] = scored.slice(0, 8);
+  });
+  var DATA = { nodes: nodesRaw, neighbors: neighbors };
+
+  // ---------------- 팔레트 — 흰 배경에서 읽히도록 원본보다 깊게 눌렀다 ----------------
+  var PALETTE = ["#c2610d","#0f8f82","#4a63d1","#b83d63","#4d8a2e","#7c4fc9","#a9791f","#2384a6","#a05a3a","#3f8a70","#6b58bd","#c14f6f"];
+  var TEAM_COLOR = {};
+  DATA.nodes.forEach(function(n){
+    if (!(n.team in TEAM_COLOR)) TEAM_COLOR[n.team] = PALETTE[Object.keys(TEAM_COLOR).length % PALETTE.length];
+  });
+  var TEAM_ANCHOR = {};
+  (function(){
+    var teams = Object.keys(TEAM_COLOR);
+    teams.forEach(function(t, i){
+      // -90deg(정상단) 시작이면 팀 라벨이 상단바와 겹친다 — 위상을 살짝 돌려 피한다
+      var a = (i / teams.length) * Math.PI * 2 - Math.PI / 2 + Math.PI / teams.length;
+      TEAM_ANCHOR[t] = { ux: 0.5 + Math.cos(a) * 0.30, uy: 0.5 + Math.sin(a) * 0.30 };
+    });
+  })();
+  var AMBER = "#a6650f";
+  var DEFAULT_COLOR = "#9a9384";
+
+  var nodes = DATA.nodes.map(function(n){
+    return { id:n.id, name:n.name, team:n.team, flavor:n.flavor, x:0,y:0, vx:0,vy:0, r:5, _placed:false, visible:true };
+  });
+  var byId = {};
+  nodes.forEach(function(n){ byId[n.id] = n; });
+  var neighborsFull = {};
+  Object.keys(DATA.neighbors).forEach(function(idStr){
+    neighborsFull[idStr] = DATA.neighbors[idStr].map(function(e){ return { node: byId[e.id], w: e.w }; });
+  });
+
+  var isolateTeam = null, hoverTeam = null;
+  function activeNodeList(){ return nodes.filter(function(n){ return !isolateTeam || n.team === isolateTeam; }); }
+
+  var topN = 5, edges = [], adjacency = {};
+  function rebuildEdges(){
+    var visibleSet = {};
+    activeNodeList().forEach(function(n){ visibleSet[n.id] = true; });
+    var seen = {}, list = [];
+    nodes.forEach(function(n){ adjacency[n.id] = []; });
+    activeNodeList().forEach(function(n){
+      var cands = neighborsFull[n.id].filter(function(c){ return visibleSet[c.node.id]; }).slice(0, topN);
+      cands.forEach(function(c){
+        var key = n.id < c.node.id ? n.id+"_"+c.node.id : c.node.id+"_"+n.id;
+        if (!seen[key]){ seen[key] = true; list.push({ a:n, b:c.node, w:c.w }); }
+      });
+    });
+    list.forEach(function(e){ adjacency[e.a.id].push({node:e.b,w:e.w}); adjacency[e.b.id].push({node:e.a,w:e.w}); });
+    Object.keys(adjacency).forEach(function(id){ adjacency[id].sort(function(a,b){ return b.w-a.w; }); });
+    edges = list;
+    nodes.forEach(function(n){ n.visible = visibleSet[n.id]; });
+  }
+  rebuildEdges();
+
+  // ---------------- 캔버스·물리 (은하수 본 화면과 동일 상수) ----------------
+  var canvas = document.getElementById("graph"), ctx = canvas.getContext("2d");
+  var W=0,H=0, DPR = Math.min(window.devicePixelRatio||1, 2);
+  var cam = { x:0, y:0, k:1 };
+  function resize(){
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener("resize", resize);
+
+  (function seedPositions(){
+    nodes.forEach(function(n){
+      var anchor = TEAM_ANCHOR[n.team] || {ux:0.5,uy:0.5};
+      var a = Math.random()*Math.PI*2, rad = Math.sqrt(Math.random())*0.08;
+      n.ux = anchor.ux + Math.cos(a)*rad; n.uy = anchor.uy + Math.sin(a)*rad;
+    });
+  })();
+
+  // 은하수 정체성 브리지: 어두운 성운 대신, 종이 위에 아주 옅게 떠 있는 점 — 같은 궤도 물리를 쓰되
+  // 명도만 낮춰 "화이트보드 위의 별자리" 느낌으로. 완전히 지우면 이름값이 사라진다.
+  var stars = [];
+  (function(){
+    for (var i=0;i<220;i++){
+      stars.push({ ang:Math.random()*Math.PI*2, rad:Math.sqrt(Math.random())*1.35,
+                   r:0.5+Math.random()*1.0, a:0.05+Math.random()*0.09,
+                   tw:0.5+Math.random()*1.5, ph:Math.random()*Math.PI*2 });
+    }
+  })();
+  var STAR_ORBIT = Math.PI*2/720000;
+  function drawStars(now){
+    var cx=W/2, cy=H/2, halfDiag=Math.sqrt(W*W+H*H)/2, theta = now*STAR_ORBIT;
+    ctx.fillStyle = "#c9c2ac";
+    for (var i=0;i<stars.length;i++){
+      var s = stars[i], R = s.rad*halfDiag;
+      var x = cx + Math.cos(s.ang+theta)*R + cam.x*0.15;
+      var y = cy + Math.sin(s.ang+theta)*R + cam.y*0.15;
+      ctx.globalAlpha = s.a * (0.75 + 0.25*Math.sin(now*0.001*s.tw+s.ph));
+      ctx.beginPath(); ctx.arc(x,y,s.r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  var alpha=1, alphaDecay=0.006, alphaMin=0.012;
+  function degreeOf(id){ return adjacency[id] ? adjacency[id].length : 0; }
+  var maxDegree = 1;
+  function recomputeMaxDegree(){ maxDegree=1; activeNodeList().forEach(function(n){ maxDegree=Math.max(maxDegree, degreeOf(n.id)); }); }
+  recomputeMaxDegree();
+  function overviewRadius(n){ var d=degreeOf(n.id); return 3 + Math.pow(d/maxDegree,0.7)*16; }
+
+  var dragNode=null, dragPos={x:0,y:0};
+
+  function tick(){
+    if (alpha < alphaMin) alpha = alphaMin;
+    var cx=W/2, cy=H/2, active = activeNodeList();
+    active.forEach(function(n){ if(!n._placed){ n.x=n.ux*W; n.y=n.uy*H; n._placed=true; } });
+
+    var repulseK = 900*(W/1400);
+    for (var i=0;i<active.length;i++){
+      var n1=active[i];
+      for (var j=i+1;j<active.length;j++){
+        var n2=active[j];
+        var dx=n1.x-n2.x, dy=n1.y-n2.y, distSq=dx*dx+dy*dy+0.01;
+        if (distSq>260000) continue;
+        var dist=Math.sqrt(distSq), force=repulseK/distSq;
+        var fx=(dx/dist)*force, fy=(dy/dist)*force;
+        n1.vx+=fx; n1.vy+=fy; n2.vx-=fx; n2.vy-=fy;
+      }
+    }
+    edges.forEach(function(e){
+      var dx=e.b.x-e.a.x, dy=e.b.y-e.a.y, dist=Math.sqrt(dx*dx+dy*dy)||0.01;
+      var restLen=(1-Math.max(e.w,0))*200+95, k=0.02+Math.max(e.w,0)*0.03;
+      if (e.a.team!==e.b.team) k*=0.05;
+      var f=(dist-restLen)*k, fx=(dx/dist)*f, fy=(dy/dist)*f;
+      e.a.vx+=fx; e.a.vy+=fy; e.b.vx-=fx; e.b.vy-=fy;
+    });
+    active.forEach(function(n){
+      if (n===dragNode){ n.x=dragPos.x; n.y=dragPos.y; n.vx=0; n.vy=0; return; }
+      var anchor = !isolateTeam && TEAM_ANCHOR[n.team];
+      if (anchor){
+        n.vx += (anchor.ux*W-n.x)*0.008 + (cx-n.x)*0.0001;
+        n.vy += (anchor.uy*H-n.y)*0.008 + (cy-n.y)*0.0001;
+      } else {
+        n.vx += (cx-n.x)*0.0003; n.vy += (cy-n.y)*0.0003;
+      }
+      n.vx*=0.8; n.vy*=0.8; n.x+=n.vx*alpha; n.y+=n.vy*alpha;
+      var pad=24; n.x=Math.max(pad,Math.min(W-pad,n.x)); n.y=Math.max(pad,Math.min(H-pad,n.y));
+    });
+    alpha *= (1-alphaDecay);
+  }
+  function warmUp(ticks){ for (var i=0;i<ticks;i++) tick(); }
+
+  var teamLabelHits = [];
+  var hoverId = null, searchGlowId = null, selectedId = null;
+
+  function hexToRgba(hex,a){
+    var r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+    return "rgba("+r+","+g+","+b+","+a+")";
+  }
+
+  function draw(){
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,W,H);
+    drawStars(performance.now());
+    ctx.setTransform(DPR*cam.k,0,0,DPR*cam.k,DPR*cam.x,DPR*cam.y);
+
+    var pool = activeNodeList();
+    var focusId = hoverId!=null ? hoverId : searchGlowId;
+    var hoverSet = null;
+    if (focusId!=null){
+      hoverSet = {}; hoverSet[focusId]=true;
+      (neighborsFull[focusId]||[]).slice(0,topN).forEach(function(e){ hoverSet[e.node.id]=true; });
+    }
+
+    if (!isolateTeam){
+      var cent = {};
+      pool.forEach(function(n){ if(!n.visible) return; var c=cent[n.team]||(cent[n.team]={x:0,y:0,c:0,r:0}); c.x+=n.x; c.y+=n.y; c.c++; });
+      Object.keys(cent).forEach(function(t){ cent[t].x/=cent[t].c; cent[t].y/=cent[t].c; });
+      pool.forEach(function(n){
+        if (!n.visible) return;
+        var c=cent[n.team], d=Math.sqrt((n.x-c.x)*(n.x-c.x)+(n.y-c.y)*(n.y-c.y));
+        if (d<200 && d>c.r) c.r=d;
+      });
+      ctx.save();
+      ctx.font = "600 19px " + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign="center"; ctx.textBaseline="middle";
+      teamLabelHits = [];
+      Object.keys(cent).forEach(function(team){
+        var c=cent[team], dx=c.x-W/2, dy=c.y-H/2, len=Math.sqrt(dx*dx+dy*dy)||1;
+        var lx=c.x+(dx/len)*(c.r+30), ly=c.y+(dy/len)*(c.r+30);
+        ctx.fillStyle = hexToRgba(TEAM_COLOR[team]||DEFAULT_COLOR, 0.85);
+        ctx.fillText(team, lx, ly);
+        teamLabelHits.push({team:team,x:lx,y:ly,hw:ctx.measureText(team).width/2+8,hh:14});
+      });
+      ctx.restore();
+    } else { teamLabelHits = []; }
+
+    edges.forEach(function(e){
+      if (!e.a.visible || !e.b.visible) return;
+      var lit = hoverSet && ((e.a.id===focusId && hoverSet[e.b.id]) || (e.b.id===focusId && hoverSet[e.a.id]));
+      ctx.beginPath(); ctx.moveTo(e.a.x,e.a.y); ctx.lineTo(e.b.x,e.b.y);
+      ctx.strokeStyle = lit ? "rgba(166,101,15,"+(0.55+e.w*0.35)+")" : "rgba(120,110,90,"+(0.07+e.w*0.16)+")";
+      ctx.lineWidth = lit ? 1.2+Math.max(e.w,0)*2.2 : 0.5+Math.max(e.w,0)*1.1;
+      ctx.stroke();
+    });
+
+    pool.forEach(function(n){
+      if (!n.visible) return;
+      var r = overviewRadius(n) * (n.id===selectedId ? 1.5 : 1);
+      var lit = !hoverSet || hoverSet[n.id];
+      var color = TEAM_COLOR[n.team] || DEFAULT_COLOR;
+      ctx.globalAlpha = lit ? 1 : 0.28;
+      // 흰 배경 대비 확보: 옅은 흰 테두리 링으로 겹친 노드도 경계가 살게
+      ctx.beginPath(); ctx.arc(n.x,n.y,r+1.6,0,Math.PI*2);
+      ctx.fillStyle = "#faf8f4"; ctx.fill();
+      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2);
+      ctx.fillStyle = color; ctx.fill();
+      if (n.id===hoverId || n.id===selectedId){
+        ctx.lineWidth = 2; ctx.strokeStyle = AMBER;
+        ctx.beginPath(); ctx.arc(n.x,n.y,r+3.5,0,Math.PI*2); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  function loop(){ tick(); draw(); requestAnimationFrame(loop); }
+
+  // ---------------- 범례 ----------------
+  var legendList = document.getElementById("legendList");
+  var isolateClearBtn = document.getElementById("isolateClearBtn");
+  function renderLegend(){
+    legendList.innerHTML = "";
+    Object.keys(TEAM_COLOR).forEach(function(team){
+      var count = nodes.filter(function(n){ return n.team===team; }).length;
+      var chip = document.createElement("button");
+      chip.className = "team-chip" + (isolateTeam===team ? " isolated" : "");
+      chip.innerHTML = '<span class="dot" style="background:'+TEAM_COLOR[team]+'"></span>'+team+'<span class="count">'+count+'</span>';
+      chip.onclick = function(){
+        isolateTeam = (isolateTeam===team) ? null : team;
+        onFilterChange();
+      };
+      legendList.appendChild(chip);
+    });
+    isolateClearBtn.style.display = isolateTeam ? "inline" : "none";
+  }
+  isolateClearBtn.onclick = function(){ isolateTeam = null; onFilterChange(); };
+  document.getElementById("resetBtn").onclick = function(){ isolateTeam = null; onFilterChange(); };
+
+  function onFilterChange(){
+    rebuildEdges(); recomputeMaxDegree(); renderLegend();
+    document.getElementById("resetBtn").classList.toggle("visible", !!isolateTeam);
+    alpha = 0.6;
+  }
+  renderLegend();
+
+  // ---------------- 검색 ----------------
+  var searchInput = document.getElementById("searchInput");
+  var searchResults = document.getElementById("searchResults");
+  var searchCount = document.getElementById("searchCount");
+  searchInput.addEventListener("input", function(){
+    var q = searchInput.value.trim();
+    searchGlowId = null;
+    if (!q){ searchResults.innerHTML=""; searchCount.textContent=""; return; }
+    var hits = nodes.filter(function(n){ return n.name.indexOf(q)>=0; });
+    searchCount.textContent = hits.length + "명";
+    searchResults.innerHTML = hits.slice(0,8).map(function(n){
+      return '<button class="result-item" data-id="'+n.id+'"><span class="dot" style="background:'+TEAM_COLOR[n.team]+'"></span>'+n.name+'<span class="team-name">'+n.team+'</span></button>';
+    }).join("");
+    Array.prototype.forEach.call(searchResults.querySelectorAll(".result-item"), function(el){
+      el.addEventListener("mouseenter", function(){ searchGlowId = Number(el.dataset.id); });
+      el.addEventListener("mouseleave", function(){ searchGlowId = null; });
+      el.addEventListener("click", function(){ openDetail(Number(el.dataset.id)); });
+    });
+  });
+
+  // ---------------- 상세 패널 ----------------
+  var detailPanel = document.getElementById("detailPanel");
+  function openDetail(id){
+    selectedId = id;
+    var n = byId[id];
+    var nbs = (neighborsFull[id]||[]).slice(0,6);
+    detailPanel.innerHTML =
+      '<div class="detail-name">'+n.name+'</div>'+
+      '<div class="detail-team" style="color:'+TEAM_COLOR[n.team]+'"><span class="dot" style="background:'+TEAM_COLOR[n.team]+'"></span>'+n.team+'</div>'+
+      '<div class="detail-flavor"><span class="label">회고 요약(더미)</span>'+n.flavor+'</div>'+
+      '<div class="neighbor-label">유사도 상위</div>'+
+      '<div class="neighbor-list">'+nbs.map(function(e){
+        var pct = Math.round(e.w*100);
+        return '<button class="neighbor-item" data-id="'+e.node.id+'">'+
+          '<span class="dot" style="background:'+TEAM_COLOR[e.node.team]+'"></span>'+
+          '<span class="n-name">'+e.node.name+'</span><span class="n-score">'+pct+'%</span>'+
+          '<span class="n-bar-track"><span class="n-bar-fill" style="width:'+pct+'%;background:'+TEAM_COLOR[e.node.team]+'"></span></span>'+
+          '</button>';
+      }).join("")+'</div>';
+    Array.prototype.forEach.call(detailPanel.querySelectorAll(".neighbor-item"), function(el){
+      el.addEventListener("click", function(){ openDetail(Number(el.dataset.id)); });
+    });
+    detailPanel.classList.add("visible");
+  }
+  function closeDetail(){ selectedId = null; detailPanel.classList.remove("visible"); }
+
+  // ---------------- hover / click / drag ----------------
+  var hoverTip = document.getElementById("hoverTip");
+  function nodeAt(px, py){
+    var wx = (px - cam.x) / cam.k, wy = (py - cam.y) / cam.k;
+    var best = null, bestD = 20;
+    activeNodeList().forEach(function(n){
+      if (!n.visible) return;
+      var d = Math.hypot(n.x - wx, n.y - wy);
+      var hit = overviewRadius(n) + 6;
+      if (d < hit && d < bestD){ bestD = d; best = n; }
+    });
+    return best;
+  }
+  canvas.addEventListener("mousemove", function(e){
+    var rect = canvas.getBoundingClientRect();
+    var px = e.clientX - rect.left, py = e.clientY - rect.top;
+    if (dragNode){ dragPos.x = (px-cam.x)/cam.k; dragPos.y = (py-cam.y)/cam.k; return; }
+    var n = nodeAt(px, py);
+    hoverId = n ? n.id : null;
+    canvas.style.cursor = n ? "pointer" : "grab";
+    if (n){
+      hoverTip.innerHTML = n.name + '<span class="team">'+n.team+'</span>';
+      hoverTip.style.left = px+"px"; hoverTip.style.top = py+"px";
+      hoverTip.classList.add("show");
+    } else hoverTip.classList.remove("show");
+  });
+  canvas.addEventListener("mouseleave", function(){ hoverId=null; hoverTip.classList.remove("show"); });
+  canvas.addEventListener("mousedown", function(e){
+    var rect = canvas.getBoundingClientRect();
+    var n = nodeAt(e.clientX-rect.left, e.clientY-rect.top);
+    if (n){ dragNode = n; canvas.classList.add("dragging"); }
+  });
+  window.addEventListener("mouseup", function(){ dragNode=null; canvas.classList.remove("dragging"); });
+  canvas.addEventListener("click", function(e){
+    var rect = canvas.getBoundingClientRect();
+    var n = nodeAt(e.clientX-rect.left, e.clientY-rect.top);
+    if (n) openDetail(n.id); else closeDetail();
+  });
+  canvas.addEventListener("wheel", function(e){
+    e.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var mx = e.clientX-rect.left, my = e.clientY-rect.top;
+    var prevK = cam.k;
+    cam.k = Math.max(0.5, Math.min(3, cam.k * (e.deltaY<0 ? 1.08 : 0.93)));
+    cam.x = mx - (mx-cam.x) * (cam.k/prevK);
+    cam.y = my - (my-cam.y) * (cam.k/prevK);
+  }, { passive:false });
+
+  resize();
+  warmUp(300);
+  loop();
+
+  var hashId = (location.hash.match(/node=(\d+)/) || [])[1];
+  if (hashId != null && byId[Number(hashId)]) openDetail(Number(hashId));
+})();
+</script>
+</body>
+</html>

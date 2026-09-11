@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>부서 로드맵 매트릭스 — 워크숍 도구 (더미)</title>
+<style>
+  :root{
+    --bg:#fbfbfa; --panel:#fff; --ink:#1c1e21; --dim:#6b7280; --line:#e3e5e8;
+    --ready:#0e9384;      /* 이미 함 */
+    --gapc:#d97706;       /* 갭만 있음 */
+    --seed:#7c5cd6;       /* 선행 신호 */
+    --risk:#dc2626;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.55 -apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo",
+       "Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink)}
+
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+         padding:14px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{font-size:16px;margin:0;font-weight:650}
+  header .sub{font-size:12px;color:var(--dim)}
+  .warn{margin-left:auto;font-size:11px;color:var(--risk);border:1px solid #f3c7c7;
+        background:#fef4f4;padding:3px 9px;border-radius:99px;font-weight:600}
+
+  .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+       padding:9px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+  button{font:inherit;font-size:12.5px;padding:5px 11px;border:1px solid var(--line);
+         background:#fff;border-radius:6px;cursor:pointer;color:var(--ink)}
+  button:hover{background:#f3f4f6}
+  button.on{background:#1c1e21;color:#fff;border-color:#1c1e21}
+  .bar .spacer{flex:1}
+  .bar .hint{font-size:11.5px;color:var(--dim)}
+
+  main{display:flex;gap:0;align-items:stretch;min-height:calc(100vh - 108px)}
+  #plot{flex:1;min-width:0;padding:8px 4px 0 8px}
+  svg{display:block;width:100%;height:auto;touch-action:none}
+
+  aside{width:330px;flex:none;border-left:1px solid var(--line);background:var(--panel);
+        padding:16px 18px;overflow-y:auto;max-height:calc(100vh - 108px)}
+  aside h2{font-size:15px;margin:0 0 2px}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;
+         color:#fff;font-weight:600;vertical-align:middle}
+  .nums{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:14px 0;
+        font-size:12.5px;color:var(--dim)}
+  .nums b{display:block;font-size:17px;color:var(--ink);font-weight:650;line-height:1.2}
+  .hbar{display:flex;height:8px;border-radius:99px;overflow:hidden;margin:4px 0 2px}
+  .hbar i{display:block}
+  .lbl{font-size:11px;color:var(--dim);margin-top:10px;font-weight:600;
+       letter-spacing:.03em;text-transform:uppercase}
+  blockquote{margin:8px 0;padding:7px 0 7px 11px;border-left:2px solid var(--line);
+             font-size:12.5px;color:#374151}
+  blockquote cite{display:block;font-style:normal;font-size:11px;color:var(--dim);margin-top:3px}
+  .rel{font-size:12.5px;margin:3px 0}
+  .rel em{font-style:normal;color:var(--dim);font-size:11px}
+  .empty{color:var(--dim);font-size:12.5px;padding:40px 0;text-align:center}
+  .moved{font-size:11.5px;color:var(--seed);font-weight:600;margin-top:8px}
+
+  .node{cursor:grab}
+  .node.drag{cursor:grabbing}
+  .node text{pointer-events:none;user-select:none}
+  .node circle{transition:stroke-width .12s}
+  .node.sel circle{stroke:#1c1e21;stroke-width:2.5}
+
+  @media (max-width:860px){
+    main{flex-direction:column}
+    aside{width:auto;border-left:0;border-top:1px solid var(--line);max-height:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>부서 로드맵 매트릭스</h1>
+  <span class="sub">세로축 = 데이터가 말한 것(고정) · 가로축 = 워크숍에서 정하는 것(드래그)</span>
+  <span class="warn">전부 합성 더미 — 실데이터 아님</span>
+</header>
+
+<div class="bar">
+  <button id="btnRel" class="on">관계선</button>
+  <button id="btnGhost" class="on">초안 위치</button>
+  <button id="btnQuad" class="on">사분면 강조</button>
+  <span class="spacer"></span>
+  <span class="hint">버블을 좌우로 끌어 시간축에 배치</span>
+  <button id="btnReset">초안으로</button>
+  <button id="btnExport">로드맵 내보내기 (JSON)</button>
+</div>
+
+<main>
+  <div id="plot"><svg id="svg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet"></svg></div>
+  <aside id="side"><div class="empty">버블을 클릭하면<br>근거 인용이 여기 나옵니다</div></aside>
+</main>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────
+// 더미 데이터 — aggregates.json + taxonomy.json + assignments.json 을
+// 합친 형태. 실연동 시 이 상수 셋만 실제 파일에서 채우면 된다.
+// 이름·인용 전부 합성. 카테고리명은 업계 일반 용어만 사용.
+// ─────────────────────────────────────────────────────────────────────
+const CATS = [
+  {name:"STDF 기반 고장분석 자동화", people:19, pjt:3, cl:3, have:6, gap:17, h:{단기:11,장기:4,불명:3}},
+  {name:"Burn-in 신뢰성 강화",       people:14, pjt:2, cl:3, have:11, gap:6, h:{단기:8,장기:2,불명:2}},
+  {name:"ATE 테스트 시간 단축",      people:23, pjt:3, cl:3, have:15, gap:9, h:{단기:16,장기:3,불명:4}},
+  {name:"테스트 프로그램 표준화",    people:17, pjt:3, cl:2, have:9,  gap:12, h:{단기:10,장기:4,불명:3}},
+  {name:"Yield 조기 안정화",         people:21, pjt:3, cl:3, have:13, gap:11, h:{단기:15,장기:3,불명:3}},
+  {name:"DPPM 저감 활동",            people:12, pjt:2, cl:2, have:9,  gap:4,  h:{단기:9,장기:1,불명:2}},
+  {name:"설비 예방보전 자동화",      people:16, pjt:3, cl:2, have:5,  gap:14, h:{단기:6,장기:7,불명:3}},
+  {name:"프로버·핸들러 운영 최적화", people:10, pjt:2, cl:2, have:8,  gap:3,  h:{단기:7,장기:1,불명:2}},
+  {name:"테스트 데이터 파이프라인",  people:15, pjt:3, cl:3, have:4,  gap:16, h:{단기:5,장기:8,불명:2}},
+  {name:"AI 기반 불량 예측",         people:9,  pjt:3, cl:2, have:2,  gap:11, h:{단기:2,장기:6,불명:1}},
+  {name:"신제품 초기 평가 체계",     people:13, pjt:2, cl:3, have:7,  gap:8,  h:{단기:8,장기:3,불명:2}},
+  {name:"협력사 품질 관리",          people:7,  pjt:2, cl:2, have:5,  gap:3,  h:{단기:5,장기:1,불명:1}},
+  {name:"테스트 커버리지 분석",      people:11, pjt:2, cl:2, have:4,  gap:9,  h:{단기:4,장기:5,불명:2}},
+  {name:"계측 표준·교정 체계",       people:6,  pjt:2, cl:2, have:5,  gap:2,  h:{단기:4,장기:1,불명:1}},
+  {name:"기술 전수·온보딩 체계",     people:2,  pjt:1, cl:1, have:1,  gap:2,  h:{단기:1,장기:1,불명:0}},
+  {name:"저전력 테스트 대응",        people:2,  pjt:1, cl:2, have:0,  gap:3,  h:{단기:0,장기:3,불명:0}},
+  {name:"양산 이관 표준화",          people:1,  pjt:1, cl:1, have:0,  gap:2,  h:{단기:1,장기:1,불명:0}},
+];
+
+const EDGES = [
+  {from:"STDF 기반 고장분석 자동화", to:"테스트 데이터 파이프라인", type:"related"},
+  {from:"AI 기반 불량 예측",        to:"테스트 데이터 파이프라인", type:"broader"},
+  {from:"DPPM 저감 활동",           to:"Yield 조기 안정화",        type:"broader"},
+  {from:"테스트 커버리지 분석",     to:"ATE 테스트 시간 단축",     type:"related"},
+  {from:"Burn-in 신뢰성 강화",      to:"설비 예방보전 자동화",     type:"related"},
+  {from:"프로버·핸들러 운영 최적화",to:"설비 예방보전 자동화",     type:"broader"},
+  {from:"계측 표준·교정 체계",      to:"테스트 프로그램 표준화",   type:"related"},
+  {from:"저전력 테스트 대응",       to:"신제품 초기 평가 체계",    type:"related"},
+];
+
+const QUOTES = {}; // 카테고리 → [{name, text}] · 합성
+const _NAMES = ["김민준","이서연","박지호","최유진","정하늘","강도윤","윤서아","임건우"];
+const _Q = [
+  "테스트 결과 데이터를 사람이 매번 뽑아 정리하다 보니 분석보다 취합에 시간이 더 든다",
+  "설비별로 포맷이 달라서 통합해서 보려면 매번 손이 간다",
+  "경험 있는 인원에게만 판단이 몰려 있어 확산이 안 된다",
+  "지금은 문제가 생긴 뒤에 대응하는데, 사전에 감지할 수 있으면 좋겠다",
+  "표준이 없어서 프로젝트마다 다시 만드는 일이 반복된다",
+  "필요한 건 아는데 이걸 할 수 있는 역량이 팀에 아직 없다",
+];
+CATS.forEach((c,i)=>{
+  const n = Math.min(4, Math.max(2, Math.round(c.people/5)));
+  QUOTES[c.name] = Array.from({length:n},(_,k)=>({
+    name:_NAMES[(i+k*3)%_NAMES.length], text:_Q[(i+k)%_Q.length]
+  }));
+});
+
+// ─── 파생 ────────────────────────────────────────────────────────────
+const WEAK = 2;
+const READINESS = c => c.people<=WEAK ? "선행 신호" : (c.gap>c.have ? "갭만 있음" : "이미 함");
+const BAND_Y = {"이미 함":0, "갭만 있음":1, "선행 신호":2};        // 아래→위
+const COLOR  = {"이미 함":"--ready", "갭만 있음":"--gapc", "선행 신호":"--seed"};
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// horizon 초안 → x(0~1). 단기=0.15 / 불명=0.5 / 장기=0.85 가중평균.
+// ※ 실파이프라인에서는 horizon 이 assign 단계에서 유실된다 — extracted.json 에서
+//    (person_id, axis, text) 로 되찾아 aggregate 에 실어야 이 축이 산다.
+function draftX(c){
+  const t = c.h.단기 + c.h.장기 + c.h.불명;
+  if(!t) return 0.5;
+  return (c.h.단기*0.15 + c.h.불명*0.5 + c.h.장기*0.85) / t;
+}
+
+const W=900, H=600, M={t:34,r:26,b:52,l:118};
+const PW = W-M.l-M.r, PH = H-M.t-M.b;
+const bandH = PH/3;
+const bandCY = b => M.t + PH - (b+0.5)*bandH;          // 밴드 중심 y
+const xPix   = u => M.l + u*PW;
+const uFromPx= x => Math.min(1, Math.max(0, (x-M.l)/PW));
+const radius = p => 9 + Math.sqrt(p)*3.4;
+const alpha  = c => 0.34 + 0.5*((c.pjt/3)+(c.cl/3))/2;
+
+const state = CATS.map(c=>{
+  const r = READINESS(c), d = draftX(c);
+  return {...c, readiness:r, band:BAND_Y[r], dx:d, x:d, y:bandCY(BAND_Y[r]), r:radius(c.people)};
+});
+const byName = Object.fromEntries(state.map(s=>[s.name,s]));
+
+// 밴드 안에서 세로로 밀어내 겹침 해소 (x 는 건드리지 않는다 — 사람이 정한 값)
+function relax(){
+  for(const b of [0,1,2]){
+    const g = state.filter(s=>s.band===b);
+    const lo = M.t+PH-(b+1)*bandH+14, hi = M.t+PH-b*bandH-14;
+    g.forEach(s=>{ if(s.y<lo||s.y>hi) s.y = bandCY(b); });
+    for(let it=0; it<70; it++){
+      let moved=false;
+      for(let i=0;i<g.length;i++) for(let j=i+1;j<g.length;j++){
+        const a=g[i], c=g[j];
+        const dx=xPix(c.x)-xPix(a.x), dy=c.y-a.y;
+        const need=a.r+c.r+4, dist=Math.hypot(dx,dy)||0.01;
+        if(dist<need){
+          const push=(need-dist)/2, sgn = dy>=0?1:-1;
+          a.y -= sgn*push*0.6; c.y += sgn*push*0.6; moved=true;
+        }
+      }
+      g.forEach(s=> s.y = Math.min(hi, Math.max(lo, s.y)));
+      if(!moved) break;
+    }
+  }
+}
+
+// ─── 렌더 ────────────────────────────────────────────────────────────
+const svg = document.getElementById("svg");
+const NS = "http://www.w3.org/2000/svg";
+const el = (t,a={})=>{const e=document.createElementNS(NS,t);
+  for(const k in a) e.setAttribute(k,a[k]); return e;};
+let show={rel:true, ghost:true, quad:true}, sel=null;
+
+const TBANDS = ["단기 (~1년)","중기 (1~3년)","장기 (3년~)"];
+const RBANDS = ["이미 함","갭만 있음","선행 신호"];
+
+function draw(){
+  relax();
+  svg.textContent = "";
+
+  // 사분면 강조
+  if(show.quad){
+    svg.appendChild(el("rect",{x:M.l, y:bandCY(1)-bandH/2, width:PW/3, height:bandH,
+      fill:css("--risk"), "fill-opacity":.055}));
+    svg.appendChild(el("rect",{x:M.l+PW*2/3, y:bandCY(2)-bandH/2, width:PW/3, height:bandH,
+      fill:css("--seed"), "fill-opacity":.06}));
+    const tag=(x,y,t,col)=>{const g=el("text",{x,y,"font-size":10.5,fill:col,
+      "font-weight":700,"letter-spacing":".04em"}); g.textContent=t; svg.appendChild(g);};
+    tag(M.l+9, bandCY(1)-bandH/2+16, "위험 구역 — 급한데 역량이 없다", css("--risk"));
+    tag(M.l+PW*2/3+9, bandCY(2)-bandH/2+16, "씨앗 — 지금 투자 결정", css("--seed"));
+  }
+
+  // 격자 + 축
+  for(let i=0;i<=3;i++){
+    const x = M.l + PW*i/3;
+    svg.appendChild(el("line",{x1:x,y1:M.t,x2:x,y2:M.t+PH,
+      stroke:css("--line"), "stroke-width": i===0?1.4:1}));
+    const y = M.t + PH*i/3;
+    svg.appendChild(el("line",{x1:M.l,y1:y,x2:M.l+PW,y2:y,
+      stroke:css("--line"), "stroke-width": i===3?1.4:1}));
+  }
+  TBANDS.forEach((t,i)=>{
+    const n=el("text",{x:M.l+PW*(i+0.5)/3, y:M.t+PH+22, "text-anchor":"middle",
+      "font-size":12, fill:css("--dim"), "font-weight":600}); n.textContent=t;
+    svg.appendChild(n);
+  });
+  RBANDS.forEach((t,i)=>{
+    const n=el("text",{x:M.l-12, y:bandCY(i)+4, "text-anchor":"end",
+      "font-size":12, fill:css(COLOR[t]), "font-weight":650}); n.textContent=t;
+    svg.appendChild(n);
+  });
+  const ax=(x,y,t,rot)=>{const n=el("text",{x,y,"font-size":11,fill:css("--dim"),
+    "text-anchor":"middle"}); if(rot) n.setAttribute("transform",`rotate(-90 ${x} ${y})`);
+    n.textContent=t; svg.appendChild(n);};
+  ax(M.l+PW/2, H-12, "언제 할 것인가  →  워크숍에서 정한다");
+  ax(20, M.t+PH/2, "준비도  ←  데이터가 말한 것 (고정)", true);
+
+  // 관계선
+  if(show.rel){
+    for(const e of EDGES){
+      const a=byName[e.from], b=byName[e.to]; if(!a||!b) continue;
+      svg.appendChild(el("line",{x1:xPix(a.x),y1:a.y,x2:xPix(b.x),y2:b.y,
+        stroke: e.type==="broader" ? "#f0c46a" : "#b9c0cc",
+        "stroke-width": e.type==="broader" ? 2.2 : 1.4,
+        "stroke-dasharray": e.type==="broader" ? "" : "5 4",
+        "stroke-opacity":.85}));
+    }
+  }
+
+  // 초안 위치 고스트
+  if(show.ghost){
+    for(const s of state){
+      if(Math.abs(s.x-s.dx) < 0.012) continue;
+      svg.appendChild(el("line",{x1:xPix(s.dx),y1:s.y,x2:xPix(s.x),y2:s.y,
+        stroke:css("--dim"),"stroke-width":1,"stroke-dasharray":"2 3","stroke-opacity":.55}));
+      svg.appendChild(el("circle",{cx:xPix(s.dx),cy:s.y,r:3.5,fill:"none",
+        stroke:css("--dim"),"stroke-width":1,"stroke-opacity":.6}));
+    }
+  }
+
+  // 버블
+  for(const s of state){
+    const g = el("g",{class:"node"+(sel===s.name?" sel":"")});
+    g.appendChild(el("circle",{cx:xPix(s.x),cy:s.y,r:s.r,
+      fill:css(COLOR[s.readiness]), "fill-opacity":alpha(s),
+      stroke:css(COLOR[s.readiness]), "stroke-width":1.2}));
+    const words = s.name.split(" ");
+    const lines = words.length>2
+      ? [words.slice(0,Math.ceil(words.length/2)).join(" "), words.slice(Math.ceil(words.length/2)).join(" ")]
+      : [s.name];
+    lines.forEach((ln,i)=>{
+      const t = el("text",{x:xPix(s.x), y:s.y+4+(i-(lines.length-1)/2)*11,
+        "text-anchor":"middle","font-size":9.5,fill:"#fff","font-weight":600});
+      t.textContent = ln; g.appendChild(t);
+    });
+    g.addEventListener("pointerdown", ev=>startDrag(ev,s,g));
+    svg.appendChild(g);
+  }
+}
+
+// ─── 드래그: x 만 움직인다 ────────────────────────────────────────────
+function startDrag(ev, s, g){
+  ev.preventDefault();
+  select(s.name); g.classList.add("drag"); g.setPointerCapture(ev.pointerId);
+  const pt = e => {const r=svg.getBoundingClientRect();
+    return (e.clientX-r.left)*(W/r.width);};
+  const off = xPix(s.x) - pt(ev);
+  let dirty=false;
+  const move = e => { s.x = uFromPx(pt(e)+off); dirty=true; draw(); };
+  const up = e => {
+    g.removeEventListener("pointermove",move); g.removeEventListener("pointerup",up);
+    g.classList.remove("drag"); if(dirty) draw();
+  };
+  g.addEventListener("pointermove",move); g.addEventListener("pointerup",up);
+}
+
+// ─── 사이드 패널 ─────────────────────────────────────────────────────
+const BAND_OF = u => u<1/3 ? "단기" : (u<2/3 ? "중기" : "장기");
+function select(name){
+  sel = name; const s = byName[name]; const side = document.getElementById("side");
+  const tot = s.h.단기+s.h.장기+s.h.불명 || 1;
+  const pct = n => Math.round(n/tot*100);
+  const moved = Math.abs(s.x-s.dx) > 0.012;
+  side.innerHTML = `
+    <h2>${s.name}</h2>
+    <span class="badge" style="background:${css(COLOR[s.readiness])}">${s.readiness}</span>
+    <span class="badge" style="background:#1c1e21">${BAND_OF(s.x)}</span>
+    ${moved ? `<div class="moved">초안 ${BAND_OF(s.dx)} → 워크숍 ${BAND_OF(s.x)}</div>` : ``}
+    <div class="nums">
+      <div><b>${s.people}</b>기여 인원</div>
+      <div><b>${s.pjt} / ${s.cl}</b>확산도 pjt / cl</div>
+      <div><b>${s.have}</b>보유 언급</div>
+      <div><b>${s.gap}</b>갭 언급</div>
+    </div>
+    <div class="lbl">시간 인식 (horizon 초안)</div>
+    <div class="hbar">
+      <i style="width:${pct(s.h.단기)}%;background:${css('--gapc')}"></i>
+      <i style="width:${pct(s.h.불명)}%;background:#d1d5db"></i>
+      <i style="width:${pct(s.h.장기)}%;background:${css('--seed')}"></i>
+    </div>
+    <div style="font-size:11px;color:var(--dim)">
+      단기 ${pct(s.h.단기)}% · 불명 ${pct(s.h.불명)}% · 장기 ${pct(s.h.장기)}%</div>
+    <div class="lbl">근거 인용</div>
+    ${QUOTES[s.name].map(q=>`<blockquote>${q.text}<cite>— ${q.name}</cite></blockquote>`).join("")}
+    <div class="lbl">관련 카테고리</div>
+    ${(EDGES.filter(e=>e.from===s.name||e.to===s.name).map(e=>
+        `<div class="rel"><em>${e.type}</em> ${e.from===s.name?e.to:e.from}</div>`).join("")
+      || `<div class="rel" style="color:var(--dim)">없음</div>`)}
+  `;
+}
+
+// ─── 툴바 ────────────────────────────────────────────────────────────
+const toggle=(id,key)=>document.getElementById(id).addEventListener("click",e=>{
+  show[key]=!show[key]; e.target.classList.toggle("on",show[key]); draw();});
+toggle("btnRel","rel"); toggle("btnGhost","ghost"); toggle("btnQuad","quad");
+
+document.getElementById("btnReset").addEventListener("click",()=>{
+  state.forEach(s=>{s.x=s.dx; s.y=bandCY(s.band);}); draw();});
+
+document.getElementById("btnExport").addEventListener("click",()=>{
+  const out = {
+    generated_at: new Date().toISOString(),
+    note: "워크숍 배치 결과. band 는 사람이 정한 값, readiness 는 데이터에서 온 값.",
+    items: state.map(s=>({name:s.name, band:BAND_OF(s.x), x:+s.x.toFixed(3),
+      draft_band:BAND_OF(s.dx), moved:BAND_OF(s.x)!==BAND_OF(s.dx),
+      readiness:s.readiness, people:s.people, have:s.have, gap:s.gap}))
+  };
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:"application/json"}));
+  a.download="roadmap.json"; a.click(); URL.revokeObjectURL(a.href);
+});
+
+draw();
+</script>
+</body>
+</html>

@@ -57,13 +57,16 @@ def normalize_all(rows, raw_dir, call, retries=1, delay=0.5):
                 out_name = raw_path.stem + ".normalized.md"
                 (raw_dir / out_name).write_text(result, encoding="utf-8")
                 r["normalized_filename"] = out_name
-                log.info(f"정제 완료 [{r['name']}] ({i + 1}/{len(targets)}) → {out_name}")
+                # 콘솔엔 seq만 — 실명은 ECS 로그(TD_OUT_DIR 안)에만 남긴다.
+                log.info(f"정제 완료 seq={r['seq']} ({i + 1}/{len(targets)})",
+                         extra={"ecs": {"user.name": r["name"], "file.name": out_name}})
                 break
             except Exception:
-                # 스택트레이스 포함 → data/pipeline.log에서 원인(URL 오타·모델명·타임아웃 등) 확인
-                log.exception(f"정제 실패 [{r['name']}] 시도 {attempt + 1}/{1 + retries}")
+                # 스택트레이스 포함 → pipeline.log에서 원인(URL 오타·모델명·타임아웃 등) 확인
+                log.exception(f"정제 실패 seq={r['seq']} 시도 {attempt + 1}/{1 + retries}",
+                              extra={"ecs": {"user.name": r["name"]}})
                 if attempt == retries:
-                    failed.append(r["name"])
+                    failed.append(r["seq"])
         if delay > 0:
             time.sleep(delay)
     return failed
@@ -90,7 +93,7 @@ def main(db_path=ROOT / "data" / "roster.db", raw_dir=ROOT / "data" / "raw_secti
         log.info(f"DB 반영: normalized_filename {len(done)}명 기록됨 ({db_path})")
 
     if failed:
-        log.warning(f"정제 실패 {len(failed)}명 (다음 실행에서 재시도 대상): {failed}")
+        log.warning(f"정제 실패 {len(failed)}명 (다음 실행에서 재시도 대상) seq={failed}")
     return failed
 
 

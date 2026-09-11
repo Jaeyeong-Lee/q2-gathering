@@ -88,7 +88,7 @@ def main(md_path, db_path=ROOT / "data" / "roster.db", out_dir=ROOT / "data" / "
         n = len(page_idxs)
         status = "정상" if (n and MIN_PAGES <= n <= MAX_PAGES) else "이상"
         if status == "이상":
-            bad.append(name)
+            bad.append(r["seq"])       # 실명 대신 seq — 콘솔에 이름을 안 흘린다
         updates.append((
             (page_idxs[0] + 1) if page_idxs else None,
             (page_idxs[-1] + 1) if page_idxs else None,
@@ -108,7 +108,7 @@ def main(md_path, db_path=ROOT / "data" / "roster.db", out_dir=ROOT / "data" / "
         print(f"경고: {md_path.name} — 전체 페이지 {len(pages)}장 중 {total_assigned}장만 배정됨", file=sys.stderr)
 
     if bad:
-        print(f"이상 {len(bad)}명 (페이지 배정 확인 필요): {bad}", file=sys.stderr)
+        print(f"이상 {len(bad)}명 (페이지 배정 확인 필요) seq={bad}", file=sys.stderr)
 
     conn.close()
     return db_path

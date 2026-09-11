@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./data/**)",
+      "Edit(./data/**)",
+      "Bash(cat data/**)",
+      "Bash(head data/**)",
+      "Bash(tail data/**)",
+      "Bash(less data/**)",
+      "Bash(more data/**)",
+      "Bash(open data/**)"
+    ]
+  }
+}
