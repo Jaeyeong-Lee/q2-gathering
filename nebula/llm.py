@@ -123,3 +123,17 @@ class OpenAICompatible:
                 ) from None
             self.sleep(min(2**attempt, 8))
         raise LLMError("LLM attempts exhausted")
+
+
+class AgentClient:
+    """No endpoint. The agent driving the run answers each stage itself.
+
+    Stages are handed off through the output directory and validated exactly like a
+    model's response; see docs/nebula-agent-run.md.
+    """
+
+    agent_turn = True
+    cache_identity = {"provider": "agent", "version": 1}
+
+    def complete(self, stage, system, payload):
+        raise LLMError("AgentClient answers through the output directory, not a call")

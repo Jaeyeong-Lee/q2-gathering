@@ -16,7 +16,14 @@ from .model import (
     need,
     ValidationError,
 )
-from .storage import Store, write_json, output_lock, begin_run, mark_failed
+from .storage import (
+    Store,
+    write_json,
+    output_lock,
+    begin_run,
+    mark_failed,
+    AgentTurn,
+)
 from .network import normalize_network
 
 
@@ -95,6 +102,8 @@ def run(
                 network,
                 reset_corrections,
             )
+        except AgentTurn:
+            raise
         except Exception:
             mark_failed(out)
             raise
@@ -358,6 +367,8 @@ def _run(
             },
         )
         return data
+    except AgentTurn:
+        raise
     except Exception:
         write_json(
             store.out / "status.json",

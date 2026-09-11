@@ -11,6 +11,8 @@ PJT별 미래 과제군으로 묶고, 오프라인 HTML 다섯 장면으로 발�
 1. `docs/nebula-spec.md` — 무엇을 만들기로 했나 (19줄, 짧다)
 2. 이 파일 — 어떻게 굴리고 무엇을 깨면 안 되나
 3. `docs/nebula-internal-runbook.md` — 운영·실패·재개·검토. **현재 계약의 living 문서다**
+4. `docs/nebula-agent-run.md` — LLM endpoint 대신 **네가 직접 각 단계의 답을 쓰는** 방법
+   (`--agent`). 합성 코퍼스 전용이다. 실데이터에는 쓰지 않는다.
 
 `HANDOFF.md`와 `docs/nebula-handoff-2026-09-11.md`는 특정 시점의 기록이다. 왜 이 커밋이
 존재하는지 알려주지만 **현재 상태가 아니다.** 현재 상태는 코드와 runbook과 gh 이슈다.

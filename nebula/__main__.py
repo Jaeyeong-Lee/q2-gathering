@@ -5,11 +5,11 @@ import json
 import sys
 from pathlib import Path
 from .demo import source, FakeClient, network as demo_network
-from .llm import OpenAICompatible, LLMError
+from .llm import OpenAICompatible, LLMError, AgentClient
 from .model import ValidationError, digest, need
 from .pipeline import run, with_review
 from .render import build
-from .storage import write_json, output_lock, begin_run, mark_failed
+from .storage import write_json, output_lock, begin_run, mark_failed, AgentTurn
 
 
 def main():
@@ -29,6 +29,7 @@ def main():
         if name == "run":
             p.add_argument("--input", type=Path, required=True)
         if name != "build":
+            p.add_argument("--agent", action="store_true")
             p.add_argument("--batch-size", type=int, default=24)
             p.add_argument("--max-chars", type=int, default=24000)
     args = parser.parse_args()
@@ -56,9 +57,13 @@ def main():
                         else json.loads(args.input.read_text())
                     )
                     client = (
-                        FakeClient()
-                        if args.command == "demo"
-                        else OpenAICompatible.from_env()
+                        AgentClient()
+                        if args.agent
+                        else (
+                            FakeClient()
+                            if args.command == "demo"
+                            else OpenAICompatible.from_env()
+                        )
                     )
                     corrections = (
                         json.loads(args.corrections.read_text())
@@ -94,6 +99,9 @@ def main():
                 if args.command != "build":
                     mark_failed(args.out)
                 raise
+    except AgentTurn as error:
+        print(str(error), file=sys.stderr)
+        return 2
     except (ValidationError, LLMError) as error:
         print(str(error), file=sys.stderr)
         return 1

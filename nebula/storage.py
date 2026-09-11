@@ -5,10 +5,23 @@ import os
 import tempfile
 import threading
 from pathlib import Path
-from .model import digest
+from .model import digest, ValidationError
 from contextlib import contextmanager
 
 _held = threading.local()
+
+
+class AgentTurn(Exception):
+    """Not a failure: the run needs the agent driving it to answer one stage.
+
+    `answer` is the only live handoff. Older request files may still sit unanswered
+    after an input change, so a driver follows this path instead of scanning.
+    """
+
+    def __init__(self, message, answer):
+        super().__init__(message)
+        self.answer = Path(answer)
+        self.request = Path(str(answer).replace(".answer.json", ".json"))
 
 
 def write_text(path, text):
@@ -92,11 +105,44 @@ class Store:
             result = validate(raw)  # Still enforce current validator on resume.
             self.hits += 1
             return result
+        if getattr(client, "agent_turn", False):
+            return self.handoff(stage, key, prompt, payload, validate, path)
         raw = client.complete(stage, prompt, payload)
         result = validate(raw)
         write_json(path, raw)
         self.calls += 1
         return result
+
+    def handoff(self, stage, key, prompt, payload, validate, cache_path):
+        """Stop, let the agent answer this one stage, resume on the next run.
+
+        The answer lands outside cache/ and is promoted only after it validates, so an
+        agent's malformed answer never becomes a completed call.
+        """
+        folder = self.out / "agent-requests" / stage
+        answer = folder / (key + ".answer.json")
+        if answer.exists():
+            try:
+                raw = json.loads(answer.read_text())
+            except ValueError:
+                raise ValidationError(
+                    "agent answer is not valid JSON: " + str(answer)
+                ) from None
+            result = validate(raw)
+            write_json(cache_path, raw)
+            answer.unlink()
+            self.calls += 1
+            return result
+        write_json(
+            folder / (key + ".json"),
+            {
+                "stage": stage,
+                "answer_path": str(answer),
+                "instructions": prompt,
+                "input": payload,
+            },
+        )
+        raise AgentTurn("agent turn: answer " + stage + " at " + str(answer), answer)
 
 
 def begin_run(out):

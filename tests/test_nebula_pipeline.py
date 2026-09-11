@@ -8,7 +8,9 @@ from pathlib import Path
 
 from nebula.demo import FakeClient, source
 from nebula.model import ValidationError, digest
+from nebula.llm import AgentClient
 from nebula.pipeline import run, with_review
+from nebula.storage import AgentTurn
 from nebula.render import build_nebula, build_view
 
 
@@ -310,6 +312,51 @@ class KoreanTaxonomyContract(unittest.TestCase):
             stale["taxonomies"][0]["categories"][0]["name"] = "Work Subject"
             with self.assertRaises(ValidationError):
                 run(source()[:2], out, FakeClient(), corrections=stale)
+
+
+class AgentDrivenRun(unittest.TestCase):
+    """The agent driving the run can stand in for the model, one stage at a time."""
+
+    def test_each_stage_is_handed_off_and_the_run_completes(self):
+        inputs = source()[:2]
+        oracle = FakeClient()  # stands in for what an agent would write
+        with tempfile.TemporaryDirectory() as out:
+            for _ in range(40):
+                try:
+                    data = run(inputs, out, AgentClient())
+                    break
+                except AgentTurn as turn:
+                    body = json.loads(turn.request.read_text())
+                    self.assertEqual(Path(body["answer_path"]), turn.answer)
+                    turn.answer.write_text(
+                        json.dumps(
+                            oracle.complete(
+                                body["stage"], body["instructions"], body["input"]
+                            ),
+                            ensure_ascii=False,
+                        )
+                    )
+            else:
+                self.fail("agent handoff did not converge")
+            self.assertEqual(len(data["tasks"]), 3)
+            self.assertEqual(data["provider"]["provider"], "agent")
+            status = json.loads((Path(out) / "status.json").read_text())
+            self.assertEqual(status["state"], "complete")
+            self.assertEqual(list(Path(out).glob("agent-requests/*/*.answer.json")), [])
+
+    def test_a_bad_answer_is_refused_and_never_becomes_a_completed_call(self):
+        with tempfile.TemporaryDirectory() as out:
+            with self.assertRaises(AgentTurn) as caught:
+                run(source()[:1], out, AgentClient())
+            answer = caught.exception.answer
+            answer.write_text("{ not json")
+            with self.assertRaises(ValidationError):
+                run(source()[:1], out, AgentClient())
+            answer.write_text('{"tasks": [{"quote": "없는 문장"}]}')
+            with self.assertRaises(ValidationError):
+                run(source()[:1], out, AgentClient())
+            self.assertEqual(list(Path(out).glob("cache/*/*.json")), [])
+            self.assertTrue(answer.exists())
 
 
 class ReviewRegressions(unittest.TestCase):
