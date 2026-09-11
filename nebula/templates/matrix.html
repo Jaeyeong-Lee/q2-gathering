@@ -415,7 +415,7 @@
       <section class="surface" style="margin-top: 20px">
         <h2>연결되지 않은 기록</h2>
         <p class="muted">
-          연결이 없어도 기록은 남습니다. 아래 목록은 현재 PJT·범주 필터를
+          연결이 없어도 기록은 남습니다. 아래 목록은 현재 PJT·과제군 필터를
           따릅니다.
         </p>
         <div id="unlinked"></div>
@@ -519,7 +519,7 @@
       ]);
       function updateCategories() {
         options(category, [
-          ["", "전체 범주"],
+          ["", "전체 과제군"],
           ["__none", "미분류"],
           ...cats
             .filter((c) => !pjt.value || c.pjt === pjt.value)

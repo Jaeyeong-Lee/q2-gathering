@@ -263,6 +263,55 @@ class SplitExtractionContract(unittest.TestCase):
             self.assertEqual(len(build_view(result)["tasks"]), 1)
 
 
+class KoreanTaxonomyContract(unittest.TestCase):
+    """A future-task group is Korean prose; an abbreviation inside it is not English."""
+
+    def _client(self, name, definition="이 PJT의 미래 과제군"):
+        class Named(FakeClient):
+            def complete(self, stage, system, payload):
+                if stage in ("taxonomy", "consolidate"):
+                    return {
+                        "additions": [
+                            {
+                                "name": name,
+                                "definition": definition,
+                                "includes": "해당 대상의 개선·검증",
+                                "excludes": "대상이 다른 업무",
+                            }
+                        ]
+                    }
+                return super().complete(stage, system, payload)
+
+        return Named()
+
+    def test_english_only_group_is_rejected_but_abbreviations_survive(self):
+        with tempfile.TemporaryDirectory() as out:
+            with self.assertRaises(ValidationError):
+                run(source()[:2], out, self._client("Test Data Analysis"))
+            self.assertEqual(
+                list((Path(out) / "cache" / "taxonomy").glob("*.json")), []
+            )
+        with tempfile.TemporaryDirectory() as out:
+            with self.assertRaises(ValidationError):
+                run(
+                    source()[:2],
+                    out,
+                    self._client("STDF 검증 자동화", "Automates STDF verification."),
+                )
+        with tempfile.TemporaryDirectory() as out:
+            data = run(source()[:2], out, self._client("STDF 검증 자동화"))
+            self.assertEqual(data["categories"][0]["name"], "STDF 검증 자동화")
+
+    def test_older_contract_taxonomy_correction_is_not_reused(self):
+        with tempfile.TemporaryDirectory() as out:
+            result = run(source()[:2], out, FakeClient())
+            stale = copy.deepcopy(result["corrections_template"])
+            stale["persons"] = []
+            stale["taxonomies"][0]["categories"][0]["name"] = "Work Subject"
+            with self.assertRaises(ValidationError):
+                run(source()[:2], out, FakeClient(), corrections=stale)
+
+
 class ReviewRegressions(unittest.TestCase):
     def test_invalid_rerun_marks_failure_and_retires_old_current_html(self):
         with tempfile.TemporaryDirectory() as out:

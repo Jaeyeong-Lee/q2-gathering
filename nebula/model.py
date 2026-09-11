@@ -191,6 +191,14 @@ def taxonomy(raw, pjt, existing):
         fields(c, ("name", "definition", "includes", "excludes"), "category fields")
         for key in c:
             string(c[key], "category text required")
+        for key in ("name", "definition"):
+            # A Korean category may carry equipment/standard abbreviations, so the
+            # test is "has Hangul", not "is ASCII-free".
+            need(
+                re.search(r"[가-힣]", c[key]),
+                "category name/definition must be written in Korean"
+                "; rerun taxonomy instead of reusing an older-contract correction",
+            )
         name = c["name"].strip().casefold()
         need(name not in names, "duplicate category name")
         names.add(name)
