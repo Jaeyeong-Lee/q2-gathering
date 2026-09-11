@@ -68,7 +68,7 @@ class Store:
     def call(self, client, stage, prompt, payload, validate):
         key = digest(
             {
-                "contract": 1,
+                "contract": 2,  # 2: extract split into tasks/capabilities/links
                 "client": client.cache_identity,
                 "stage": stage,
                 "prompt": prompt,

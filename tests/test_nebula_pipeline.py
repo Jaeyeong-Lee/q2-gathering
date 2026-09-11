@@ -68,12 +68,8 @@ class RecoveryAndReviewContract(unittest.TestCase):
     def test_failed_call_is_not_cached_but_finished_people_resume(self):
         class Failing(FakeClient):
             def complete(self, stage, system, payload):
-                if stage == "extract" and payload["person_id"] == "2":
-                    return {
-                        "tasks": [{"quote": "INVALID"}],
-                        "capabilities": [],
-                        "links": [],
-                    }
+                if stage == "tasks" and payload["person_id"] == "2":
+                    return {"tasks": [{"quote": "INVALID"}]}
                 return super().complete(stage, system, payload)
 
         with tempfile.TemporaryDirectory() as out:
@@ -82,7 +78,7 @@ class RecoveryAndReviewContract(unittest.TestCase):
             status = json.loads((Path(out) / "status.json").read_text())
             self.assertEqual(status["state"], "failed")
             self.assertEqual(
-                len(list((Path(out) / "cache" / "extract").glob("*.json"))), 1
+                len(list((Path(out) / "cache" / "tasks").glob("*.json"))), 1
             )
             result = run(source()[:3], out, FakeClient())
             self.assertEqual(len(result["tasks"]), 5)
@@ -131,6 +127,7 @@ class RecoveryAndReviewContract(unittest.TestCase):
             self.assertEqual(view["bubbles"], [])
             self.assertEqual(view["no_task_person_ids"], ["silent"])
             self.assertEqual(len(view["unlinked_capabilities"]), 1)
+            self.assertFalse((Path(out) / "cache" / "links").exists())
 
     def test_taxonomy_can_be_corrected_without_reextracting_people(self):
         with tempfile.TemporaryDirectory() as out:
@@ -141,7 +138,7 @@ class RecoveryAndReviewContract(unittest.TestCase):
 
             class NoExtraction(FakeClient):
                 def complete(self, stage, *args):
-                    if stage == "extract":
+                    if stage in ("tasks", "capabilities", "links"):
                         raise AssertionError("must reuse extraction")
                     return super().complete(stage, *args)
 
@@ -162,40 +159,43 @@ class RecoveryAndReviewContract(unittest.TestCase):
 
         class Fixture(FakeClient):
             def complete(self, stage, system, payload):
-                if stage == "extract":
-                    tasks = [
-                        {
-                            "ref": ref,
-                            "label": "공통 개선",
-                            "quote": q,
-                            "occurrence": 1,
-                            "horizon": "short",
-                            "time_quote": q,
-                        }
-                        for ref, q in [
-                            ("t1", "단기 개선 A를 추진한다."),
-                            ("t2", "단기 개선 B를 추진한다."),
-                        ]
-                    ]
+                if stage == "tasks":
                     return {
-                        "tasks": tasks,
+                        "tasks": [
+                            {
+                                "label": "공통 개선",
+                                "quote": q,
+                                "occurrence": 1,
+                                "horizon": "short",
+                                "time_quote": q,
+                            }
+                            for q in (
+                                "단기 개선 A를 추진한다.",
+                                "단기 개선 B를 추진한다.",
+                            )
+                        ]
+                    }
+                if stage == "capabilities":
+                    return {
                         "capabilities": [
                             {
-                                "ref": "c1",
                                 "label": "분석",
                                 "kind": "have",
                                 "quote": "이를 위해 분석 경험을 활용한다.",
                                 "occurrence": 1,
                             }
-                        ],
+                        ]
+                    }
+                if stage == "links":
+                    return {
                         "links": [
                             {
-                                "task_ref": ref,
+                                "task_ref": t["ref"],
                                 "capability_ref": "c1",
                                 "relation_quote": inputs[0]["text"],
                             }
-                            for ref in ("t1", "t2")
-                        ],
+                            for t in payload["tasks"]
+                        ]
                     }
                 return super().complete(stage, system, payload)
 
@@ -204,6 +204,63 @@ class RecoveryAndReviewContract(unittest.TestCase):
             self.assertEqual(len(view["bubbles"]), 1)
             self.assertEqual(view["bubbles"][0]["people"], 1)
             self.assertEqual(len(view["bubbles"][0]["task_ids"]), 2)
+
+
+class SplitExtractionContract(unittest.TestCase):
+    """Tasks, capabilities and links are three calls; one bad stage keeps the others."""
+
+    inputs = [
+        {
+            "id": "split",
+            "pjt": "PJT",
+            "text": "단기적으로 수율 변동 분석 과제를 추진하고 싶다.\n이 과제에는 기존의 수율 변동 분석 관련 분석 경험을 활용하려 한다."
+            "\n\n별도로 문서 작성 경험을 갖고 있다.",
+        }
+    ]
+
+    def test_distant_sections_are_not_a_direct_link(self):
+        class CoOccurrence(FakeClient):
+            def complete(self, stage, system, payload):
+                if stage == "links":
+                    return {
+                        "links": [
+                            {
+                                "task_ref": payload["tasks"][0]["ref"],
+                                "capability_ref": payload["capabilities"][-1]["ref"],
+                                "relation_quote": payload["text"],
+                            }
+                        ]
+                    }
+                return super().complete(stage, system, payload)
+
+        with tempfile.TemporaryDirectory() as out:
+            with self.assertRaises(ValidationError):
+                run(self.inputs, out, CoOccurrence())
+            self.assertEqual(list((Path(out) / "cache" / "links").glob("*.json")), [])
+            view = build_view(run(self.inputs, out, FakeClient()))
+            self.assertEqual(len(view["tasks"][0]["skills"]), 1)
+            self.assertEqual(len(view["unlinked_capabilities"]), 1)
+
+    def test_incomplete_stage_response_is_not_cached_and_earlier_stages_resume(self):
+        class Truncated(FakeClient):
+            def complete(self, stage, system, payload):
+                if stage == "capabilities":
+                    body = super().complete(stage, system, payload)
+                    body["capabilities"][0].pop("occurrence")
+                    return body
+                return super().complete(stage, system, payload)
+
+        with tempfile.TemporaryDirectory() as out:
+            with self.assertRaises(ValidationError):
+                run(self.inputs, out, Truncated())
+            root = Path(out)
+            self.assertEqual(len(list((root / "cache" / "tasks").glob("*.json"))), 1)
+            self.assertEqual(list((root / "cache" / "capabilities").glob("*.json")), [])
+            result = run(self.inputs, out, FakeClient())
+            self.assertGreaterEqual(
+                json.loads((root / "status.json").read_text())["cache_hits"], 1
+            )
+            self.assertEqual(len(build_view(result)["tasks"]), 1)
 
 
 class ReviewRegressions(unittest.TestCase):
@@ -374,9 +431,7 @@ class NebulaPresentation(unittest.TestCase):
             self.assertIn(task["person"], people)
             self.assertIn(task["category"], categories)
             self.assertIn(task["pjt"], range(len(payload["pjts"])))
-            self.assertEqual(
-                task["pjt"], payload["people"][task["person"]]["pjt"]
-            )
+            self.assertEqual(task["pjt"], payload["people"][task["person"]]["pjt"])
         for edge in payload["edges"]:
             self.assertIn(edge["a"], people)
             self.assertIn(edge["b"], people)
@@ -414,7 +469,9 @@ class NebulaPresentation(unittest.TestCase):
         )
         payload = build_nebula(build_view(placed))
         self.assertTrue(payload["has_layout"])
-        values = [p["x"] for p in payload["people"]] + [p["y"] for p in payload["people"]]
+        values = [p["x"] for p in payload["people"]] + [
+            p["y"] for p in payload["people"]
+        ]
         self.assertEqual((min(values), max(values)), (0.0, 1.0))
 
     def test_scene_layout_is_stable_across_reruns(self):

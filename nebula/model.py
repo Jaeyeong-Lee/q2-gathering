@@ -153,11 +153,33 @@ def extraction(raw, person):
             tr[2] in q and cr[2] in q,
             "link evidence must contain both task and capability quotes",
         )
+        need("\n\n" not in q, "link evidence must be one passage, not distant sections")
         pair = (tr[1], cr[1])
         need(pair not in seen_links, "duplicate link")
         seen_links.add(pair)
         links.append({"task_id": tr[1], "capability_id": cr[1], "relation_quote": q})
     return {"tasks": tasks, "capabilities": caps, "links": links}
+
+
+def stage_items(raw, key, prefix, person):
+    """Validate one extraction stage on its own; refs are ours, so stages can't collide."""
+    fields(raw, (key,), key + " fields")
+    need(isinstance(raw[key], list), key + " list required")
+    for item in raw[key]:
+        need(isinstance(item, dict), key + " item object required")
+    items = [{**item, "ref": prefix + str(i)} for i, item in enumerate(raw[key], 1)]
+    extraction({"tasks": [], "capabilities": [], "links": [], key: items}, person)
+    return items
+
+
+def stage_links(raw, tasks, capabilities, person):
+    """Links are judged after the fact, against already validated tasks and capabilities."""
+    fields(raw, ("links",), "links fields")
+    need(isinstance(raw["links"], list), "links list required")
+    extraction(
+        {"tasks": tasks, "capabilities": capabilities, "links": raw["links"]}, person
+    )
+    return raw["links"]
 
 
 def taxonomy(raw, pjt, existing):

@@ -55,81 +55,82 @@ def source():
     return result
 
 
+def _extract(text):
+    """Split the synthetic paragraph shape into tasks and capabilities, without refs."""
+    tasks: list[dict[str, Any]] = []
+    caps: list[dict[str, Any]] = []
+    for paragraph in text.split("\n\n"):
+        lines = paragraph.splitlines()
+        if "과제를 추진하고 싶다." not in lines[0]:
+            if "문서 작성 경험" in paragraph:
+                caps.append(
+                    {
+                        "kind": "have",
+                        "label": "문서 작성",
+                        "quote": paragraph,
+                        "occurrence": 1,
+                    }
+                )
+            continue
+        quote = lines[0]
+        label = re.sub(r"^(단기|중기|장기)적으로 ", "", quote).replace(
+            " 과제를 추진하고 싶다.", ""
+        )
+        h = next(
+            (
+                h
+                for marker, h in [("단기", "short"), ("중기", "mid"), ("장기", "long")]
+                if quote.startswith(marker)
+            ),
+            "unknown",
+        )
+        tasks.append(
+            {
+                "label": label,
+                "quote": quote,
+                "occurrence": 1,
+                "horizon": h,
+                "time_quote": quote if h != "unknown" else None,
+            }
+        )
+        for line in lines[1:]:
+            have = line.startswith("이 과제에는")
+            caps.append(
+                {
+                    "kind": "have" if have else "need",
+                    "label": label + (" 분석 경험" if have else " 검증 설계"),
+                    "quote": line,
+                    "occurrence": 1,
+                }
+            )
+    return tasks, caps
+
+
 class FakeClient:
     cache_identity = {"provider": "fake", "version": 1}
 
     def complete(self, stage, system, payload):
-        if stage == "extract":
-            tasks: list[dict[str, Any]] = []
-            caps: list[dict[str, Any]] = []
+        if stage in ("tasks", "capabilities"):
+            tasks, caps = _extract(payload["text"])
+            return {stage: tasks if stage == "tasks" else caps}
+        if stage == "links":
             links: list[dict[str, Any]] = []
             for paragraph in payload["text"].split("\n\n"):
-                lines = paragraph.splitlines()
-                if "과제를 추진하고 싶다." not in lines[0]:
-                    if "문서 작성 경험" in paragraph:
-                        caps.append(
-                            {
-                                "ref": f"c{len(caps)}",
-                                "kind": "have",
-                                "label": "문서 작성",
-                                "quote": paragraph,
-                                "occurrence": 1,
-                            }
-                        )
+                task = next(
+                    (t for t in payload["tasks"] if t["quote"] in paragraph), None
+                )
+                if task is None:
                     continue
-                quote = lines[0]
-                label = re.sub(r"^(단기|중기|장기)적으로 ", "", quote).replace(
-                    " 과제를 추진하고 싶다.", ""
-                )
-                h = next(
-                    (
-                        h
-                        for marker, h in [
-                            ("단기", "short"),
-                            ("중기", "mid"),
-                            ("장기", "long"),
-                        ]
-                        if quote.startswith(marker)
-                    ),
-                    "unknown",
-                )
-                ref = f"t{len(tasks)}"
-                tasks.append(
+                links.extend(
                     {
-                        "ref": ref,
-                        "label": label,
-                        "quote": quote,
-                        "occurrence": 1,
-                        "horizon": h,
-                        "time_quote": quote if h != "unknown" else None,
+                        "task_ref": task["ref"],
+                        "capability_ref": c["ref"],
+                        "relation_quote": paragraph,
                     }
+                    for c in payload["capabilities"]
+                    if c["quote"] in paragraph
                 )
-                for line in lines[1:]:
-                    cr = f"c{len(caps)}"
-                    caps.append(
-                        {
-                            "ref": cr,
-                            "kind": (
-                                "have" if line.startswith("이 과제에는") else "need"
-                            ),
-                            "label": label
-                            + (
-                                " 분석 경험"
-                                if line.startswith("이 과제에는")
-                                else " 검증 설계"
-                            ),
-                            "quote": line,
-                            "occurrence": 1,
-                        }
-                    )
-                    links.append(
-                        {
-                            "task_ref": ref,
-                            "capability_ref": cr,
-                            "relation_quote": paragraph,
-                        }
-                    )
-            return {"tasks": tasks, "capabilities": caps, "links": links}
+            return {"links": links}
         if stage == "taxonomy":
             existing = {c["name"] for c in payload["existing"]}
             names = sorted({t["label"] for t in payload["tasks"]} - existing)

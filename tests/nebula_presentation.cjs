@@ -25,7 +25,7 @@ from nebula.render import build
 root = Path(sys.argv[1])
 class Empty(FakeClient):
     def complete(self, stage, *args):
-        return {'tasks': [], 'capabilities': [], 'links': []}
+        return {stage: []}
 build(run(source()[:1], root/'empty', Empty()), root/'empty')
 # Fixture deliberately exercises real-data labels without using real records.
 class RealLabels(FakeClient):

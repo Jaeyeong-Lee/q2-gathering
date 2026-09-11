@@ -7,9 +7,16 @@ import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from nebula import prompts
 from nebula.demo import FakeClient, source
 from nebula.llm import OpenAICompatible, LLMError
 from nebula.pipeline import run
+
+
+STAGES = {
+    getattr(prompts, name.upper()): name
+    for name in ("tasks", "capabilities", "links", "taxonomy", "consolidate", "assign")
+}
 
 
 class HTTPContract(unittest.TestCase):
@@ -34,19 +41,7 @@ class HTTPContract(unittest.TestCase):
                     self.wfile.write(b"PRIVATE ERROR BODY")
                     return
                 system = body["messages"][0]["content"]
-                stage = (
-                    "extract"
-                    if system.startswith("You extract")
-                    else (
-                        "taxonomy"
-                        if system.startswith("Build local")
-                        else (
-                            "consolidate"
-                            if system.startswith("Consolidate")
-                            else "assign"
-                        )
-                    )
-                )
+                stage = STAGES[system]
                 result = FakeClient().complete(
                     stage, system, json.loads(body["messages"][1]["content"])
                 )
@@ -85,8 +80,8 @@ class HTTPContract(unittest.TestCase):
             result = run(source()[:2], out, client)
         self.assertEqual(len(result["tasks"]), 3)
         self.assertEqual(
-            len(self.requests), 5
-        )  # two people, taxonomy, consolidate, assign
+            len(self.requests), 9
+        )  # two people x (tasks, capabilities, links), taxonomy, consolidate, assign
         for path, body, auth in self.requests:
             self.assertEqual(path, "/v1/chat/completions")
             self.assertEqual(body["response_format"], {"type": "json_object"})
@@ -97,7 +92,7 @@ class HTTPContract(unittest.TestCase):
         self.failures = [429, 503, 503]
         client = OpenAICompatible(self.base, "model", attempts=3, sleep=lambda _: None)
         with self.assertRaises(LLMError) as caught:
-            client.complete("extract", "You extract", {"text": source()[0]["text"]})
+            client.complete("tasks", prompts.TASKS, {"text": source()[0]["text"]})
         self.assertEqual(len(self.requests), 3)
         self.assertNotIn("PRIVATE", str(caught.exception))
 
@@ -107,6 +102,6 @@ class HTTPContract(unittest.TestCase):
             self.base, "model", response_format="none", sleep=lambda _: None
         )
         with self.assertRaises(LLMError):
-            client.complete("extract", "You extract", {"text": source()[0]["text"]})
+            client.complete("tasks", prompts.TASKS, {"text": source()[0]["text"]})
         self.assertEqual(len(self.requests), 1)
         self.assertNotIn("response_format", self.requests[0][1])

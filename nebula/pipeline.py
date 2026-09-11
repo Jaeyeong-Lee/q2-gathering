@@ -8,6 +8,8 @@ from . import prompts
 from .model import (
     persons,
     extraction,
+    stage_items,
+    stage_links,
     taxonomy,
     assignments,
     digest,
@@ -31,6 +33,43 @@ def batches(items, size, max_chars):
         total += length
     if group:
         yield group
+
+
+def _refs(items):
+    return [{k: item[k] for k in ("ref", "label", "quote")} for item in items]
+
+
+def extract_person(store, client, person):
+    """Three narrow calls instead of one: tasks, capabilities, then stated links only.
+
+    Each stage is validated and cached on its own, so a person with no tasks still
+    yields capabilities and a rejected link response does not discard the rest.
+    """
+    payload = {"person_id": person["id"], "text": person["text"]}
+    tasks = store.call(
+        client,
+        "tasks",
+        prompts.TASKS,
+        payload,
+        lambda raw: stage_items(raw, "tasks", "t", person),
+    )
+    capabilities = store.call(
+        client,
+        "capabilities",
+        prompts.CAPABILITIES,
+        payload,
+        lambda raw: stage_items(raw, "capabilities", "c", person),
+    )
+    links = []
+    if tasks and capabilities:
+        links = store.call(
+            client,
+            "links",
+            prompts.LINKS,
+            {**payload, "tasks": _refs(tasks), "capabilities": _refs(capabilities)},
+            lambda raw: stage_links(raw, tasks, capabilities, person),
+        )
+    return {"tasks": tasks, "capabilities": capabilities, "links": links}
 
 
 def run(
@@ -143,13 +182,7 @@ def _run(
             if p["id"] in overrides:
                 result = validate(overrides[p["id"]])
             else:
-                result = store.call(
-                    client,
-                    "extract",
-                    prompts.EXTRACT,
-                    {"person_id": p["id"], "text": p["text"]},
-                    validate,
-                )
+                result = validate(extract_person(store, client, p))
             extracted.append(result)
             correction_entries.append(
                 {
