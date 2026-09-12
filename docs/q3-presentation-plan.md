@@ -188,9 +188,9 @@ window.nebula = {
 ### 5.1 이미 있는 것
 
 - `python3 -m nebula demo --out <dir>` — `nebula/demo.py` `source()`: 합성 200명, 8 PJT, `FakeClient`(LLM 0회), TF-IDF 이웃 인당 4명, 좌표 없음. 출력 `<dir>/synthetic-persons.json`·`synthetic-network.json`·`result.json`·HTML 3종.
-- 한계: `demo`는 `--input`을 받지 않는다(`nebula/__main__.py`). `FakeClient`는 `source()`의 문장 모양("…과제를 추진하고 싶다.", "이 과제에는 …", "이를 위해 … 역량이 더 필요하다.")만 추출한다.
+- `FakeClient`는 `source()`의 문장 모양("…과제를 추진하고 싶다.", "이 과제에는 …", "이를 위해 … 역량이 더 필요하다.")만 추출한다.
 
-### 5.2 만들 것 — `nebula/fixtures/q3/` (커밋, 전부 합성)
+### 5.2 만든 것 — `nebula/fixtures/q3/` (T1 완료, 커밋, 전부 합성)
 
 | 파일 | 내용 | 실데이터 대응 |
 |---|---|---|
@@ -200,8 +200,10 @@ window.nebula = {
 | `make.py` | 위 셋을 결정적으로 생성 | — |
 | `README.md` | 합성 명시, 재생성 명령, `P000` 교체 절차 | — |
 
-- `P000` "예시 인물": 과제 3–4개를 쓴 자리표시 원문. Jay 예시가 오면 이 한 사람만 바꾼다(5.3).
-- `demo`에 `--input`을 붙인다: 있으면 `source()` 대신 그 파일을 쓴다.
+- `P000` "예시 인물": 과제 4개·역량 연결 8개를 쓴 자리표시 원문. Jay 예시가 오면 이 한 사람만 바꾼다(5.3).
+- `demo`는 `--input`을 받는다: 있으면 `source()` 대신 그 파일을 쓴다.
+- `FakeClient`는 `기타 `로 시작하는 과제를 분류하지 않는다 → 픽스처에서 미분류 경로가 재현된다. 기존 `demo` 200명 결과는 변경 전후 동일.
+- **실측**: 320명, 과제 682, 과제군 40(PJT당 5), 과제 0개 19명, 미분류 17건, PJT별 과제 39–159, 연결선 5,923개(좌표 없음). 빌드 0.66초. 연결선이 많으니 장면 0은 그리기 전에 인당 상위 N개로 줄인다(§4.2).
 
 모든 에이전트 공통 재현:
 
@@ -231,8 +233,8 @@ python3 -m nebula demo --input nebula/fixtures/q3/persons.json \
 
 | 티켓 | 상태 | 커밋 |
 |---|---|---|
-| T0 | 대기 | |
-| T1 | 대기 | |
+| T0 | 완료 — 워크트리 `~/orca/workspaces/q2-gathering/q3-nebula`, #47 닫음 | `0033854` (머지. `CLAUDE.md` 충돌은 두 절 모두 유지) |
+| T1 | 완료 — 계약 테스트 34 passed, mypy 통과 | `3ca66ef` |
 | T2 | 대기 | |
 | T3 | 대기 | |
 | T4 | 대기 | |
