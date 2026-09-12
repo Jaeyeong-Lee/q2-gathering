@@ -30,7 +30,7 @@
 ```
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/q3_story_check.cjs \
   docs/q3-visual/story-kimi/story.js docs/q3-visual/story-kimi/shots
-PASS: docs/q3-visual/story-kimi/story.js — 9 beats 28129ms, reduced motion 1135ms
+PASS: docs/q3-visual/story-kimi/story.js — 9 beats 27423ms, reduced motion 861ms
 ```
 
 - 콘솔 오류 0, 외부 요청 0, `#synthetic-mark` 상시 표시, `1-2` 뒤 장면 0, `1-6` 뒤 PJT 진입, 각 비트 `screen` 첫 줄 표시 — 모두 PASS.
