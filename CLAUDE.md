@@ -61,6 +61,10 @@ debugging, and that collapses this whole structure.
 Full design: `docs/task-discovery-coldstart.md`. Internal-network operations:
 `docs/task-discovery-internal-run-guide.md`.
 
+### Presentation work (pitch deck, demo, web serving)? Start at `docs/q3-presentation-index.md`
+
+It maps branches and worktrees; the plan, decisions, and tickets live in `docs/q3-presentation-plan.md`.
+
 ---
 
 ## General coding guidelines
