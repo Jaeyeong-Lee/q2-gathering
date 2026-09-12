@@ -85,10 +85,10 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
 사람별 텍스트와 기존 유사도 네트워크에서 PJT별 미래 과제·시간·보유/필요 역량을 추출하고 검토하는 별도 파이프라인입니다. 기존 Archive와 `td_*` 산출물을 변경하지 않습니다.
 
-발표 산출물은 `nebula.html`입니다. **사람 → 과제로 펼치기 → 성운으로 모이기 → 시간으로 보기 → 역량 들여다보기**의 다섯 장면을 자동 발표(10초 간격)나 좌우 화살표로 넘깁니다. `matrix.html`은 같은 결과를 시간 × 역량 축으로 다시 보는 보조 화면입니다.
+발표 산출물은 `nebula.html`입니다. **사람 → 미래 과제로 펼치기 → 성운 → 과제·역량**의 네 장면을 자동 발표(10초 간격)나 좌우 화살표로 넘깁니다. 이름 검색으로 한 사람의 과제를 펼치고, 성운 장면에서 PJT 격자 칸을 눌러 진입합니다. ESC로 격자에 돌아옵니다. 시간 장면은 보류하며 `matrix.html`에서 같은 결과를 시간 × 역량 축으로 볼 수 있습니다. `#mode=story`는 발표 연출용으로 화면 틀을 숨깁니다. 시각 작업 안내는 [공통 요구사항](docs/q3-visual-brief.md)을 봅니다.
 
 ```sh
 python3 -m nebula demo --out data/nebula-demo
 ```
 
-`nebula.html`(발표용 다섯 장면), `matrix.html`(시간 × 역량 버블), `review.html`(검토)을 로컬에서 엽니다. 실제 내부 모델 연결, 입력 계약, 실패 재개, 수정과 승인 빌드는 [내부망 실행 가이드](docs/nebula-internal-runbook.md)를 먼저 읽으세요. 구현 범위와 해석 기준은 [기능 명세](docs/nebula-spec.md)에 있습니다. Python 3.10+ Linux/macOS, 런타임 추가 패키지 없음.
+`nebula.html`(발표용 네 장면), `matrix.html`(시간 × 역량 버블), `review.html`(검토)을 로컬에서 엽니다. 실제 내부 모델 연결, 입력 계약, 실패 재개, 수정과 승인 빌드는 [내부망 실행 가이드](docs/nebula-internal-runbook.md)를 먼저 읽으세요. 구현 범위와 해석 기준은 [기능 명세](docs/nebula-spec.md)에 있습니다. Python 3.10+ Linux/macOS, 런타임 추가 패키지 없음.

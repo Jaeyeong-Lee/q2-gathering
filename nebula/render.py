@@ -4,6 +4,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 from .model import digest, need
+from .layout import place_people
 from .storage import Store, write_json, write_text, output_lock
 
 
@@ -112,7 +113,7 @@ def _coordinates(people):
 
 
 def build_nebula(view):
-    """Reshape build_view output for the five-scene presentation.
+    """Reshape build_view output for the four-scene presentation.
 
     The scenes address people and PJTs by position, so stable ids are indexed
     here and the original ids ride along for evidence display. Unclassified
@@ -138,6 +139,14 @@ def build_nebula(view):
                 "y": node.get("y"),
             }
         )
+    edges = [
+        {"a": person_at[e["a"]], "b": person_at[e["b"]], "w": e["similarity"]}
+        for e in network.get("edges", [])
+    ]
+    layout_source = "supplied" if network.get("has_layout") else "absent"
+    if layout_source == "absent" and edges:
+        place_people(people, edges, len(pjt_names))
+        layout_source = "computed"
     _coordinates(people)
 
     loose = {t["pjt"] for t in view["tasks"] if not t["category_id"]}
@@ -196,7 +205,8 @@ def build_nebula(view):
         "run_id": view["run_id"],
         "synthetic": view["synthetic"],
         "approved_only": view["approved_only"],
-        "has_layout": bool(network.get("has_layout")),
+        "has_layout": layout_source != "absent",
+        "layout_source": layout_source,
         "people": people,
         "tasks": tasks,
         "categories": categories,
@@ -204,10 +214,7 @@ def build_nebula(view):
             {"name": name, "color": PALETTE[i % len(PALETTE)], "count": per_pjt[i]}
             for i, name in enumerate(pjt_names)
         ],
-        "edges": [
-            {"a": person_at[e["a"]], "b": person_at[e["b"]], "w": e["similarity"]}
-            for e in network.get("edges", [])
-        ],
+        "edges": edges,
     }
 
 
@@ -243,6 +250,9 @@ def _build(data, out, approved_only):
         ("review", data),
     ):
         page = (root / f"{name}.html").read_text()
+        if name == "nebula":
+            story = root / "story.js"
+            page = page.replace("__STORY__", story.read_text() if story.exists() else "")
         write_text(out / f"{name}.html", page.replace("__PAYLOAD__", encoded(payload)))
     write_json(out / "view.json", view)
     return out / "nebula.html"

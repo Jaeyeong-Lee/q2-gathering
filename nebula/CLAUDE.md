@@ -1,10 +1,10 @@
 # nebula — 이 디렉터리에서 작업하는 에이전트용
 
 `nebula`는 task-discovery와 **별개 패키지**다. 사람별 회고 텍스트에서 미래 과제·역량을 뽑아
-PJT별 미래 과제군으로 묶고, 오프라인 HTML 다섯 장면으로 발표한다. 루트 `CLAUDE.md`의 실데이터
+PJT별 미래 과제군으로 묶고, 오프라인 HTML 네 장면으로 발표한다. 루트 `CLAUDE.md`의 실데이터
 금지는 여기서도 그대로 적용된다 — 이 파일은 그것을 대체하지 않고 nebula 쪽 사정만 더한다.
 
-기준 브랜치는 `codex/future-task-capability-map`이다. 새 작업은 여기서 딴다.
+발표 작업 기준은 `Jaeyeong-Lee/q3-nebula-presentation`, 워크트리는 `~/orca/workspaces/q2-gathering/q3-nebula`다. 계획은 `docs/q3-presentation-plan.md`를 따른다.
 
 ## 읽는 순서
 
@@ -39,6 +39,7 @@ PJT별 미래 과제군으로 묶고, 오프라인 HTML 다섯 장면으로 발�
 ./.venv/bin/python -m pytest tests/test_nebula_pipeline.py tests/test_nebula_http.py tests/test_nebula_network.py tests/test_nebula_fixture.py -q
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_browser.cjs /tmp/<demo out>
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_presentation.cjs
+NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_q3.cjs
 ```
 
 - nebula 계약 테스트는 2초면 끝난다. 고칠 때마다 돌린다.

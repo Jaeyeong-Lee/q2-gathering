@@ -44,7 +44,7 @@ function cli(args, code = 0) {
 
   // The presentation is the main deliverable: every scene must draw from the
   // same run, and the deep link is what makes a scene checkable at all.
-  const scenes = ["사람", "과제로 펼치기", "성운으로 모이기", "시간으로 보기", "역량 들여다보기"];
+  const scenes = ["사람", "미래 과제로 펼치기", "성운", "과제·역량"];
   for (const [index, name] of scenes.entries()) {
     await page.goto(url("nebula.html") + "#scene=" + index);
     await page.reload(); // hash-only goto does not re-run the page
@@ -60,14 +60,11 @@ function cli(args, code = 0) {
     await page.waitForTimeout(1800); // Capture the settled scene, after its transition.
     await page.screenshot({ path: path.join(temp, "nebula-" + index + ".png") });
   }
-  // 중기 is a horizon the pipeline emits; the prototype only knew short/long.
+  // Time remains in the evidence/matrix, but is not a presentation scene.
   await page.goto(url("nebula.html") + "#scene=3");
   await page.reload();
-  assert.ok(
-    (await page.locator("#time text").allTextContents()).some((t) => t.includes("중기")),
-    "mid horizon must have its own ring",
-  );
-  await page.locator("#sky g.task").first().click();
+  assert.equal(await page.locator("#time text").count(), 0);
+  await page.locator('#sky g.task[tabindex="0"]').first().press('Enter');
   assert.ok(await page.locator("#panel blockquote").count(), "star must open its quote");
 
   await page.goto(url("matrix.html"));

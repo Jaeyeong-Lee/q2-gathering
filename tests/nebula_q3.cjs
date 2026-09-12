@@ -1,0 +1,86 @@
+// Public engine and rendered DOM contract, using only the committed synthetic Q3 fixture.
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const os = require('node:os');
+const {spawnSync} = require('node:child_process');
+const {pathToFileURL} = require('node:url');
+const {chromium} = require('../nebula/browser-tests/node_modules/playwright');
+const out = fs.mkdtempSync(path.join(os.tmpdir(), 'nebula-q3-'));
+const start = performance.now();
+const build = spawnSync(process.env.NEBULA_PYTHON || 'python3', ['-m', 'nebula', 'demo',
+  '--input', 'nebula/fixtures/q3/persons.json', '--network', 'nebula/fixtures/q3/neighbors.json', '--out', out], {encoding:'utf8'});
+assert.equal(build.status, 0, build.stderr);
+assert.ok(performance.now()-start < 30000, '320-person build must finish in 30s');
+(async()=>{
+  const browser = await chromium.launch({headless:true, ...(process.env.NEBULA_BROWSER ? {executablePath:process.env.NEBULA_BROWSER} : {})});
+  try {
+    const page = await browser.newPage({viewport:{width:1920,height:1080}});
+    const errors=[];
+    page.on('pageerror', e=>errors.push(e.message));
+    const url=pathToFileURL(path.join(out,'nebula.html')).href;
+    await page.goto(url);
+    const data = await page.locator('#data').textContent().then(JSON.parse);
+    assert.equal(data.people.length,320);
+    assert.equal(await page.locator('.step').count(),4);
+    assert.ok(await page.locator('#links line').count() <= 320*4);
+    await page.screenshot({path:path.join(out,'people.png')});
+    const person=data.people.find(p=>p.pid==='P000');
+    await page.locator('#search').fill(person.name);
+    await page.locator(`#panel [data-person="${person.id}"]`).click();
+    await page.waitForFunction(count=>[...document.querySelectorAll('#tasks .task')].filter(n=>+getComputedStyle(n).opacity>.5).length===count,data.tasks.filter(t=>t.person===person.id).length);
+    await page.evaluate(id=>window.nebula.focusPerson(id),person.id);
+    const visibleTasks=()=>page.locator('#sky g.task').evaluateAll(ns=>ns.filter(n=>getComputedStyle(n).display!=='none' && +getComputedStyle(n).opacity>0.5).map(n=>n.dataset.taskNode));
+    assert.deepEqual((await visibleTasks()).sort(),data.tasks.filter(t=>t.person===person.id).map(t=>t.id).sort());
+    await page.screenshot({path:path.join(out,'focus.png')});
+    await page.evaluate(()=>window.nebula.go(1));
+    assert.equal((await visibleTasks()).length,data.tasks.length);
+    assert.equal(await page.locator('#tasks [tabindex="0"]').count(),0,'split is a transition, not a task explorer');
+    await page.evaluate(()=>window.nebula.go(2));
+    assert.equal(await page.locator('[data-pjt-cell]').count(),data.pjts.length);
+    for(let i=0;i<data.pjts.length;i++){
+      const cell=page.locator(`[data-pjt-cell="${i}"]`);
+      assert.match(await cell.innerText(),new RegExp(`${data.tasks.filter(t=>t.pjt===i).length}개 과제`));
+      assert.equal(await cell.evaluate(n=>n.classList.contains('highlighted')),i===person.pjt);
+    }
+    assert.equal(await page.locator('#tasks .highlighted').count(),data.tasks.filter(t=>t.person===person.id).length);
+    assert.equal(new URL(page.url()).hash.includes('pjt='),false);
+    await page.screenshot({path:path.join(out,'grid.png')});
+    await page.locator(`[data-pjt-cell="${person.pjt}"]`).click();
+    await page.evaluate(id=>window.nebula.enterPjt(id),person.pjt);
+    assert.equal(await page.locator('#tasks g.task').evaluateAll(ns=>ns.filter(n=>getComputedStyle(n).display!=='none').length),data.tasks.filter(t=>t.pjt===person.pjt).length);
+    await page.screenshot({path:path.join(out,'pjt.png')});
+    await page.reload();
+    assert.equal(new URL(page.url()).hash.includes(`pjt=${person.pjt}`),true);
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('[data-pjt-cell]').count(),data.pjts.length);
+    const otherPjt=(person.pjt+1)%data.pjts.length;
+    await page.evaluate(id=>window.nebula.enterPjt(id),otherPjt);
+    await page.reload();
+    assert.ok(new URL(page.url()).hash.includes(`person=${person.id}`),'selection survives visiting a different PJT');
+    await page.evaluate(()=>window.nebula.leavePjt());
+    await page.emulateMedia({reducedMotion:'reduce'});
+    const emptyPerson=data.people.find(p=>!data.tasks.some(t=>t.person===p.id));
+    await page.evaluate(id=>window.nebula.focusPerson(id),emptyPerson.id);
+    assert.equal((await visibleTasks()).length,0);
+    assert.match(await page.locator('#panel').innerText(),/0개의 과제/);
+    await page.evaluate(()=>window.nebula.clearPerson());
+    assert.equal(new URL(page.url()).hash.includes('person='),false);
+    await page.emulateMedia({reducedMotion:'no-preference'});
+    await page.evaluate(async id=>{const focusing=window.nebula.focusPerson(id);await window.nebula.go(2);await focusing;},person.id);
+    assert.equal(await page.locator('[data-pjt-cell]').count(),data.pjts.length,'new scene cancels delayed personal split');
+    await page.goto(url+'#mode=story');
+    await page.reload();
+    for(const selector of ['header','.hero','.inspector','footer'])assert.equal(await page.locator(selector).isVisible(),false);
+    assert.equal(await page.locator('#synthetic-mark').isVisible(),true);
+    await page.evaluate(()=>window.nebula.go(2));
+    assert.ok(new URL(page.url()).hash.includes('mode=story'));
+    await page.evaluate(()=>window.nebula.go(0));
+    const positions=await page.evaluate(()=>window.nebula.peoplePositions());
+    assert.equal(positions.length,320);
+    assert.ok(positions.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1920&&p.y>=0&&p.y<=1080));
+    assert.deepEqual(errors,[]);
+    console.log('PASS: Q3 public engine, search, split, grid, PJT entry, reload, story mode');
+    console.log(out);
+  } finally {await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

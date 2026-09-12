@@ -62,7 +62,7 @@ assert.equal(fixture.status, 0, fixture.stderr);
     const url = (folder, hash = "") =>
       pathToFileURL(path.join(out, folder, "nebula.html")).href + hash;
     for (const folder of ["empty", "unapproved"]) {
-      await page.goto(url(folder, "#scene=4"));
+      await page.goto(url(folder, "#scene=3"));
       await page.waitForTimeout(150);
       assert.deepEqual(errors, [], "empty presentation must render");
       assert.match(
@@ -88,8 +88,8 @@ assert.equal(fixture.status, 0, fixture.stderr);
     assert.ok(new URL(await page.url()).hash.includes("person=0"));
     await page.reload();
     assert.match(await page.locator("#panel h2").innerText(), /합성 인물/);
-    await page.locator('[data-scene="1"]').click();
-    await page.locator("#tasks .task").first().press("Enter");
+    await page.evaluate(()=>window.nebula.focusPerson(0));
+    await page.locator('#tasks .task[tabindex="0"]').first().press("Enter");
     assert.match(await page.locator("#panel").innerText(), /승인/);
     assert.doesNotMatch(
       await page.locator("#panel").innerText(),
@@ -111,7 +111,7 @@ assert.equal(fixture.status, 0, fixture.stderr);
       .first();
     await relation.click();
     assert.ok((await relation.locator("..").innerText()).includes("과제"));
-    await page.locator('[data-scene="4"]').click();
+    await page.locator('[data-scene="3"]').click();
     await page.waitForTimeout(1800);
     await page.screenshot({ path: path.join(out, "capabilities.png") });
     assert.deepEqual(errors, []);

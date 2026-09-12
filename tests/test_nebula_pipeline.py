@@ -501,7 +501,7 @@ class ReviewRegressions(unittest.TestCase):
 
 
 class NebulaPresentation(unittest.TestCase):
-    """The five-scene presentation addresses people and PJTs by position.
+    """The four-scene presentation addresses people and PJTs by position.
 
     build_view keeps stable string ids; the scenes index into arrays. These
     tests pin that translation, because a silent mismatch shows an empty sky
@@ -565,6 +565,9 @@ class NebulaPresentation(unittest.TestCase):
         )
         payload = build_nebula(build_view(placed))
         self.assertTrue(payload["has_layout"])
+        self.assertEqual(payload["layout_source"], "supplied")
+        self.assertEqual([p["x"] for p in payload["people"]], [0, .2, .4, .6, .8, 1])
+        self.assertEqual([p["y"] for p in payload["people"]], [1, .8, .6, .4, .2, 0])
         values = [p["x"] for p in payload["people"]] + [
             p["y"] for p in payload["people"]
         ]
@@ -575,6 +578,24 @@ class NebulaPresentation(unittest.TestCase):
         first = {t["id"]: t["seed"] for t in build_nebula(self.view)["tasks"]}
         second = {t["id"]: t["seed"] for t in build_nebula(build_view(again))["tasks"]}
         self.assertEqual(first, second)
+
+    def test_network_without_coordinates_gets_a_deterministic_display_layout(self):
+        ids = [p["id"] for p in self.view["persons"]]
+        self.view["network"] = {
+            "edges": [{"a": ids[0], "b": ids[1], "similarity": 0.8}],
+            "has_layout": False,
+        }
+        before = copy.deepcopy(self.view)
+        first = build_nebula(self.view)
+        second = build_nebula(self.view)
+        self.assertTrue(first["has_layout"])
+        self.assertEqual(first["layout_source"], "computed")
+        self.assertEqual(first["people"], second["people"])
+        self.assertEqual(self.view, before, "rendering must not mutate the run")
+        for p in first["people"]:
+            self.assertTrue(0 <= p["x"] <= 1 and 0 <= p["y"] <= 1)
+        self.view["network"]["edges"][0]["similarity"] = 0.1
+        self.assertNotEqual(first["people"], build_nebula(self.view)["people"])
 
     def test_build_writes_the_presentation_alongside_matrix_and_review(self):
         from nebula.render import build

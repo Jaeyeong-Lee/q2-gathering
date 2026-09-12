@@ -235,8 +235,8 @@ python3 -m nebula demo --input nebula/fixtures/q3/persons.json \
 |---|---|---|
 | T0 | 완료 — 워크트리 `~/orca/workspaces/q2-gathering/q3-nebula`, #47 닫음 | `0033854` (머지. `CLAUDE.md` 충돌은 두 절 모두 유지) |
 | T1 | 완료 — 계약 테스트 34 passed, mypy 통과 | `3ca66ef` |
-| T2 | 대기 | |
-| T3 | 대기 | |
+| T2 | 완료 (Codex 작성, Claude 검증·커밋) — `nebula/layout.py`, 결정성·비변경 테스트 | (T3와 같은 커밋) |
+| T3 | 뼈대 완료 (Codex 작성, Claude 검증·커밋) — 네 장면·검색·클로즈업·4열 PJT 격자·`window.nebula`·story 모드, `tests/nebula_q3.cjs`. 모션·톤은 시각 작업 몫. 시각 담당 안내 `docs/q3-visual-brief.md` | (이 표를 담은 커밋) |
 | T4 | 대기 | |
 | T5 | 대기 | (내부망, 커밋 없음) |
 | T6 | 대기 | |
