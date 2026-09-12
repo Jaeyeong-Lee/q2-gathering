@@ -1,40 +1,285 @@
-# 3Q 발표 — 시각 작업 공통 요구사항
+# 3Q 발표 — 시각 작업 지시서 (오케스트레이터용)
 
-작업 위치: `~/orca/workspaces/q2-gathering/q3-nebula`, 통합 브랜치 `Jaeyeong-Lee/q3-nebula-presentation`.
-흐름·결정·함수 계약의 정본은 [발표 계획](q3-presentation-plan.md) §2–4.5다. 화면 태도는 [deck-soul](design-candidates-2026-09-11/deck-soul.md)의 화면·정직성 절을 따른다.
+> 작성 2026-09-13. 발표 2026-09-15.
+> **이 파일 하나로 시각 작업을 배분하고 검수한다.** 엔진 함수 계약·텍스트 파일 형식·폴더 규칙·검수 기준의 정본은 이 문서다.
+> 발표 전체의 배경과 결정은 `docs/q3-presentation-plan.md` §1–§3에 있다.
 
-## 발표 흐름과 작업 경계
+## 0. 오케스트레이터 순서
 
-기록의 도입 → PPT·텍스트가 사람의 별로 변환 → 전원 네트워크 → 예시 인물 클로즈업·분열 → 전원 분열 → PJT 격자·한 PJT 성운 → 한 과제의 역량 근거 → 맺음.
+1. **L0 배정**(§4) → L0 완료 기준 확인 → 통합 브랜치에 머지.
+2. Jay에게 `nebula/templates/deck.md` 초안이 생겼다고 알린다. Jay는 언제든 문구를 고치고 다시 빌드한다(§3.4).
+3. **V-story N명 + V-engine 1명을 동시에 배정**한다. 각 에이전트에게 이 문서와 자기 `agent-id`, 브랜치, 워크트리 경로를 준다(§5).
+4. 에이전트가 끝났다고 보고하면 §6 검수 명령을 직접 돌려 확인하고, 그 브랜치를 통합 브랜치에 머지한다. 폴더가 겹치지 않아 충돌이 없다.
+5. Jay와 §7 기준으로 story 후보 하나를 고른다 → **통합**(§4) → 전체 테스트 → 머지.
+6. `docs/q3-visual/README.md` 후보 표와 `docs/q3-presentation-plan.md` §6 상태 표를 갱신한다.
 
-- T4: 도입·wow1·wow2·맺음과 전체 비트 진행을 `nebula/templates/story.js`에서 만든다. Space/→ 다음, ← 이전, R 다시 시작을 담당한다. 엔진은 story 모드에서 좌우 키를 처리하지 않는다.
-- 엔진: 장면 0 사람, 1 전원 분열, 2 PJT 격자·성운, 3 과제·역량. 검색·상태·복원은 `nebula.html`이 담당한다. 시간 장면은 보류다.
-- 병렬 시안은 각자 별도 파일 또는 브랜치에 보관하고, 고른 시안 하나를 `story.js`에 합친다. `nebula.html`의 모션·톤 변경은 한 명이 순서대로 맡는다.
-- `render.py`의 인라인 연결은 준비됐다. `story.js`가 있으면 `__STORY__`에 삽입하며, 없으면 엔진만 동작한다. `story.js`는 `#mode=story`에서만 연출을 시작해야 한다.
+| 날짜 | 목표 |
+|---|---|
+| 09-13 | L0 완료·머지, V-story·V-engine 착수 |
+| 09-14 | 후보 제출(오후), 선택·통합(저녁) |
+| 09-15 | 오전 리허설, 발표 |
 
-## 엔진과 연결하기
+## 1. 무엇을 만드나
 
-`window.nebula`의 함수 이름·인자는 계획서 §4.5를 그대로 쓴다. 인물·PJT 인자는 페이로드 색인, 과제 인자는 과제 ID다. `P000`은 원본 사람 ID이므로 `people[].pid`로 찾아 `id`를 전달한다.
+- 발표는 **1부 개념 덱**(ELI5, 합성 데이터)과 **2부 실데이터 라이브 데모**로 나뉜다. 둘은 같은 엔진 `nebula/templates/nebula.html`을 쓴다.
+- **파일이 다르다.** 1부 = 합성 픽스처로 빌드한 `nebula.html`을 `#mode=story`로 연 것. 2부 = 내부망 실데이터로 빌드한 `nebula.html`. 시각 작업은 전부 1부(합성)에서 한다.
+- 엔진은 장면·검색·클로즈업·PJT 격자·상태 복원을 이미 갖고 있고 테스트가 붙어 있다(Codex 뼈대). 1부 연출은 **`story.js`가 엔진 함수를 호출**해서 만든다.
+- **화면 문장과 발표자 멘트는 `nebula/templates/deck.md` 한 파일에 둔다.** 빌드가 이 파일을 읽어 HTML에 넣는다. Jay가 문구를 고치고 다시 빌드하면 그대로 반영된다. 코드에는 문구를 쓰지 않는다.
 
-`focusPerson`, `clearPerson`, `enterPjt`, `leavePjt`, `go`는 전환이 끝나면 resolve한다. 다음 비트는 `await`로 기다린다. 연속 조작으로 새 명령이 오면 이전 개인 분열의 후속 단계는 취소되고 Promise는 정상 종료한다. story 쪽도 비트가 바뀐 뒤 오래된 비트의 후속 호출을 실행하지 않도록 관리한다.
+## 2. 1부 비트 명세
 
-`peoplePositions()`는 현재 사람 중심의 **브라우저 뷰포트 기준 px**를 돌려준다. story 레이어가 다른 원점을 쓰면 그 레이어의 `getBoundingClientRect()`를 빼서 변환한다. wow2 마지막 별 위치를 이 좌표에 맞춘 뒤 엔진 장면 0에 넘긴다. 레이어는 `#sky` 위에 두고, 글자는 줌되는 월드 바깥 HTML로 그린다.
+비트는 9개다. ID는 `deck.md`의 절 제목, `window.nebulaStory.beats`, 스크린샷 파일 이름에 똑같이 쓴다.
 
-## 태도와 완료 기준
+| ID | 이름 | 화면에서 일어나는 것 | 엔진 호출 | 끝 상태 |
+|---|---|---|---|---|
+| `1-0` | 도입 | 검은 화면. 판독할 수 없는 PPT 실루엣 몇 장이 느리게 겹쳐 떠 있다. 큰 움직임 없이 조용히 시작 | 없음 | 문장 + 멈춘 실루엣 |
+| `1-1` | wow1 임베딩 | PPT 한 장이 중앙으로 → 텍스트 줄(판독 불가 막대)로 풀림 → 얇은 선의 임베딩 아이콘을 통과 → 빛나는 별 하나 | 없음 | 중앙 별 하나 |
+| `1-2` | wow2 유사도 | 별이 전원 수만큼 늘어나며 연결선이 생김 → 카메라가 뒤로 빠짐 → 별이 엔진 좌표로 이동 → 스토리 레이어가 걷히며 엔진 장면 0이 드러남 | `await go(0)` 후 `peoplePositions()` | 엔진 장면 0, 별 위치가 튀지 않음 |
+| `1-3` | wow3 추출 | 예시 인물에게 클로즈업 → LLM 아이콘이 그 별을 통과(점화) → 미래 과제 별로 분열 | `await focusPerson(i, {split:false})` → 아이콘 연출 → `await splitPerson()` | 예시 인물의 과제 별 |
+| `1-4` | wow4 전원 분열 | 줌 아웃 → 전원의 과제가 한 번 갈라짐 | `await clearPerson()` → `await go(1)` | 전원 과제 별 |
+| `1-5` | PJT 격자 | 과제 별이 PJT 칸(4열 격자)으로 해쳐모임 | `await go(2)` | 격자, 예시 인물의 PJT 칸 강조 |
+| `1-6` | wow5 성운 | 예시 인물의 PJT 칸으로 들어가 닮은 과제끼리 성운 | `await enterPjt(p)` | 그 PJT 과제군 성운 |
+| `1-7` | 역량 | 예시 과제 하나가 강조되고, 확보/필요 역량 카드(라벨 + 원문 인용 한 줄)가 뜬다 | `selectTask(id)` + 카드는 story 오버레이 | 카드 |
+| `1-8` | 맺음 | 화면이 어두워지고 중앙 문장 | 없음 | 문장 |
 
-검은 배경, 중앙 문장 하나, 대강당에서 읽히는 글자. 말은 발표자에게 남기고 관점 변화는 실제 이동·분열·응집으로 보여준다. PPT 이미지는 판독할 수 없는 추상 표현을 쓴다. 실제 인물의 감정·수정 흔적을 지어내지 않는다. 위치·밝기·크기는 중요도나 준비도 점수가 아니다.
+- **예시 인물·PJT·과제**: `D.people`에서 `pid === 'P000'`인 사람, 그 사람의 `pjt`, 그 사람의 첫 과제(`D.tasks`에서 `person`이 같은 첫 항목). 픽스처 `nebula/fixtures/q3/showcase.json`과 같다.
+- `1-7`: story 모드에서는 엔진의 우측 패널이 숨겨지므로 역량 카드는 story가 `D.tasks[].skills`(`kind`=`have`|`gap`, `label`, `quote`)로 직접 그린다. 결정 4(역량 생략)가 나면 이 비트는 문장만 남기거나 빠진다.
+- **진행 조작**
+  - Space / → : 모션 중이면 그 비트의 끝 상태로 바로 가고, 끝났으면 다음 비트를 재생한다.
+  - ← : 이전 비트의 끝 상태로 간다. 역재생은 만들지 않는다.
+  - R : 현재 비트를 처음부터 다시 재생한다.
+  - N : 발표자 멘트(`note`)를 작은 오버레이로 켜고 끈다.
+  - 자동 진행은 없다. 비트 모션은 1.5–4초, wow는 짧은 정적(0.3–0.8초) 뒤 전환한다.
+  - ESC는 쓰지 않는다. 엔진이 ESC로 개인·PJT 선택을 해제한다.
 
-1920×1080, 오프라인 `file://`에서 확인한다. `prefers-reduced-motion`에서는 이동 대신 페이드를 사용한다. 합성 표시는 상시 보이게 둔다. 비트별 스크린샷 8장은 스크래치 폴더에 보관하며 커밋하지 않는다. 실제 데이터·실제 분류명은 사용하지 않는다.
+## 3. 계약
 
-## 가짜 데이터 실행
+### 3.1 엔진 함수 `window.nebula`
 
-```sh
-q3_demo_dir=$(mktemp -d /tmp/nebula-visual.XXXXXX)
-python3 -m nebula demo --input nebula/fixtures/q3/persons.json \
-  --network nebula/fixtures/q3/neighbors.json --out "$q3_demo_dir"
-open "$q3_demo_dir/nebula.html"
-# 브라우저 주소 끝에 #mode=story 추가
-node tests/nebula_q3.cjs
+```js
+window.nebula = {
+  go(sceneIndex),                 // 0 사람 · 1 전원 분열 · 2 PJT 격자/성운 · 3 과제·역량. 전환이 끝나면 resolve
+  focusPerson(personIndex, opts), // 줌 → 과제 분열. opts.split === false면 줌만 하고 멈춤(L0 추가). 끝나면 resolve
+  splitPerson(),                  // 줌 상태인 사람의 과제를 분열(L0 추가). 끝나면 resolve
+  clearPerson(),                  // 줌 아웃. 끝나면 resolve
+  enterPjt(pjtIndex),             // 격자 → 그 PJT 성운. 끝나면 resolve
+  leavePjt(),                     // 성운 → 격자. 끝나면 resolve
+  selectTask(taskId),             // 과제 선택(장면 3으로 이동). 동기
+  peoplePositions(),              // 장면 0 사람 중심의 [{id, x, y}] — 브라우저 뷰포트 px
+};
 ```
 
-픽스처는 320명·8 PJT이고 예시 인물은 `P000`이다. LLM 호출은 없다. 엔진 첫 장면은 전체 연결로 계산한 배치를 사용하고, 화면 연결선만 인물별 상위 4개를 합쳐 그린다. 시각 담당은 계산된 좌표·과제 수·분류를 연출용으로 바꾸지 않는다.
+- 인자: 사람 = `D.people[].id`(페이로드 색인), PJT = `D.pjts` 색인, 과제 = `D.tasks[].id`.
+- `D`는 엔진이 만든 전역 페이로드다. story는 읽기만 한다.
+- 새 명령이 오면 이전 명령의 남은 단계는 취소되고 이전 Promise는 정상 종료한다. story도 비트가 바뀐 뒤 옛 비트의 후속 호출을 실행하지 않도록 관리한다.
+- story 모드에서 엔진은 ←/→ 키를 처리하지 않는다. 진행은 story가 맡는다.
+- 페이로드의 좌표·과제 수·분류는 연출용으로 바꾸지 않는다.
+
+### 3.2 문구 `window.nebulaCopy` (L0 추가)
+
+```js
+window.nebulaCopy = {
+  "1-0": { screen: ["첫 줄", "둘째 줄"], sub: "보조 라벨 또는 null", note: "발표자 멘트 또는 null" },
+  // … "1-8", "scene-0" … "scene-3"
+};
+```
+
+- `{people}` `{tasks}` `{pjts}` 자리는 이미 페이로드 값으로 채워져 있다.
+- 화면에 넣을 때는 `textContent`로만 넣는다. `screen`의 원소 하나가 한 줄이다.
+
+### 3.3 story가 내놓는 것 `window.nebulaStory`
+
+```js
+window.nebulaStory = {
+  beats: ["1-0", "1-1", "1-2", "1-3", "1-4", "1-5", "1-6", "1-7", "1-8"],
+  goto(beatId),   // 그 비트를 처음부터 재생하고 끝 상태에서 resolve하는 Promise
+  current(),      // 현재 비트 ID
+};
+```
+
+- `location.hash`에 `mode=story`가 있을 때만 그리고, 이 객체도 그때만 만든다. live 모드에서는 아무것도 하지 않는다.
+- `story.js` 전체를 즉시 실행 함수로 감싼다. 엔진이 최상위에 `D`·`S`·`$`·`el` 같은 이름을 쓰므로 새 최상위 이름을 만들면 충돌한다. 전역에 추가하는 이름은 `nebulaStory` 하나다.
+- 검수 스크립트(§6)가 `goto`로 비트마다 스크린샷을 찍는다.
+
+### 3.4 텍스트 파일 `nebula/templates/deck.md`
+
+```md
+# 3Q 발표 문구
+
+## 1-0 도입
+화면: 치열하게 고민해 쓴 기록들이
+화면: 조금 더 오래 남도록.
+멘트: 엔지니어들이 각자 치열하게 고민해 PPT를 썼습니다. …
+
+## 1-3 wow3 추출
+화면: 한 사람에게도, 여러 미래가.
+보조: LLM 추출 · 별 하나 = 미래 과제 하나
+멘트: 그런데 한 사람이 앞으로 하고 싶은 일은 하나일까요?
+
+## scene-0 사람
+화면: {people}명이 적어둔, 아직 오지 않은 일들.
+보조: 지난번에는 서로 닮은 사람을 찾았습니다. 이번에는 그 사람들이 바라보는 다음을 봅니다.
+```
+
+- 절 제목은 `## <ID> <이름>`. ID는 `1-0`…`1-8`(1부 비트), `scene-0`…`scene-3`(2부 엔진 장면 제목·설명) 13개로 고정.
+- 키는 `화면`(큰 문장, 반복하면 줄바꿈), `보조`(작은 라벨 한 줄), `멘트`(발표자 노트, 화면에 안 나옴). `scene-*`에서 `화면`은 장면 제목, `보조`는 제목 아래 설명이다.
+- ID가 빠지거나, 모르는 ID·키·자리표시가 있으면 **빌드가 오류로 멈춘다**. 빈 슬라이드가 조용히 나가지 않게 하기 위해서다.
+- 반영: 1부는 §6의 픽스처 빌드를, 2부는 내부망에서 `python3 -m nebula build --out <실행 out>`을 다시 돌린다. 둘 다 LLM을 호출하지 않는다.
+
+## 4. 역할과 완료 기준
+
+| 역할 | 인원 | 선행 | 고칠 수 있는 곳 | 산출물 |
+|---|---|---|---|---|
+| L0 로직 준비 | 1 (Codex 또는 Claude) | 없음 | `nebula/render.py`, `nebula/templates/nebula.html`(계약 추가분만), `nebula/templates/deck.md`, `tests/`, `docs/q3-visual/README.md` | 통합 브랜치 커밋 |
+| V-story | N (병렬) | L0 머지 | `docs/q3-visual/<agent-id>/` 안만 | 1부 전체 `story.js` 후보 |
+| V-engine | 1 | L0 머지 | `nebula/templates/nebula.html`의 CSS·모션, `docs/q3-visual/engine/` | 엔진 모션·톤 개선 |
+| 통합 | 오케스트레이터 | 후보 선택 | `nebula/templates/story.js`, 문서 상태 표 | 통합 브랜치 커밋 |
+
+### L0 로직 준비
+
+1. `nebula/templates/deck.md` 초안 — 13개 ID 전부. 문구 출처:
+   - Jay의 문장: 도입 "엔지니어들이 치열하게 고민해 쓴 PPT를, 더 잘 보이게 생명력을 불어넣어 그 노력이 heritage로 남도록", 맺음 "우리의 미래 경쟁력이 팀의 로드맵입니다"
+   - `docs/design-candidates-2026-09-11/pitch-cosmos-v2/presentation.js`의 `scenes[]` `title`·`say`
+   - 엔진 `nebula.html`의 장면 제목·설명 배열(`scene-*`로 옮김, 시간 장면 문구는 버림)
+   - `docs/q3-presentation-plan.md` §2
+2. `render.py`: `deck.md`를 파싱해 `nebula.html`에 인라인한다(§3.4 규칙과 오류). `NEBULA_STORY` 환경변수가 있으면 그 파일을, 없으면 `nebula/templates/story.js`를 `__STORY__`에 넣는다.
+3. `nebula.html`: `window.nebulaCopy` 노출(자리표시 채움), 2부 장면 제목·설명을 `scene-*`에서 읽기, `focusPerson(i, {split:false})`와 `splitPerson()` 추가.
+4. `tests/q3_story_check.cjs <story.js 경로> <스크린샷 폴더>`:
+   - `NEBULA_STORY`로 픽스처를 `data/q3-visual/check/`에 빌드한다.
+   - 1920×1080에서 `#mode=story`로 열고 `nebulaStory.beats`가 §2의 9개와 같은지 본다.
+   - 비트마다 `await goto(id)` 후 `<폴더>/<id>.png`를 저장한다.
+   - 확인할 것: 페이지 오류 0, `file://` 외 요청 0, `#synthetic-mark` 표시, `1-2` 뒤 엔진 장면 0, `1-6` 뒤 PJT 진입, 각 비트의 `screen` 첫 줄이 화면에 보임.
+   - `prefers-reduced-motion`으로 한 번 더 돌려 9비트 전부 끝나는지 본다.
+5. `docs/q3-visual/README.md`: 후보 표 틀(agent-id·브랜치·커밋·검수 결과·선택 여부).
+
+**완료**:
+- `deck.md` 한 줄을 고치고 다시 빌드하면 화면 문장이 바뀐다(테스트).
+- 모르는 ID로 빌드가 멈춘다(테스트).
+- 최소 스텁 story로 `q3_story_check.cjs` PASS.
+- 기존 검사 전부 통과: pytest 4파일, `nebula_q3.cjs`, `nebula_presentation.cjs`, `nebula_browser.cjs`.
+- 통합 브랜치에 push.
+
+### V-story (에이전트마다)
+
+- 자기 폴더에 1부 9비트 전체를 구현한 `story.js` 후보를 만든다(§2, §3). 문구는 `nebulaCopy`에서만 읽는다.
+- 문구를 바꾸고 싶으면 `deck-suggestions.md`에 제안을 적는다. `deck.md`는 고치지 않는다.
+- 폴더 `README.md`에 콘셉트 3줄, 비트별 연출 한 줄씩, 알려진 한계, 검수 결과를 적는다.
+- **완료**: §6 story 검수 PASS, `shots/`에 9장, 자기 폴더 밖 변경 0, 자기 브랜치에 커밋·push 후 브랜치·커밋을 오케스트레이터에게 보고.
+
+### V-engine
+
+- 엔진의 모션과 톤만 다듬는다.
+  - 클로즈업에서 과제 별이 겹치지 않게
+  - 분열·격자·PJT 진입 궤적
+  - 성운 안개
+  - 2Q 화면을 떠올리게 하는 배경 별밭
+  - 2부 live 모드의 대강당 글자 크기
+- 유지할 것: `window.nebula` 시그니처, 테스트가 잡는 셀렉터, 페이로드 구조, `nebulaCopy`.
+- 폴더 `docs/q3-visual/engine/`에 `README.md`와 `shots/before-*.png`·`shots/after-*.png`(장면 0, 클로즈업, 분열, 격자, PJT 성운)를 둔다.
+- **완료**:
+  - 기존 검사 전부 통과.
+  - 320명 픽스처에서 장면 1·2 전환을 Chrome Performance로 한 번씩 녹화해 50ms 넘는 프레임 수를 README에 기록.
+  - 자기 브랜치에 커밋·push 후 보고.
+
+### 통합 (선택 후 오케스트레이터)
+
+1. `docs/q3-visual/<선택 id>/story.js`를 `nebula/templates/story.js`로 복사한다. 후보 폴더는 그대로 둔다.
+2. V-engine 브랜치를 먼저 머지했다면 선택 story로 §6 story 검수를 다시 돌린다.
+3. 기존 검사 전부 + `q3_story_check.cjs nebula/templates/story.js <스크래치>` PASS → 커밋·push.
+4. `docs/q3-visual/README.md`에 선택 결과, plan §6에 T4·T8 상태를 적는다.
+
+## 5. 폴더·브랜치·경로
+
+```
+docs/q3-visual/
+  README.md                  # 후보 표 (L0이 틀 생성, 오케스트레이터가 채움)
+  <agent-id>/                # 에이전트 한 명 = 폴더 하나
+    README.md
+    story.js                 # V-story만
+    deck-suggestions.md      # 선택
+    shots/1-0.png … 1-8.png  # V-story. V-engine은 before-*/after-*
+data/q3-visual/<agent-id>/   # 빌드 결과. data/는 gitignore라 커밋되지 않는다
+```
+
+- `agent-id`: 소문자·숫자·하이픈. 예: `story-claude`, `story-codex`, `story-gemini`, `engine`.
+- 브랜치: `Jaeyeong-Lee/q3-visual-<agent-id>`. **L0이 머지된** `Jaeyeong-Lee/q3-nebula-presentation`에서 딴다.
+- 워크트리: `~/orca/workspaces/q2-gathering/q3-visual-<agent-id>`.
+- 커밋은 자기 폴더 안에서만 한다(V-engine은 `nebula/templates/nebula.html` 포함). 머지는 오케스트레이터가 한다.
+- `shots/`의 PNG는 합성 화면이라 커밋한다.
+
+## 6. 설치·빌드·검수 명령
+
+워크트리 루트에서 실행한다.
+
+```sh
+# 새 워크트리 준비 (한 번)
+python3 -m venv .venv && ./.venv/bin/pip install -r requirements-nebula-dev.txt
+npm install --prefix nebula/browser-tests && npx --prefix nebula/browser-tests playwright install chromium
+
+# 1부 미리보기 빌드
+NEBULA_STORY=docs/q3-visual/<agent-id>/story.js ./.venv/bin/python -m nebula demo \
+  --input nebula/fixtures/q3/persons.json --network nebula/fixtures/q3/neighbors.json \
+  --out data/q3-visual/<agent-id>
+# 브라우저: file://<워크트리 절대경로>/data/q3-visual/<agent-id>/nebula.html#mode=story
+
+# story 검수 (V-story 완료 기준)
+NEBULA_PYTHON=$PWD/.venv/bin/python node tests/q3_story_check.cjs \
+  docs/q3-visual/<agent-id>/story.js docs/q3-visual/<agent-id>/shots
+
+# 기존 검사 (L0·V-engine·통합 완료 기준)
+./.venv/bin/python -m pytest tests/test_nebula_pipeline.py tests/test_nebula_http.py \
+  tests/test_nebula_network.py tests/test_nebula_fixture.py -q
+NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_q3.cjs
+NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_presentation.cjs
+./.venv/bin/python -m nebula demo --out data/q3-visual/browser-check && \
+  NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_browser.cjs data/q3-visual/browser-check
+```
+
+## 7. 후보 선택 기준 (Jay + 오케스트레이터, 각 1–5점)
+
+| 기준 | 보는 곳 |
+|---|---|
+| 첫 10초 | `1-0`·`1-1`이 조용하지만 시선을 붙잡는가 |
+| 인과 | wow1–5에서 무엇이 무엇으로 바뀌는지 설명 없이 읽히는가 (문서→별, 사람→과제, 과제→성운) |
+| 이음매 | `1-2`→엔진 장면 0, `1-3` 점화→분열의 타이밍 |
+| 대강당 가독성 | 스크린샷을 50%로 줄여도 문장과 별이 읽히는가 |
+| 절제·정직성 | §8 태도·정직성 위반이 없는가 |
+| 안정성 | 검수 PASS, reduced-motion, 끊김 없음 |
+
+## 8. 공통 규칙
+
+**태도** — `docs/design-candidates-2026-09-11/deck-soul.md`
+- 검은 배경, 중앙 문장 하나. 조용한 시작과 세 번의 큰 전환(문서→별, 사람→과제, 과제→성운)의 대비.
+- 화면은 별·선·빛으로만 말한다. 우주 사진·과한 가스·SF 장식 없이, 사람의 기록이라는 출발점이 보이게.
+- 설명은 발표자 멘트로 보내고 화면 글자는 최소로. 화면 문장 64px 이상, 보조 28px 이상(1920×1080 기준).
+- 인과는 실제 이동·분열·응집으로 보여준다. 밝기 토글이나 설명 글로 대신하지 않는다.
+
+**정직성**
+- 위치·거리·크기·밝기는 중요도·준비도·우열이 아니다.
+- 실제 인물의 감정·작성 과정을 재현하지 않는다. PPT는 판독할 수 없는 추상 표현.
+- 합성 표시(`#synthetic-mark`)는 늘 보이게 둔다.
+
+**데이터**
+- 합성 픽스처만 쓴다. 실데이터·실제 분류명·실제 PJT 이름을 쓰지 않고, 실데이터 빌드 출력을 열지 않는다.
+
+**기술**
+- 외부 요청 0: CDN·웹폰트·원격 이미지 없이, 이미지는 SVG·Canvas 코드로 그린다. 발표장은 `file://` 오프라인이다.
+- 1920×1080 기준. 창 비율이 다르면 레터박스.
+- `prefers-reduced-motion`에서는 이동 대신 페이드.
+- 콘솔 오류 0. 문구는 `nebulaCopy`에서 `textContent`로.
+- `1-0`–`1-2`의 별 수백 개는 Canvas 한 장으로 그리는 편이 엔진 SVG에 부담을 주지 않는다.
+
+## 9. 참고 파일
+
+| 무엇 | 경로 |
+|---|---|
+| 발표 계획(배경·결정·티켓) | `docs/q3-presentation-plan.md` |
+| 발표 태도 | `docs/design-candidates-2026-09-11/deck-soul.md` |
+| 이전 모션 시안(점화·분열·응집) | `docs/design-candidates-2026-09-11/pitch-cosmos-v2/` |
+| 5모델 디자인 리뷰 | `docs/design-candidates-2026-09-11/llm-reviews-2026-09-12.md` |
+| 오프닝·클로즈업 컨셉(아이콘 방향) | `docs/nebula-opening-scene-concept.md` |
+| 엔진 | `nebula/templates/nebula.html` |
+| 엔진 공개 동작 테스트 | `tests/nebula_q3.cjs` |
+| 빌드·인라인 | `nebula/render.py` |
+| 합성 픽스처 | `nebula/fixtures/q3/` (README 포함) |
+| nebula 에이전트 규칙 | `nebula/CLAUDE.md` |
