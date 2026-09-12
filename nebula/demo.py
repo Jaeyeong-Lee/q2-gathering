@@ -133,7 +133,9 @@ class FakeClient:
             return {"links": links}
         if stage == "taxonomy":
             existing = {c["name"] for c in payload["existing"]}
-            names = sorted({t["label"] for t in payload["tasks"]} - existing)
+            # "기타 "로 시작하는 합성 과제는 분류하지 않아 미분류 경로를 픽스처에서 재현한다.
+            labels = {t["label"] for t in payload["tasks"] if not t["label"].startswith("기타 ")}
+            names = sorted(labels - existing)
             return {
                 "additions": [
                     {
@@ -167,7 +169,7 @@ class FakeClient:
         raise ValueError("unknown demo stage")
 
 
-def network(inputs):
+def network(inputs, k=4):
     """Actual TF-IDF cosine on synthetic text, only to exercise the existing-network input."""
     import math
     from collections import Counter
@@ -197,5 +199,5 @@ def network(inputs):
             )
         neighbors[person["id"]] = sorted(
             scores, key=lambda n: (-n["similarity"], n["id"])
-        )[:4]
+        )[:k]
     return neighbors

@@ -26,8 +26,8 @@ def main():
             p.add_argument("--network", type=Path)
             p.add_argument("--corrections", type=Path)
             p.add_argument("--reset-corrections", action="store_true")
-        if name == "run":
-            p.add_argument("--input", type=Path, required=True)
+        if name != "build":
+            p.add_argument("--input", type=Path, required=name == "run")
         if name != "build":
             p.add_argument("--agent", action="store_true")
             p.add_argument("--batch-size", type=int, default=24)
@@ -52,9 +52,9 @@ def main():
                     )
                 else:
                     inputs = (
-                        source()
-                        if args.command == "demo"
-                        else json.loads(args.input.read_text())
+                        json.loads(args.input.read_text())
+                        if args.input
+                        else source()
                     )
                     client = (
                         AgentClient()
