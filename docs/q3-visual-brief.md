@@ -25,6 +25,11 @@
 - **파일이 다르다.** 1부 = 합성 픽스처로 빌드한 `nebula.html`을 `#mode=story`로 연 것. 2부 = 내부망 실데이터로 빌드한 `nebula.html`. 시각 작업은 전부 1부(합성)에서 한다.
 - 엔진은 장면·검색·클로즈업·PJT 격자·상태 복원을 이미 갖고 있고 테스트가 붙어 있다(Codex 뼈대). 1부 연출은 **`story.js`가 엔진 함수를 호출**해서 만든다.
 - **화면 문장과 발표자 멘트는 `nebula/templates/deck.md` 한 파일에 둔다.** 빌드가 이 파일을 읽어 HTML에 넣는다. Jay가 문구를 고치고 다시 빌드하면 그대로 반영된다. 코드에는 문구를 쓰지 않는다.
+- **재량 — 모델의 창의성을 환영한다.** §2 표와 deck-soul은 출발점이다.
+  - 비트 안의 연출·은유·색·질감·타이밍·카메라·아이콘 모양은 각 모델이 해석해도 된다.
+  - 저장소의 과거 산출물(§9)을 가져다 쓰거나 해체해 재조합해도 된다.
+  - 고정되는 것은 네 가지뿐이다: 비트 ID 9개와 순서(검수·비교를 위해), §3 계약, §8 태도·정직성·데이터 규칙, §6 검수 PASS.
+  - 비트를 합치거나 나누는 편이 낫다고 보면, 구현은 9개 ID에 맞추고 폴더 `README.md`에 제안과 이유를 적는다.
 
 ## 2. 1부 비트 명세
 
@@ -271,17 +276,35 @@ NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_presentation.cjs
 - 콘솔 오류 0. 문구는 `nebulaCopy`에서 `textContent`로.
 - `1-0`–`1-2`의 별 수백 개는 Canvas 한 장으로 그리는 편이 엔진 SVG에 부담을 주지 않는다.
 
-## 9. 참고 파일
+## 9. 참고 — 과거 산출물 포함
 
-| 무엇 | 경로 |
-|---|---|
-| 발표 계획(배경·결정·티켓) | `docs/q3-presentation-plan.md` |
-| 발표 태도 | `docs/design-candidates-2026-09-11/deck-soul.md` |
-| 이전 모션 시안(점화·분열·응집) | `docs/design-candidates-2026-09-11/pitch-cosmos-v2/` |
-| 5모델 디자인 리뷰 | `docs/design-candidates-2026-09-11/llm-reviews-2026-09-12.md` |
-| 오프닝·클로즈업 컨셉(아이콘 방향) | `docs/nebula-opening-scene-concept.md` |
-| 엔진 | `nebula/templates/nebula.html` |
-| 엔진 공개 동작 테스트 | `tests/nebula_q3.cjs` |
-| 빌드·인라인 | `nebula/render.py` |
-| 합성 픽스처 | `nebula/fixtures/q3/` (README 포함) |
-| nebula 에이전트 규칙 | `nebula/CLAUDE.md` |
+필요하면 저장소 안의 과거 산출물을 열어 보고 모션·색·레이아웃·문장 톤을 가져다 쓴다. 그대로 옮겨도, 해체해 재조합해도 된다.
+
+- 열지 않는 곳: `data/`(자기 빌드 결과 `data/q3-visual/` 제외), `dist/`, 루트 `CLAUDE.md`의 실데이터 경로 표.
+- 과거 산출물에서 실명이나 실제 회고로 보이는 내용이 나오면 더 읽지 말고 오케스트레이터에게 알린다.
+
+| 무엇 | 경로 | 가져갈 만한 것 |
+|---|---|---|
+| 발표 계획(배경·결정·티켓) | `docs/q3-presentation-plan.md` | 발표 흐름과 결정의 이유 |
+| 발표 태도 | `docs/design-candidates-2026-09-11/deck-soul.md` | 화면의 태도, 정직성, 바꿔도 되는 것과 이유가 필요한 것 |
+| Cosmos v2 모션 시안 | `docs/design-candidates-2026-09-11/pitch-cosmos-v2/` | 문서 압축·점화·분열·응집 모션, 발표자 노트·조작 UI |
+| Cosmos v1 | `docs/design-candidates-2026-09-11/candidate-pitch-cosmos.html` | 밝은 기록 화면 → 암전·점화 |
+| 성운 후보 4종 | `docs/design-candidates-2026-09-11/candidate-*.html` | 5모델 리뷰에서 A로 평가된 분열→성운 전환(`candidate-50`) |
+| 5모델 디자인 리뷰 | `docs/design-candidates-2026-09-11/llm-reviews-2026-09-12.md` | 공통 지적: 첫 장면 임팩트, 작은 글자, 15분 리듬 |
+| 이미지 방향 탐색 | `docs/design-candidates-2026-09-11/image-directions-v1.jkBVOa/` | 종이 중심 vs 빛 중심 분위기 보드 |
+| 오프닝·클로즈업 컨셉 | `docs/nebula-opening-scene-concept.md` | 쌓임→유사도→추출→택소노미 아이콘 전환, 클로즈업 기법 메모 |
+| 성운 발표 원본 프로토타입 | `docs/nebula-prototype/future-nebula.html` | 지금 엔진의 출발점, 성운 안개 표현 |
+| 2Q 화면 소스 | `archive/template.html` | 캔버스 별밭·글로우 스프라이트·에고 뷰·힘 배치 |
+| 2Q 유사도 네트워크 프로토타입 | `docs/similarity-network-prototype.html` | 사람 네트워크 초기 연출 |
+| 은하수 라이트 톤 프로토타입 | `docs/heritage-archive-light-prototype-2026-09-03.html` | 밝은 톤 대안 |
+| 사람·미래 과제 합성 데모 | `templates/td_people_atlas.html` | 검색·렌즈·발표 모드 |
+| 미래 지도 덱 프로토타입 | `docs/task-discovery-future-map.html` | 1280×720 덱 구성, 궤도·중력 연출 |
+| 파이프라인 설명 자료 | `docs/pipeline-3stages.html`, `docs/task-discovery-eli30-2026-08-25.html` | 기술을 쉽게 설명하는 방식(1-1·1-3 멘트 참고) |
+| 산출물 후보 제안서 | `docs/deliverable-candidates-2026-08-28.html`, `docs/deliverable-candidates-fable-2026-08-30.html` | 화면 아이디어 목록 |
+| 로드맵 매트릭스 목업 | `docs/roadmap-matrix-mockup.html`, `docs/task-discovery-roadmap-mockup-2026-08-12.html` | 역량 표현 대안(1-7) |
+| 8/14 임원 보고 덱 | `git show Jaeyeong-Lee/exec-deck-narrative-flow:docs/2026-08-14-exec/deck.html` (원고 `script.md`) | 요구와 자료의 간극을 설명한 문장 |
+| 엔진 | `nebula/templates/nebula.html` | 호출할 함수, 장면 톤 |
+| 엔진·story 검수 | `tests/nebula_q3.cjs`, `tests/q3_story_check.cjs`, `tests/q3_story_stub.js` | 계약의 실제 동작 |
+| 빌드·인라인 | `nebula/render.py` | `deck.md` 파싱, `NEBULA_STORY` |
+| 합성 픽스처 | `nebula/fixtures/q3/` (README 포함) | 320명·예시 인물 P000 |
+| nebula 에이전트 규칙 | `nebula/CLAUDE.md` | 깨면 안 되는 계약 |
