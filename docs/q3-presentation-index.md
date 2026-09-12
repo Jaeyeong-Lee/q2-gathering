@@ -1,5 +1,9 @@
 # 3Q 분기회 발표 — 작업 인덱스
 
+> **이 사본은 더 갱신하지 않는다.** 2026-09-13부터 발표 작업의 정본은 통합 브랜치
+> `Jaeyeong-Lee/q3-nebula-presentation`(워크트리 `~/orca/workspaces/q2-gathering/q3-nebula`)의
+> `docs/q3-presentation-index.md`·`docs/q3-presentation-plan.md`다.
+
 2026-09-13 작성. 위치와 상태만 가리킨다. **흐름·결정·티켓·가짜 데이터는 [[q3-presentation-plan]]이 정본이다.**
 
 ## 먼저 읽기

@@ -1,5 +1,8 @@
 # 3Q 분기회 발표 계획 — 개념 덱과 실데이터 성운 데모
 
+> **이 사본은 더 갱신하지 않는다.** 정본은 통합 브랜치 `Jaeyeong-Lee/q3-nebula-presentation`
+> (워크트리 `~/orca/workspaces/q2-gathering/q3-nebula`)의 같은 경로다.
+
 > 작성 2026-09-13. **상태: Jay 컨펌 반영(2026-09-13). 발표일 2026-09-15.**
 > 발표 작업의 정본 계획이다. 위치 요약은 [[q3-presentation-index]].
 > 코드 경로는 특별한 표시가 없으면 `codex/future-task-capability-map` 브랜치(= T0 이후 통합 브랜치) 기준이다.
