@@ -1,6 +1,8 @@
 """Build presentation and review payload, with provenance-preserving aggregates."""
 
 import json
+import os
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 from .model import digest, need
@@ -218,6 +220,44 @@ def build_nebula(view):
     }
 
 
+DECK_BEATS = [f"1-{i}" for i in range(9)] + [f"scene-{i}" for i in range(4)]
+DECK_KEYS = {"화면": "screen", "보조": "sub", "멘트": "note"}
+DECK_PLACEHOLDERS = {"people", "tasks", "pjts"}
+
+
+def parse_deck(text):
+    """deck.md → {beat: {screen: [lines], sub, note}}.
+
+    A typo stops the build: a silently blank slide is worse on stage than an error
+    at build time. Lines before the first "## " heading are the file's own notes.
+    """
+    copy: dict[str, dict] = {}
+    beat = None
+    for number, line in enumerate(text.splitlines(), 1):
+        where = f"deck.md line {number}"
+        if line.startswith("## "):
+            beat = (line[3:].split() or [""])[0]
+            need(beat in DECK_BEATS and beat not in copy, f"{where}: unknown or duplicate beat")
+            copy[beat] = {"screen": [], "sub": None, "note": None}
+        elif beat is not None and line.strip():
+            key, sep, value = line.partition(":")
+            need(bool(sep) and key.strip() in DECK_KEYS, f"{where}: expected 화면/보조/멘트")
+            value = value.strip()
+            for name in re.findall(r"\{(\w*)\}", value):
+                need(name in DECK_PLACEHOLDERS, f"{where}: unknown placeholder")
+            entry, field = copy[beat], DECK_KEYS[key.strip()]
+            if field == "screen":
+                entry["screen"].append(value)
+            elif field == "note" and entry["note"]:
+                entry["note"] += "\n" + value
+            else:
+                need(entry[field] is None, f"{where}: 보조 appears twice")
+                entry[field] = value
+    missing = [b for b in DECK_BEATS if b not in copy]
+    need(not missing, "deck.md missing beats: " + ", ".join(missing))
+    return copy
+
+
 def encoded(data):
     return (
         json.dumps(data, ensure_ascii=False)
@@ -244,15 +284,25 @@ def build(data, out, approved_only=False):
 def _build(data, out, approved_only):
     view = build_view(data, approved_only)
     root = Path(__file__).parent / "templates"
+    # NEBULA_STORY picks a story candidate to preview without touching templates/.
+    override = os.environ.get("NEBULA_STORY")
+    story_path = Path(override) if override else root / "story.js"
+    need(not override or story_path.is_file(), "NEBULA_STORY file not found")
+    story = story_path.read_text() if story_path.is_file() else ""
+    need("</script" not in story.lower(), "story.js must not contain a closing script tag")
+    copy = encoded(parse_deck((root / "deck.md").read_text()))
     for name, payload in (
         ("nebula", build_nebula(view)),
         ("matrix", view),
         ("review", data),
     ):
-        page = (root / f"{name}.html").read_text()
-        if name == "nebula":
-            story = root / "story.js"
-            page = page.replace("__STORY__", story.read_text() if story.exists() else "")
-        write_text(out / f"{name}.html", page.replace("__PAYLOAD__", encoded(payload)))
+        parts = {"PAYLOAD": encoded(payload), "STORY": story, "COPY": copy}
+        # One pass, so text inserted for one placeholder is never re-scanned for another.
+        page = re.sub(
+            r"__(PAYLOAD|STORY|COPY)__",
+            lambda m: parts[m.group(1)],
+            (root / f"{name}.html").read_text(),
+        )
+        write_text(out / f"{name}.html", page)
     write_json(out / "view.json", view)
     return out / "nebula.html"

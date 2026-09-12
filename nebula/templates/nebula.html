@@ -19,12 +19,14 @@ body.story .app{height:100dvh;min-height:0;display:block}body.story header,body.
 <aside class="inspector"><div class="search"><input id="search" type="search" placeholder="이름 · 미래 과제의 문장 찾기" aria-label="이름 또는 과제 검색"></div><div class="panel" id="panel" aria-live="polite"></div></aside></main>
 <footer><div class="steps" id="steps"></div><div class="controls"><button id="play">▶ 자동 발표</button><button id="prev" aria-label="이전 장면">←</button><button id="next">다음 →</button></div></footer>
 </div><div id="synthetic-mark" hidden>합성 자료 · 발표 시연</div><dialog id="dialog"><h2>사람에서 과제로, 과제에서 준비로.</h2><p id="about-scale"></p><p><b>첫 장면:</b> <span id="about-layout"></span> 이후 장면의 위치는 과제의 PJT·분류·시간을 설명하기 위한 배치이며, 유사도 거리나 자동 군집 계산 결과가 아닙니다.</p><p><b>성운:</b> PJT 내부에서 사람들이 무엇을 어느 방향으로 바꾸려는지로 묶은 미래 과제군입니다. 업무 분야 분류가 아닙니다. 서로 다른 PJT의 비슷한 단어를 하나로 합치지 않았습니다. 개별 과제가 같은 과제군에 속해도 실행 순서를 의미하지 않습니다.</p><p><b>거리:</b> 원문에 '단기'라고 적힌 과제는 가까이, '장기'는 멀리 놓았습니다. 연도·우선순위·실현 가능성을 나타내지 않습니다. 시점 미명시는 별도 영역에 둡니다.</p><p><b>역량:</b> 같은 과제의 원문에서 직접 연결해 적은 보유 경험과 필요한 역량입니다. 빈 원은 부족하다고 서술한 역량이며, 언급이 없는 부분은 측정된 gap이 아닙니다. 인원은 고유 작성자 수이고 준비율을 계산하지 않습니다.</p><p>이 HTML은 네트워크 없이 동작합니다. 기존 발표 파일은 변경하지 않았습니다.</p><button id="close">닫기</button></dialog>
-<script id="data" type="application/json">__PAYLOAD__</script><script>
+<script id="data" type="application/json">__PAYLOAD__</script><script id="copy" type="application/json">__COPY__</script><script>
 'use strict';
 if(document.getElementById('data').textContent.trim()==='__'+'PAYLOAD__'){
   location.replace('future-nebula.html'+location.hash);
 }else{
 const D=JSON.parse(document.getElementById('data').textContent),$=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+// Screen copy comes from nebula/templates/deck.md; {people}/{tasks}/{pjts} are filled from this payload.
+const COPY=(()=>{const n={people:D.people.length,tasks:D.tasks.length,pjts:D.pjts.length},fill=s=>s===null?null:s.replace(/\{(\w+)\}/g,(_,k)=>n[k]);return Object.fromEntries(Object.entries(JSON.parse($('copy').textContent)).map(([id,c])=>[id,{screen:c.screen.map(fill),sub:fill(c.sub),note:fill(c.note)}]));})();window.nebulaCopy=COPY;
 const people=new Map(D.people.map(p=>[p.id,p])),cats=new Map(D.categories.map(c=>[c.id,c]));
 const catOrder=new Map(D.categories.map((c,i)=>[c.id,i]));
 // The payload distinguishes supplied, computed display, and absent layouts.
@@ -142,9 +144,8 @@ for(const t of D.tasks){
  g.classList.toggle('selected',t.id===S.task);g.classList.toggle('highlighted',shown&&S.person!==null&&t.person===S.person);
 }
 $('links').style.opacity=S.scene===0?(S.person!==null?'.18':'1'):'0';$('links').style.transition='opacity .8s';for(const l of $('links').children){const a=people.get(+l.dataset.a),b=people.get(+l.dataset.b);l.style.display=S.pjt==='all'||a.pjt===+S.pjt&&b.pjt===+S.pjt?'':'none';}
-const titles=[D.people.length+'명이 적어둔, 아직 오지 않은 일들.','사람의 기록이, 여러 미래로 펼쳐집니다.','흩어진 과제들이, 성운을 이룹니다.','가까운 미래에서, 더 먼 미래까지.','그 미래를 위해, 무엇을 준비할까요?'];
-const subtitles=['지난번에 우리는 서로 닮은 사람들을 찾았습니다. 이번에는 그 사람들이 바라보는 다음을 봅니다.','이제 별 하나는 사람 하나가 아니라, 그 사람이 적은 미래 과제 하나입니다.','PJT마다 다른 업무 언어를 존중하며, 비슷한 과제들을 함께 읽습니다.','원문에 적힌 단기·중기·장기를 거리로 펼칩니다. 같은 주제도 서로 다른 시간에 놓일 수 있습니다.','성운을 선택하면, 그 과제에 직접 연결된 보유 경험과 필요한 역량이 나타납니다.'];
-const caption=S.scene===3?4:S.scene;$('title').textContent=titles[caption];$('subtitle').textContent=subtitles[caption];$('eyebrow').textContent=['PROLOGUE / 사람의 기록','EXPAND / 기록에서 과제로','GATHER / PJT별 미래 과제','HORIZON / 원문에 적힌 시간','PREPARE / 과제와 역량'][caption];
+const sceneCopy=COPY['scene-'+S.scene]||{screen:[],sub:null};
+const caption=S.scene===3?4:S.scene;$('title').textContent=sceneCopy.screen.join(' ');$('subtitle').textContent=sceneCopy.sub||'';$('eyebrow').textContent=['PROLOGUE / 사람의 기록','EXPAND / 기록에서 과제로','GATHER / PJT별 미래 과제','HORIZON / 원문에 적힌 시간','PREPARE / 과제와 역량'][caption];
 const num=S.scene===0?ps.length:S.scene===3?ts.filter(t=>t.category===S.category).length:ts.length;const second=S.scene===0?ts.length:S.scene===3?new Set(ts.filter(t=>t.category===S.category).map(t=>t.person)).size:visibleCats().length;
 $('numbers').innerHTML=`<div><strong>${num}</strong><small>${S.scene===0?personLabel:'과제 언급'}</small></div><div><strong>${second}</strong><small>${S.scene===0?'미래 과제':S.scene===3?'작성자':'미래 과제군'}</small></div>`;
 $('scope').textContent=S.pjt==='all'?'PJT 고유 분류를 유지합니다':D.pjts[+S.pjt].name+'의 업무 언어로 읽습니다';
@@ -159,12 +160,17 @@ async function settled(){
   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   await Promise.allSettled($('sky').getAnimations({subtree:true}).map(a=>a.finished));
 }
-async function focusPerson(id){
+// split:false stops after the zoom so a story can stage something before splitPerson().
+async function focusPerson(id,{split=true}={}){
   if(!people.has(id))return;
   pause();const action=++transitionId;
   S.scene=0;S.pjt='all';resetSelection();S.person=id;personalSplit=false;render();
-  await settled();if(action!==transitionId)return;
+  await settled();if(action!==transitionId||!split)return;
   personalSplit=true;render();await settled();
+}
+async function splitPerson(){
+  if(S.scene!==0||S.person===null||personalSplit)return;
+  pause();++transitionId;personalSplit=true;render();await settled();
 }
 async function clearPerson(){
   pause();const action=++transitionId;personalSplit=false;S.task=S.skill=null;
@@ -203,7 +209,7 @@ function selectCategory(id){
 function peoplePositions(){
   return D.people.map(p=>{const point=new DOMPoint(0,0).matrixTransform(personNodes.get(p.id).getScreenCTM());return{id:p.id,x:point.x,y:point.y};});
 }
-window.nebula={go,focusPerson,clearPerson,enterPjt,leavePjt,selectTask,peoplePositions};
+window.nebula={go,focusPerson,splitPerson,clearPerson,enterPjt,leavePjt,selectTask,peoplePositions};
 document.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.scene!==undefined){pause();go(+d.scene);}

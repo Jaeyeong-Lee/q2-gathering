@@ -224,7 +224,7 @@ python3 -m nebula demo --input nebula/fixtures/q3/persons.json \
 | T1 | 완료 — 계약 테스트 34 passed, mypy 통과 | `3ca66ef` |
 | T2 | 완료 (Codex 작성, Claude 검증·커밋) — `nebula/layout.py`, 결정성·비변경 테스트 | (T3와 같은 커밋) |
 | T3 | 뼈대 완료 (Codex 작성, Claude 검증·커밋) — 네 장면·검색·클로즈업·4열 PJT 격자·`window.nebula`·story 모드, `tests/nebula_q3.cjs`. 모션·톤은 시각 작업 몫. 시각 담당 안내 `docs/q3-visual-brief.md` | (이 표를 담은 커밋) |
-| T4 | 대기 — 역할 분담(L0·V-story·V-engine·통합)과 완료 기준은 `docs/q3-visual-brief.md` §4 | |
+| T4 | L0 완료(deck.md·빌드 인라인·`NEBULA_STORY`·`splitPerson`·`q3_story_check`), V-story·V-engine 대기 — 역할과 완료 기준은 `docs/q3-visual-brief.md` §4 | L0: (이 행을 담은 커밋) |
 | T5 | 대기 | (내부망, 커밋 없음) |
 | T6 | 대기 | |
 | T7 | 대기 | |

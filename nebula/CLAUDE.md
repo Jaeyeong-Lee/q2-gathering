@@ -36,10 +36,11 @@ PJT별 미래 과제군으로 묶고, 오프라인 HTML 네 장면으로 발표�
 `nebula` 자체는 표준 라이브러리만 쓴다 — 설치가 필요한 것은 테스트 도구뿐이다.
 
 ```
-./.venv/bin/python -m pytest tests/test_nebula_pipeline.py tests/test_nebula_http.py tests/test_nebula_network.py tests/test_nebula_fixture.py -q
+./.venv/bin/python -m pytest tests/test_nebula_pipeline.py tests/test_nebula_http.py tests/test_nebula_network.py tests/test_nebula_fixture.py tests/test_nebula_deck.py -q
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_browser.cjs /tmp/<demo out>
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_presentation.cjs
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_q3.cjs
+NEBULA_PYTHON=$PWD/.venv/bin/python node tests/q3_story_check.cjs tests/q3_story_stub.js /tmp/<shots>   # 1부 story 계약
 ```
 
 - nebula 계약 테스트는 2초면 끝난다. 고칠 때마다 돌린다.

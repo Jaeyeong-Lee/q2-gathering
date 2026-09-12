@@ -6,8 +6,8 @@
 
 ## 0. 오케스트레이터 순서
 
-1. **L0 배정**(§4) → L0 완료 기준 확인 → 통합 브랜치에 머지.
-2. Jay에게 `nebula/templates/deck.md` 초안이 생겼다고 알린다. Jay는 언제든 문구를 고치고 다시 빌드한다(§3.4).
+1. **L0는 완료돼 통합 브랜치에 있다**(§4). 3번부터 시작한다.
+2. (선택) Jay가 인스트럭션을 더 다듬고 싶을 때 `nebula/templates/deck.md` 문구를 고친다. 시각 작업은 이를 기다리지 않고 초안 문구로 진행한다(§3.4).
 3. **V-story N명 + V-engine 1명을 동시에 배정**한다. 각 에이전트에게 이 문서와 자기 `agent-id`, 브랜치, 워크트리 경로를 준다(§5).
 4. 에이전트가 끝났다고 보고하면 §6 검수 명령을 직접 돌려 확인하고, 그 브랜치를 통합 브랜치에 머지한다. 폴더가 겹치지 않아 충돌이 없다.
 5. Jay와 §7 기준으로 story 후보 하나를 고른다 → **통합**(§4) → 전체 테스트 → 머지.
@@ -42,8 +42,8 @@
 | `1-7` | 역량 | 예시 과제 하나가 강조되고, 확보/필요 역량 카드(라벨 + 원문 인용 한 줄)가 뜬다 | `selectTask(id)` + 카드는 story 오버레이 | 카드 |
 | `1-8` | 맺음 | 화면이 어두워지고 중앙 문장 | 없음 | 문장 |
 
-- **예시 인물·PJT·과제**: `D.people`에서 `pid === 'P000'`인 사람, 그 사람의 `pjt`, 그 사람의 첫 과제(`D.tasks`에서 `person`이 같은 첫 항목). 픽스처 `nebula/fixtures/q3/showcase.json`과 같다.
-- `1-7`: story 모드에서는 엔진의 우측 패널이 숨겨지므로 역량 카드는 story가 `D.tasks[].skills`(`kind`=`have`|`gap`, `label`, `quote`)로 직접 그린다. 결정 4(역량 생략)가 나면 이 비트는 문장만 남기거나 빠진다.
+- **예시 인물·PJT·과제**: 페이로드(§3.1) `people`에서 `pid === 'P000'`인 사람, 그 사람의 `pjt`, 그 사람의 첫 과제(`tasks`에서 `person`이 같은 첫 항목). 픽스처 `nebula/fixtures/q3/showcase.json`과 같다.
+- `1-7`: story 모드에서는 엔진의 우측 패널이 숨겨지므로 역량 카드는 story가 페이로드 `tasks[].skills`(`kind`=`have`|`gap`, `label`, `quote`)로 직접 그린다. 결정 4(역량 생략)가 나면 이 비트는 문장만 남기거나 빠진다.
 - **진행 조작**
   - Space / → : 모션 중이면 그 비트의 끝 상태로 바로 가고, 끝났으면 다음 비트를 재생한다.
   - ← : 이전 비트의 끝 상태로 간다. 역재생은 만들지 않는다.
@@ -69,8 +69,9 @@ window.nebula = {
 };
 ```
 
-- 인자: 사람 = `D.people[].id`(페이로드 색인), PJT = `D.pjts` 색인, 과제 = `D.tasks[].id`.
-- `D`는 엔진이 만든 전역 페이로드다. story는 읽기만 한다.
+- 페이로드는 `JSON.parse(document.getElementById('data').textContent)`로 읽는다. 엔진 변수(`D` 등)는 블록 안에 있어 전역이 아니다. story는 읽기만 한다.
+- 인자: 사람 = 페이로드 `people[].id`(색인), PJT = `pjts` 색인, 과제 = `tasks[].id`.
+- 최소 동작 예시는 `tests/q3_story_stub.js`(연출 없이 비트별 호출 순서만 있다).
 - 새 명령이 오면 이전 명령의 남은 단계는 취소되고 이전 Promise는 정상 종료한다. story도 비트가 바뀐 뒤 옛 비트의 후속 호출을 실행하지 않도록 관리한다.
 - story 모드에서 엔진은 ←/→ 키를 처리하지 않는다. 진행은 story가 맡는다.
 - 페이로드의 좌표·과제 수·분류는 연출용으로 바꾸지 않는다.
@@ -98,7 +99,8 @@ window.nebulaStory = {
 ```
 
 - `location.hash`에 `mode=story`가 있을 때만 그리고, 이 객체도 그때만 만든다. live 모드에서는 아무것도 하지 않는다.
-- `story.js` 전체를 즉시 실행 함수로 감싼다. 엔진이 최상위에 `D`·`S`·`$`·`el` 같은 이름을 쓰므로 새 최상위 이름을 만들면 충돌한다. 전역에 추가하는 이름은 `nebulaStory` 하나다.
+- `story.js` 전체를 즉시 실행 함수로 감싸, 전역에 추가하는 이름은 `nebulaStory` 하나로 둔다.
+- `story.js`에 `</script>` 문자열이 있으면 빌드가 거부한다(HTML에 인라인되기 때문).
 - 검수 스크립트(§6)가 `goto`로 비트마다 스크린샷을 찍는다.
 
 ### 3.4 텍스트 파일 `nebula/templates/deck.md`
@@ -125,6 +127,7 @@ window.nebulaStory = {
 - 키는 `화면`(큰 문장, 반복하면 줄바꿈), `보조`(작은 라벨 한 줄), `멘트`(발표자 노트, 화면에 안 나옴). `scene-*`에서 `화면`은 장면 제목, `보조`는 제목 아래 설명이다.
 - ID가 빠지거나, 모르는 ID·키·자리표시가 있으면 **빌드가 오류로 멈춘다**. 빈 슬라이드가 조용히 나가지 않게 하기 위해서다.
 - 반영: 1부는 §6의 픽스처 빌드를, 2부는 내부망에서 `python3 -m nebula build --out <실행 out>`을 다시 돌린다. 둘 다 LLM을 호출하지 않는다.
+- **문구 수정은 선택이다.** 지금 파일은 초안이며 시각 작업은 이 초안으로 바로 진행한다. Jay가 인스트럭션을 다듬고 싶을 때만 고친다. 시각 담당은 문구를 고치지 않고 `deck-suggestions.md`에 제안한다.
 
 ## 4. 역할과 완료 기준
 
@@ -135,7 +138,7 @@ window.nebulaStory = {
 | V-engine | 1 | L0 머지 | `nebula/templates/nebula.html`의 CSS·모션, `docs/q3-visual/engine/` | 엔진 모션·톤 개선 |
 | 통합 | 오케스트레이터 | 후보 선택 | `nebula/templates/story.js`, 문서 상태 표 | 통합 브랜치 커밋 |
 
-### L0 로직 준비
+### L0 로직 준비 — 완료 (2026-09-13, Claude)
 
 1. `nebula/templates/deck.md` 초안 — 13개 ID 전부. 문구 출처:
    - Jay의 문장: 도입 "엔지니어들이 치열하게 고민해 쓴 PPT를, 더 잘 보이게 생명력을 불어넣어 그 노력이 heritage로 남도록", 맺음 "우리의 미래 경쟁력이 팀의 로드맵입니다"
@@ -153,9 +156,8 @@ window.nebulaStory = {
 5. `docs/q3-visual/README.md`: 후보 표 틀(agent-id·브랜치·커밋·검수 결과·선택 여부).
 
 **완료**:
-- `deck.md` 한 줄을 고치고 다시 빌드하면 화면 문장이 바뀐다(테스트).
-- 모르는 ID로 빌드가 멈춘다(테스트).
-- 최소 스텁 story로 `q3_story_check.cjs` PASS.
+- 엔진 장면 제목이 `nebulaCopy`와 같다(`q3_story_check.cjs`의 live 검사). 모르는 ID·키·자리표시, 중복·누락 비트는 빌드 오류(`tests/test_nebula_deck.py`).
+- 스텁 `tests/q3_story_stub.js`로 `q3_story_check.cjs` PASS.
 - 기존 검사 전부 통과: pytest 4파일, `nebula_q3.cjs`, `nebula_presentation.cjs`, `nebula_browser.cjs`.
 - 통합 브랜치에 push.
 
@@ -228,7 +230,7 @@ NEBULA_PYTHON=$PWD/.venv/bin/python node tests/q3_story_check.cjs \
 
 # 기존 검사 (L0·V-engine·통합 완료 기준)
 ./.venv/bin/python -m pytest tests/test_nebula_pipeline.py tests/test_nebula_http.py \
-  tests/test_nebula_network.py tests/test_nebula_fixture.py -q
+  tests/test_nebula_network.py tests/test_nebula_fixture.py tests/test_nebula_deck.py -q
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_q3.cjs
 NEBULA_PYTHON=$PWD/.venv/bin/python node tests/nebula_presentation.cjs
 ./.venv/bin/python -m nebula demo --out data/q3-visual/browser-check && \
