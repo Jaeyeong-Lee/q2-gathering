@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>각자의 다음 · Cosmos v2</title>
+  <link rel="stylesheet" href="presentation.css">
+</head>
+<body>
+  <main id="viewport">
+    <section id="stage" aria-label="각자의 다음 발표">
+      <canvas id="space" width="1920" height="1080" aria-hidden="true"></canvas>
+      <header><span>각자의 다음</span><span>합성 시연</span></header>
+      <div id="heading"><p id="method"></p><h1 id="title"></h1></div>
+      <p id="visual-description" class="sr-only"></p>
+      <div id="scene-labels" aria-hidden="true"></div>
+      <footer><span id="counter"></span><span id="unit"></span></footer>
+    </section>
+  </main>
+  <div id="controls" role="toolbar" aria-label="발표 조작">
+    <button id="previous" aria-label="이전 장면">←</button>
+    <label class="sr-only" for="scene-picker">장면 선택</label>
+    <select id="scene-picker"></select>
+    <button id="next" aria-label="다음 장면">다음 →</button>
+    <span class="separator"></span>
+    <button id="replay" aria-label="현재 장면 다시 재생">↺</button>
+    <button id="play" aria-label="현재 장면 일시정지">Ⅱ</button>
+    <button id="notes-toggle" aria-expanded="false" aria-controls="notes">발표자 노트</button>
+    <button id="fullscreen" aria-label="전체 화면 전환">전체 화면</button>
+    <button id="settings-toggle" aria-expanded="false" aria-controls="settings">설정</button>
+    <input id="progress" type="range" min="0" max="1" step="0.001" value="0" aria-label="현재 장면 진행 위치">
+  </div>
+  <aside id="notes" hidden aria-label="발표자 노트">
+    <button id="close-notes" class="close" aria-label="발표자 노트 닫기">×</button>
+    <p class="panel-kicker">발표자에게만 필요한 말</p>
+    <h2 id="note-title"></h2><p id="note-body"></p><p id="note-caution"></p>
+    <p class="shortcuts">← → / Space 장면 이동 · R 다시 보기 · P 일시정지 · N 노트 · F 전체 화면</p>
+  </aside>
+  <aside id="settings" hidden aria-label="발표 설정">
+    <label>모션 속도 <select id="speed"><option value="1">기본</option><option value="0.65">천천히</option><option value="1.35">빠르게</option></select></label>
+    <label><input id="reduced" type="checkbox"> 움직임 줄이기</label>
+    <p>각 장면은 연출 후 멈춥니다.<br>설명을 마친 뒤 다음으로 넘기세요.</p>
+    <button id="close-settings">닫기</button>
+  </aside>
+  <div id="hint">Space로 다음 장면 <span>·</span> R로 다시 보기</div>
+  <p id="status" class="sr-only" role="status"></p>
+  <noscript>이 발표는 JavaScript가 필요합니다. 순서: 고민의 흔적 → 기록 집결 → 별의 탄생 → 사람 유사도 → 한 사람 확대 → 미래 과제 추출 → 전체 확장 → 미래 과제군 합성.</noscript>
+  <script src="presentation.js"></script>
+</body>
+</html>

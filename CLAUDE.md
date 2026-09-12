@@ -70,6 +70,10 @@ page still applies there; that file adds to it rather than replacing it. The out
 a nebula run (`result.json`, `view.json`, the three HTML files, `cache/**`) is real data — treat
 it exactly like the paths listed above, and reproduce with `python -m nebula demo` instead.
 
+### Presentation work (pitch deck, demo, web serving)? Start at `docs/q3-presentation-index.md`
+
+It maps branches and worktrees; the plan, decisions, and tickets live in `docs/q3-presentation-plan.md`.
+
 ---
 
 ## General coding guidelines
