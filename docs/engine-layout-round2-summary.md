@@ -38,6 +38,31 @@ Jay는 결과만 선택.
 
 ## 3. 방법론 인사이트 — 에이전트×모델 조합의 교훈
 
+### 3.0 실제 실행 명령 — 전부 원샷 인스트럭션이었다
+
+이 실험의 모든 워커는 **동일한 패턴**으로 구동됐다: 실행 스크립트 1개 + 인스트럭션 1개, 그것뿐.
+
+| 후보 | 실제 명령 (요지) |
+|---|---|
+| engine-claude | `claude --dangerously-skip-permissions -p "<지시>" --max-turns 150` |
+| engine-codex | `codex exec --dangerously-bypass-approvals-and-sandbox -C "$PWD" "<지시>"` |
+| engine-kimi | `codex exec -p openrouter -m moonshotai/kimi-k3 --dangerously-bypass-approvals-and-sandbox -C "$PWD" "<지시>"` |
+| engine-qwen (실패 3회) | 위와 동일한 codex exec 형태 — 모델이 스스로 Stop |
+| engine-qwen (성공) | `ANTHROPIC_BASE_URL=https://openrouter.ai/api ANTHROPIC_AUTH_TOKEN=$OR_KEY ANTHROPIC_API_KEY="" ANTHROPIC_MODEL=qwen/qwen3-coder-flash claude -p "<지시>"` |
+| engine-minimax | `codex exec -p openrouter -m minimax/minimax-m3 ...` |
+| ~~engine-fable~~ | `codex exec -p openrouter -m anthropic/claude-fable-5.1 ...` |
+
+공통 원리:
+
+- **인스트럭션 하나에 agent-id + 브리프 경로 + 배정 구도 + 산출물 목록 + 완료 기준 + 금지사항을 전부 압축**했다.
+  에이전트는 그 지시를 받고 자기 루프로 브리프를 읽고, 코드를 고치고, 테스트를 돌리고, 커밋·push까지 스스로 한다.
+- `-p`(claude)/`exec`(codex)는 비대화형 모드 — 중간 질문 불가, 산출물과 보고만 돌아온다. 그래서
+  **지시문에 검수 기준·금지사항·커밋 범위까지 미리 다 박아둬야** 한다. 빠진 건 에이전트가 임의로 채우거나 빼먹는다
+  (qwen이 스크린샷을 안 찍고 끝낸 사례).
+- 실패 세션의 재시작은 새 원샷이지만 **컨텍스트를 사람(오케스트레이터)이 압축해서 전달**했다 —
+  "이전 세션에서 X까지 됐고 남은 건 Y·Z다". 이 압축이 정확할수록 재시작이 성공했다.
+- 감독은 오케스트레이터(Hermes)가 했다: 로그 tail, 산출물 ls, git status 확인, 커밋 누락 시 직접 수습.
+
 ### 3.1 완성도는 모델보다 "에이전트 루프 안정성"이 좌우한다
 
 - **Claude Code CLI (Sonnet, qwen)**: 루프가 안정적. Sonnet은 보고까지 완벽, qwen도 CC에선 끝까지 갔다 —
