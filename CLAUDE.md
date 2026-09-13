@@ -16,6 +16,12 @@
 The pipeline *processing* real data and you *reading* it are different things. Whatever enters
 your context leaves the network.
 
+> **One exception — internal-network nebula runs.** When a human starts this session inside the
+> company network and names `docs/nebula-internal-cc-run.md`, that document governs: the model
+> behind that session is hosted internally, so it may read source text while answering
+> `nebula run --agent` turns. Apply it only on that explicit instruction; otherwise everything
+> below holds.
+
 ### Never open these — not via `Read`, nor `cat`/`head`/`grep`/`python -c open(...)`
 
 | File | Why |

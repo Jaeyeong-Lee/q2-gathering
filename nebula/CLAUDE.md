@@ -12,7 +12,8 @@ PJT별 미래 과제군으로 묶고, 오프라인 HTML 네 장면으로 발표�
 2. 이 파일 — 어떻게 굴리고 무엇을 깨면 안 되나
 3. `docs/nebula-internal-runbook.md` — 운영·실패·재개·검토. **현재 계약의 living 문서다**
 4. `docs/nebula-agent-run.md` — LLM endpoint 대신 **네가 직접 각 단계의 답을 쓰는** 방법
-   (`--agent`). 합성 코퍼스 전용이다. 실데이터에는 쓰지 않는다.
+   (`--agent`). 합성 코퍼스 전용이다. 실데이터에 쓰는 것은 사람이 내부망 세션에서
+   `docs/nebula-internal-cc-run.md`를 지정했을 때뿐이다.
 
 `HANDOFF.md`와 `docs/nebula-handoff-2026-09-11.md`는 특정 시점의 기록이다. 왜 이 커밋이
 존재하는지 알려주지만 **현재 상태가 아니다.** 현재 상태는 코드와 runbook과 gh 이슈다.
@@ -20,7 +21,8 @@ PJT별 미래 과제군으로 묶고, 오프라인 HTML 네 장면으로 발표�
 ## 실데이터
 
 출력 디렉터리는 통째로 민감하다 — `result.json`, `view.json`, `nebula.html`, `matrix.html`,
-`review.html`, `cache/**` 모두 원문을 담는다. 열지 않는다.
+`review.html`, `cache/**` 모두 원문을 담는다. 열지 않는다 — 예외는 위 4번의 내부망 실행에서
+`agent-requests/`의 요청을 읽고 답을 쓰는 것뿐이다.
 
 대신 합성으로 돌린다. 입력이 가짜라 마음껏 열어도 된다:
 

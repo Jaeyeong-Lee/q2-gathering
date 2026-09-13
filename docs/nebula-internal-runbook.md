@@ -101,6 +101,7 @@ python3 -m nebula run \
 endpoint 없이 각 단계의 답을 사람이나 에이전트가 직접 써서 돌리는 `--agent` 모드가 있다.
 프롬프트를 손으로 시험하거나 합성 코퍼스를 endpoint 없이 완주시킬 때 쓴다. 원문이 실행하는
 쪽의 컨텍스트로 들어오므로 **합성 자료 전용이다.** 절차는 [[nebula-agent-run]]에 있다.
+내부망 Claude Code가 GPT-OSS 대신 실데이터를 이 방식으로 돌리는 예외는 [[nebula-internal-cc-run]]을 따른다.
 
 ## 6. 실패·재개와 출력물
 
