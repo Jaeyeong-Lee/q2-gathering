@@ -1,24 +1,307 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>아직 오지 않은 일들 — 미래 과제의 성운</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>아직 오지 않은 일들 — 미래 과제의 성운 — 관제탑</title>
 <style>
-:root{--bg:#0e1225;--text:#f1eff8;--sub:#a19eb8;--line:#ffffff20;--violet:#b8a3ed;--mint:#a1dfd0;--rose:#eeb3ce;--font:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--display:"Avenir Next",var(--font)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px var(--font)}button,input,select{font:inherit}button,select{cursor:pointer}button{color:inherit;border:0;background:none}button:hover{filter:brightness(1.25)}button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--mint);outline-offset:4px}button:disabled{opacity:.3;cursor:default}.app{height:100dvh;min-height:760px;display:grid;grid-template:62px 164px minmax(0,1fr) 84px/minmax(0,1fr)}header{display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid var(--line)}.brand{letter-spacing:.12em;font-size:12px}.brand span{margin-left:18px;color:#7d829d;font-size:10px}.actions{display:flex;align-items:center;gap:14px}.badge{font-size:10px;color:#d0bfdc;border:1px solid #cbb9e848;padding:6px 10px;border-radius:20px}.actions button{font-size:11px;color:var(--sub)}.hero{padding:25px 32px 22px;display:flex;justify-content:space-between;gap:24px;align-items:center}.eyebrow{font-size:10px;letter-spacing:.17em;color:var(--violet);margin-bottom:10px}h1{font:500 clamp(32px,3.35vw,54px)/1.18 var(--display);letter-spacing:-.055em;margin:0;word-break:keep-all}.hero p{font-size:14px;color:var(--sub);margin:12px 0 0;line-height:1.65}.numbers{display:flex;gap:25px;text-align:right;flex-shrink:0}.numbers strong{font:300 48px var(--display);letter-spacing:-.06em}.numbers small{display:block;font-size:10px;color:var(--sub);margin-top:2px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 336px;min-height:0;border-top:1px solid var(--line)}.universe{position:relative;min-width:0;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 45% 46%,#25223f99,transparent 66%)}.toolbar{position:absolute;top:17px;left:25px;right:24px;display:flex;align-items:center;gap:12px;z-index:3;flex-wrap:wrap}.toolbar label{font-size:10px;color:var(--sub)}select{background:#171b31;color:var(--text);padding:8px 30px 8px 12px;border:1px solid #bdb3dc44;border-radius:5px;font-size:12px;max-width:240px}.toolbar .scope{color:#a69bb9;font-size:11px}.toolbar .spacer{flex:1}.toolbar button{font-size:11px;color:var(--mint)}svg{width:100%;height:100%;display:block;overflow:visible}.world{transform-origin:0 0;transition:transform 2s cubic-bezier(.22,.75,.18,1)}.person,.task{cursor:pointer;transition:transform 1.65s cubic-bezier(.22,.75,.18,1),opacity .7s}.person circle{stroke:#fffc;stroke-width:.5}.person text,.task text{font:12px var(--font);fill:#f1eff8;paint-order:stroke;stroke:#17182d;stroke-width:4px;pointer-events:none}.task .core{stroke:#fff8;stroke-width:.55}.task.selected .core{stroke:white;stroke-width:2;r:6}.task .hit{fill:transparent}.task:focus-visible .core,.person:focus-visible circle{stroke:white;stroke-width:3}.fog{transition:opacity 1s;pointer-events:none}.nebula-label{cursor:pointer;transition:opacity .6s}.nebula-label text{font:14px var(--font);fill:#d9d2ee;paint-order:stroke;stroke:#16162c;stroke-width:4px}.nebula-label .tiny{font-size:10px;fill:#aaa0bd}.nebula-label:hover text{fill:white}.time-ring{fill:none;stroke:#afa8d238;stroke-width:1;stroke-dasharray:3 7}.time-label{fill:#b0a3c6;font:12px var(--font)}.origin{fill:#ded6ef;font:11px var(--font)}.skill{cursor:pointer}.skill text{font:14px var(--font);fill:var(--text);text-anchor:middle}.skill .small{font-size:11px;fill:#afb7c5}.skill-line{stroke:#b4c6d844;stroke-width:1;fill:none}.skill:hover .bubble,.skill:focus-visible .bubble{stroke:white;stroke-width:2.5}.skill .number{font:400 28px var(--display)}.footnote{position:absolute;bottom:18px;left:25px;right:20px;font-size:10px;line-height:1.8;color:#88839f;pointer-events:none}.legend{position:absolute;bottom:61px;left:25px;display:flex;gap:20px;font-size:11px;color:#b9afcb;pointer-events:none}.legend i{display:inline-block;width:6px;height:6px;background:#d1c5ee;border-radius:50%;margin-right:7px;vertical-align:1px}.legend .ring{background:none;border:1.5px solid var(--rose);width:11px;height:11px;vertical-align:-1px}.legend .fill{width:11px;height:11px;background:var(--mint);vertical-align:-1px}.tooltip{position:absolute;background:#eeebf5;color:#242138;max-width:300px;padding:10px 14px;font-size:12px;line-height:1.6;pointer-events:none;border-radius:5px;box-shadow:0 10px 40px #0006;z-index:9}.inspector{background:#191d32;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}.search{padding:17px 20px;border-bottom:1px solid var(--line)}.search input{width:100%;background:#12172b;border:1px solid #aaa5c330;border-radius:5px;padding:11px;color:var(--text);font-size:12px}.panel{padding:23px 24px;overflow:auto;flex:1}.kicker{font-size:10px;color:var(--violet);letter-spacing:.12em;margin-bottom:12px}.panel h2{font-size:27px;line-height:1.35;font-weight:500;letter-spacing:-.045em;margin:0 0 13px;word-break:keep-all}.panel p{font-size:12px;color:#aaaac0;line-height:1.85}.panel h3{font-size:12px;font-weight:500;margin:25px 0 10px}.panel .large{font-size:15px;color:#d9d6e5;line-height:1.8}.row{width:100%;text-align:left;padding:13px 0;border-top:1px solid var(--line);border-radius:0;display:flex;align-items:center;gap:10px}.row .dot{height:6px;width:6px;border-radius:50%;flex-shrink:0}.row b{font-weight:500;font-size:12px;flex:1;line-height:1.6}.row small{font-size:10px;color:#89879e;display:block}.row .count{color:#c6badb;font:15px var(--display)}.chip{display:inline-block;font-size:10px;color:#d1c5e3;padding:5px 8px;border:1px solid #aaa0bc44;border-radius:4px;margin:0 5px 7px 0}.quote{margin:17px 0 12px;font-size:18px;line-height:1.85;letter-spacing:-.025em;border-left:2px solid var(--violet);padding-left:14px}.evidence{margin:18px 0;border:1px solid #9ad9ca33;border-radius:7px;padding:14px;background:#9ad9ca08}.evidence.gap{border-color:#eeb3ce33;background:#eeb3ce08}.evidence h3{margin:0 0 9px;color:var(--mint)}.evidence.gap h3{color:var(--rose)}.evidence p{margin:0;color:#cecadb;font-size:13px}.micro{font-size:10px!important;color:#87879f!important;line-height:1.75!important}.back{font-size:11px;color:var(--mint);padding:0 0 20px}.panel details{border-top:1px solid var(--line);padding-top:12px;margin-top:17px;font-size:11px;color:#a9a6bf;line-height:1.8}.panel summary{cursor:pointer}.raw{white-space:pre-wrap}.empty{padding:25px 0;color:var(--sub)}.overview-metric{display:flex;gap:25px;margin:22px 0}.overview-metric b{font:32px var(--display);font-weight:400}.overview-metric small{display:block;color:var(--sub);font-size:10px}.bar{height:3px;background:#ffffff13;margin:9px 0 18px}.bar i{height:100%;display:block;background:var(--violet)}
-footer{padding:0 28px;display:flex;align-items:center;gap:24px;border-top:1px solid var(--line);background:#111529;z-index:5}.steps{display:flex;gap:12px;flex:1}.step{border-top:2px solid #ffffff1e;flex:1;text-align:left;padding:12px 0 0;color:#75788f;display:flex;gap:9px;align-items:center;font-size:12px}.step.active{border-color:var(--violet);color:#e9e4f5}.step span{font:11px var(--display)}.controls{display:flex;gap:8px}.controls button{font-size:12px;padding:10px 15px;border:1px solid var(--line);border-radius:5px}.controls #next{background:#d9d1e8;color:#252036}.controls #play{color:var(--mint)}dialog{background:#20233b;color:var(--text);border:1px solid var(--line);border-radius:10px;width:min(610px,90vw);padding:30px;line-height:1.9}dialog::backdrop{background:#06091bc9}dialog h2{font-size:23px}dialog p{font-size:13px;color:#c2bdd1}dialog button{background:#d9d1e8;color:#252036;padding:10px 22px;border-radius:5px;float:right}
-@media(min-width:1800px){.workspace{grid-template-columns:minmax(0,1fr) 390px}.panel{padding:28px 30px}.panel h2{font-size:31px}.panel .large{font-size:17px}.quote{font-size:21px}.app{grid-template-rows:66px 178px minmax(0,1fr) 88px}}
-@media(max-width:1000px){.workspace{grid-template-columns:minmax(0,1fr) 285px}.hero{padding:22px}.hero h1{font-size:35px}.numbers strong{font-size:36px}.panel{padding:20px}.step{font-size:10px}.controls button{padding:9px 10px}.toolbar .scope{display:none}}
-@media(max-width:700px){.app{height:auto;min-height:100dvh;grid-template-rows:56px auto 1fr auto}header{padding:0 17px}.brand span,.actions #full{display:none}.actions{gap:8px}.hero{padding:24px 18px;align-items:flex-start}.hero h1{font-size:29px}.hero p{font-size:12px}.numbers{gap:10px}.numbers strong{font-size:29px}.numbers div:last-child{display:none}.workspace{display:flex;flex-direction:column}.universe{height:490px}.toolbar{left:16px;right:16px;gap:8px}select{max-width:210px}.inspector{min-height:410px;border-left:0;border-top:1px solid var(--line)}.panel{max-height:510px}.legend{font-size:10px;gap:14px;left:17px}.footnote{left:17px;font-size:9px}footer{position:sticky;bottom:0;padding:12px;flex-wrap:wrap;gap:12px}.steps{flex-basis:100%;gap:8px}.step{font-size:10px;gap:4px}.controls{margin-left:auto}.controls button{padding:7px 12px}.brand{font-size:10px}.badge{font-size:9px}.hero>div:first-child{min-width:0}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
-.html-labels{position:absolute;inset:0;pointer-events:none}.html-labels button{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;color:#d9d2ee;font-size:14px;text-align:center}.html-labels small{display:block;font-size:11px;color:var(--sub);margin-top:8px}
-.pjt-cell{border:1px solid #ffffff20;border-radius:8px;text-align:left!important;display:flex;flex-direction:column;justify-content:flex-start;padding:14px;background:#ffffff02}.pjt-cell.highlighted{border-color:var(--mint);background:#a1dfd010}.task.highlighted .core{stroke:#fff;stroke-width:1.8}
-#pjt-back{position:absolute;top:66px;left:25px;z-index:4;color:var(--mint)}#synthetic-mark{position:fixed;top:18px;right:24px;z-index:20;font-size:12px;color:#c7bbda;pointer-events:none}
-body.story .app{height:100dvh;min-height:0;display:block}body.story header,body.story .hero,body.story .inspector,body.story footer,body.story .toolbar,body.story .legend,body.story .footnote{display:none}body.story .workspace{display:block;height:100%;border:0}body.story .universe{height:100%;background:#080b16}body.story #pjt-back{top:24px}
+:root{
+  --bg:#0e1225;--panel:#191d32;--rail:#10132a;--text:#f1eff8;--sub:#a19eb8;--line:#ffffff20;
+  --violet:#b8a3ed;--mint:#a1dfd0;--rose:#eeb3ce;
+  --font:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --display:"Avenir Next",var(--font);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px var(--font)}
+button,input,select{font:inherit}
+button,select{cursor:pointer}
+button{color:inherit;border:0;background:none}
+button:hover{filter:brightness(1.25)}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--mint);outline-offset:4px}
+button:disabled{opacity:.3;cursor:default}
+
+/* ───── Mission Control layout ─────
+   Same plane for presenter and audience.
+   Top rail = time-axis + scene tabs + PJT filter.
+   Center map = full topview (no right inspector stealing width).
+   Bottom status = selected target state, replaces the side inspector. */
+.app{
+  height:100dvh;min-height:760px;
+  display:grid;
+  grid-template-rows:52px 92px minmax(0,1fr) 178px;
+  grid-template-columns:minmax(0,1fr);
+}
+
+/* Header is slimmer — the brand row only. */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg)}
+.brand{letter-spacing:.12em;font-size:12px}
+.brand span{margin-left:18px;color:#7d829d;font-size:10px}
+.actions{display:flex;align-items:center;gap:14px}
+.badge{font-size:10px;color:#d0bfdc;border:1px solid #cbb9e848;padding:6px 10px;border-radius:20px}
+.actions button{font-size:11px;color:var(--sub)}
+
+/* Top rail: time-axis + scene tabs + PJT filter + clear. One horizontal strip. */
+.rail{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) auto minmax(0,.95fr);
+  align-items:center;
+  gap:18px;
+  padding:0 28px;
+  border-bottom:1px solid var(--line);
+  background:var(--rail);
+  position:relative;
+  overflow:hidden;
+}
+.rail::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--violet) 35%,var(--mint) 65%,transparent);
+  opacity:.35;
+}
+
+/* The horizontal time-axis strip — short / mid / long. */
+.rail-axis{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+.rail-axis-label{font-size:10px;letter-spacing:.18em;color:var(--sub);white-space:nowrap}
+.rail-axis-track{
+  position:relative;height:36px;border-radius:6px;
+  background:linear-gradient(90deg,#b8a3ed44 0%,#a1dfd044 50%,#eeb3ce44 100%);
+  border:1px solid #ffffff14;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.rail-axis-tick{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  font-size:11px;letter-spacing:.05em;color:#e9e3f5;
+  border-right:1px dashed #ffffff18;
+}
+.rail-axis-tick:last-child{border-right:0}
+.rail-axis-tick::before{
+  content:"";position:absolute;left:50%;top:6px;width:1px;height:24px;background:#ffffff20;
+}
+.rail-axis-tick[data-active="true"]{
+  background:radial-gradient(ellipse at 50% 50%,#ffffff22,transparent 70%);
+  color:#ffffff;
+  font-weight:600;
+}
+.rail-axis-tick[data-active="true"]::after{
+  content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  width:8px;height:8px;border-radius:50%;background:var(--mint);
+  box-shadow:0 0 12px var(--mint);
+}
+
+/* Scene tabs live in the rail — same plane as the time-axis. */
+.rail-scenes{display:flex;gap:6px}
+.step{
+  display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+  padding:8px 12px;border:1px solid #ffffff14;border-radius:6px;
+  background:#0e122580;color:var(--sub);font-size:11px;letter-spacing:.02em;
+  min-width:108px;text-align:left;
+}
+.step span{font:500 10px var(--display);letter-spacing:.12em;color:#7d829d}
+.step.active{
+  background:linear-gradient(135deg,#1f1d3a,#181634);
+  color:var(--text);border-color:#cbb9e855;
+  box-shadow:inset 0 0 0 1px #ffffff10;
+}
+.step.active span{color:var(--violet)}
+.step:hover{filter:brightness(1.25)}
+
+/* PJT filter — sits on the same rail row, right side. */
+.rail-controls{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.rail-controls label{font-size:10px;color:var(--sub)}
+select{
+  background:#171b31;color:var(--text);
+  padding:8px 30px 8px 12px;border:1px solid #bdb3dc44;border-radius:5px;
+  font-size:12px;max-width:240px;
+}
+.toolbar .scope{color:#a69bb9;font-size:11px}
+.rail-controls button{font-size:11px;color:var(--mint)}
+
+/* Workspace is now single-column: full-width map only. */
+.workspace{display:grid;grid-template-columns:minmax(0,1fr);min-height:0;border-top:1px solid var(--line)}
+.universe{
+  position:relative;min-width:0;min-height:0;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 48%,#25223f99,transparent 66%);
+}
+.universe svg{width:100%;height:100%;display:block;overflow:visible}
+
+/* Legend and footnote stay over the map — they're read-along, not controls. */
+.legend{
+  position:absolute;bottom:18px;left:24px;display:flex;gap:20px;
+  font-size:11px;color:#b9afcb;pointer-events:none;
+}
+.legend i{display:inline-block;width:6px;height:6px;background:#d1c5ee;border-radius:50%;margin-right:7px;vertical-align:1px}
+.legend .ring{background:none;border:1.5px solid var(--rose);width:11px;height:11px;vertical-align:-1px}
+.legend .fill{background:var(--mint);width:11px;height:11px;vertical-align:-1px}
+.footnote{position:absolute;bottom:18px;right:24px;font-size:10px;line-height:1.8;color:#88839f;pointer-events:none;max-width:540px;text-align:right}
+
+/* Status bar (was side inspector) — current selection state on the same plane. */
+.inspector{
+  background:var(--panel);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr) auto;
+  align-items:stretch;gap:0;min-height:0;
+}
+.inspector-head{padding:14px 22px 12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:10px;letter-spacing:.17em;color:var(--violet)}
+h1{font:500 clamp(20px,1.9vw,30px)/1.18 var(--display);letter-spacing:-.04em;margin:0;word-break:keep-all}
+.inspector-head p{font-size:12px;color:var(--sub);margin:0;line-height:1.55}
+.numbers{display:flex;gap:18px;margin-top:auto;padding-top:6px}
+.numbers strong{font:300 22px var(--display);letter-spacing:-.04em}
+.numbers small{display:block;font-size:9px;color:var(--sub);margin-top:2px;letter-spacing:.06em}
+
+.search{padding:14px 18px;border-bottom:1px solid var(--line);grid-column:2/3;grid-row:1/3;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.search input{
+  width:100%;background:#12172b;border:1px solid #aaa5c330;border-radius:5px;
+  padding:10px;color:var(--text);font-size:12px;
+}
+.panel{padding:14px 22px;overflow:auto;flex:1;min-height:0}
+.kicker{font-size:10px;color:var(--violet);letter-spacing:.12em;margin-bottom:10px}
+.panel h2{font-size:18px;font-weight:500;letter-spacing:-.03em;margin:0 0 12px}
+.panel h3{font-size:12px;color:var(--sub);margin:18px 0 8px;letter-spacing:.04em}
+.panel p{font-size:12px;line-height:1.6;color:var(--sub);margin:0 0 10px}
+.panel p.large{font-size:14px;line-height:1.7;color:var(--text)}
+.panel .micro{font-size:10px;color:#88839f;line-height:1.7}
+.panel .empty{font-size:12px;color:var(--sub);padding:8px 0}
+blockquote.quote{
+  font-size:13px;line-height:1.7;margin:12px 0;padding:12px 14px;
+  background:#ffffff08;border-left:2px solid var(--mint);border-radius:0 4px 4px 0;color:var(--text);
+  word-break:keep-all;
+}
+.chip{display:inline-block;font-size:10px;padding:4px 10px;border-radius:14px;background:#ffffff10;color:var(--violet);margin-right:6px}
+.row{
+  display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+  width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;
+  border:1px solid #ffffff14;border-radius:5px;background:#131730;font-size:12px;color:var(--text);
+}
+.row b{display:block;font-weight:400;line-height:1.4;word-break:keep-all}
+.row small{display:block;font-size:10px;color:var(--sub);margin-top:3px}
+.row i.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.row span{font-size:11px;color:var(--mint)}
+.row span.count{color:var(--sub);font-variant-numeric:tabular-nums}
+.back{font-size:11px;color:var(--mint);margin-bottom:12px}
+details{margin-top:8px}
+details summary{font-size:11px;color:var(--sub);cursor:pointer;padding:4px 0}
+details p{font-size:12px;color:var(--text);padding:8px 0 4px;line-height:1.6}
+p.raw{font-size:11px;color:#c5bcd8;white-space:pre-wrap;background:#0a0d1d;padding:12px;border-radius:4px;line-height:1.7;max-height:200px;overflow:auto}
+.evidence{margin:10px 0;padding:10px 12px;border-left:2px solid var(--rose);background:#ffffff06;border-radius:0 4px 4px 0}
+.evidence.have{border-left-color:var(--mint)}
+.evidence h3{font-size:11px;color:var(--sub);margin:0 0 4px}
+.overview-metric{display:flex;gap:22px;margin:14px 0}
+.overview-metric b{font:300 28px var(--display);display:block}
+.overview-metric small{font-size:10px;color:var(--sub)}
+
+.inspector-controls{
+  grid-column:3/4;grid-row:1/3;
+  display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;
+  padding:14px 18px;border-left:1px solid var(--line);background:#13172e;min-width:140px;
+}
+.inspector-controls button{
+  font-size:11px;color:var(--text);padding:10px 14px;border:1px solid #ffffff1a;
+  border-radius:5px;background:#0e122580;margin-bottom:8px;
+}
+.inspector-controls button:last-child{margin-bottom:0}
+.inspector-controls button:hover{border-color:#cbb9e855}
+
+/* Footer kept as a thin separator — the story-mode CSS hides it. */
+footer{display:contents}
+
+/* Map internals (unchanged from round1) */
+.world{transform-origin:0 0;transition:transform 2s cubic-bezier(.22,.75,.18,1)}
+.person,.task{cursor:pointer;transition:transform 1.65s cubic-bezier(.22,.75,.18,1),opacity .7s}
+.person circle{stroke:#fffc;stroke-width:.5}
+.person text,.task text{font:12px var(--font);fill:#f1eff8;paint-order:stroke;stroke:#17182d;stroke-width:4px;pointer-events:none}
+.task .core{stroke:#fff8;stroke-width:.55}
+.task.selected .core{stroke:white;stroke-width:2;r:6}
+.task .hit{fill:transparent}
+.task:focus-visible .core,.person:focus-visible circle{stroke:white;stroke-width:3}
+.fog{transition:opacity 1s;pointer-events:none}
+.nebula-label{cursor:pointer;transition:opacity .6s}
+.nebula-label text{font:14px var(--font);fill:#d9d2ee;paint-order:stroke;stroke:#16162c;stroke-width:4px}
+.nebula-label .tiny{font-size:10px;fill:#aaa0bd}
+.nebula-label:hover text{fill:white}
+.time-ring{fill:none;stroke:#afa8d238;stroke-width:1;stroke-dasharray:3 7}
+.time-label{fill:#b0a3c6;font:12px var(--font)}
+.origin{fill:#ded6ef;font:11px var(--font)}
+.skill{cursor:pointer}
+.skill text{font:14px var(--font);fill:var(--text);text-anchor:middle}
+.skill .small{font-size:11px;fill:#afb7c5}
+.skill-line{stroke:#b4c6d844;stroke-width:1;fill:none}
+.skill:hover .bubble,.skill:focus-visible .bubble{stroke:white;stroke-width:2.5}
+.skill .number{font:400 28px var(--display)}
+
+.tooltip{position:absolute;background:#eeebf5;color:#242138;max-width:300px;padding:10px 14px;font-size:12px;line-height:1.6;pointer-events:none;border-radius:5px;box-shadow:0 10px 40px #0006;z-index:9}
+
+#pjt-back{position:absolute;top:18px;left:24px;font-size:11px;color:var(--mint);background:#0e122599;padding:6px 12px;border:1px solid #ffffff1a;border-radius:5px;z-index:3}
+#pjt-back:hover{border-color:#cbb9e855}
+#synthetic-mark{
+  position:fixed;top:64px;right:18px;z-index:10;
+  font-size:10px;letter-spacing:.12em;color:var(--rose);
+  background:#0e122599;border:1px solid #eeb3ce44;padding:6px 10px;border-radius:14px;
+}
+dialog#dialog{border:1px solid #ffffff20;background:var(--panel);color:var(--text);max-width:560px;padding:24px;border-radius:8px}
+dialog::backdrop{background:#00000080}
+dialog#dialog h2{font:500 18px var(--display);letter-spacing:-.03em;margin:0 0 10px}
+dialog#dialog p{font-size:12px;color:var(--sub);line-height:1.7;margin:0 0 10px}
+dialog#dialog p b{color:var(--text)}
+
+/* Story mode: hide the rail chrome; same plane means the audience just sees the map. */
+body.story .app{height:100dvh;min-height:0;display:block}
+body.story header,body.story .rail,body.story .inspector,body.story footer{display:none}
+body.story .workspace{display:block;height:100%;border:0}
+body.story .universe{height:100%;background:#080b16}
+body.story #pjt-back{top:24px}
+
+/* Small-viewport fallback — keep all three bands visible. */
+@media (max-width:1180px){
+  .rail{grid-template-columns:1fr;gap:8px;padding:8px 18px}
+  .rail-axis{order:1}
+  .rail-scenes{order:2;overflow-x:auto;flex-wrap:nowrap}
+  .rail-controls{order:3;justify-content:flex-start}
+  .step{min-width:96px}
+  .inspector{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}
+  .inspector-head{border-right:0;border-bottom:1px solid var(--line)}
+  .search{grid-column:auto;grid-row:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .inspector-controls{flex-direction:row;grid-column:auto;grid-row:auto;border-left:0;border-top:1px solid var(--line)}
+  .inspector-controls button{margin-right:8px;margin-bottom:0}
+  .footnote{max-width:340px}
+}
 </style></head><body><div class="app">
-<header><div class="brand">근원경쟁력 <span>AN ATLAS OF FUTURE WORK</span></div><div class="actions"><span class="badge">합성 자료로 보는 발표 시연</span><button id="about">읽는 법</button><button id="full">전체 화면 ↗</button></div></header>
-<section class="hero"><div><div class="eyebrow" id="eyebrow"></div><h1 id="title"></h1><p id="subtitle"></p></div><div class="numbers" id="numbers"></div></section>
-<main class="workspace"><section class="universe" aria-label="미래 과제의 성운 지도"><div class="toolbar"><label for="pjt">살펴볼 조직</label><select id="pjt"><option value="all"></option></select><span class="scope" id="scope"></span><span style="flex:1"></span><button id="clear">선택 해제</button></div>
-<svg id="sky" viewBox="0 0 1200 720" role="group" aria-label="사람과 미래 과제의 변화"><defs><filter id="blur" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="22"/></filter><filter id="starGlow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3"/></filter><filter id="gas" x="-50%" y="-50%" width="200%" height="200%"><feTurbulence type="fractalNoise" baseFrequency=".019" numOctaves="3" seed="11" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="38"/><feGaussianBlur stdDeviation="9"/></filter></defs><g id="world" class="world"><g id="time"></g><g id="fog"></g><g id="links"></g><g id="persons"></g><g id="tasks"></g></g><g id="labels"></g><g id="skills"></g></svg>
-<div id="html-labels" class="html-labels"></div><button id="pjt-back" hidden>← PJT 격자로</button><div class="tooltip" id="tooltip" hidden></div><div class="legend" id="legend"></div><div class="footnote" id="footnote"></div></section>
-<aside class="inspector"><div class="search"><input id="search" type="search" placeholder="이름 · 미래 과제의 문장 찾기" aria-label="이름 또는 과제 검색"></div><div class="panel" id="panel" aria-live="polite"></div></aside></main>
-<footer><div class="steps" id="steps"></div><div class="controls"><button id="play">▶ 자동 발표</button><button id="prev" aria-label="이전 장면">←</button><button id="next">다음 →</button></div></footer>
-</div><div id="synthetic-mark" hidden>합성 자료 · 발표 시연</div><dialog id="dialog"><h2>사람에서 과제로, 과제에서 준비로.</h2><p id="about-scale"></p><p><b>첫 장면:</b> <span id="about-layout"></span> 이후 장면의 위치는 과제의 PJT·분류·시간을 설명하기 위한 배치이며, 유사도 거리나 자동 군집 계산 결과가 아닙니다.</p><p><b>성운:</b> PJT 내부에서 사람들이 무엇을 어느 방향으로 바꾸려는지로 묶은 미래 과제군입니다. 업무 분야 분류가 아닙니다. 서로 다른 PJT의 비슷한 단어를 하나로 합치지 않았습니다. 개별 과제가 같은 과제군에 속해도 실행 순서를 의미하지 않습니다.</p><p><b>거리:</b> 원문에 '단기'라고 적힌 과제는 가까이, '장기'는 멀리 놓았습니다. 연도·우선순위·실현 가능성을 나타내지 않습니다. 시점 미명시는 별도 영역에 둡니다.</p><p><b>역량:</b> 같은 과제의 원문에서 직접 연결해 적은 보유 경험과 필요한 역량입니다. 빈 원은 부족하다고 서술한 역량이며, 언급이 없는 부분은 측정된 gap이 아닙니다. 인원은 고유 작성자 수이고 준비율을 계산하지 않습니다.</p><p>이 HTML은 네트워크 없이 동작합니다. 기존 발표 파일은 변경하지 않았습니다.</p><button id="close">닫기</button></dialog>
+<header><div class="brand">근원경쟁력 <span>AN ATLAS OF FUTURE WORK · 관제탑</span></div><div class="actions"><span class="badge">합성 자료로 보는 발표 시연</span><button id="about">읽는 법</button><button id="full">전체 화면 ↗</button></div></header>
+<aside class="rail" aria-label="장면과 시간축">
+  <div class="rail-axis" aria-label="시점 축">
+    <span class="rail-axis-label">지금</span>
+    <div class="rail-axis-track">
+      <span class="rail-axis-tick" data-horizon="short">단기 · 가까운 미래</span>
+      <span class="rail-axis-tick" data-horizon="mid">중기</span>
+      <span class="rail-axis-tick" data-horizon="long">장기 · 먼 미래</span>
+    </div>
+    <span class="rail-axis-label">먼 미래</span>
+  </div>
+  <div class="rail-scenes" id="steps"></div>
+  <div class="rail-controls">
+    <label for="pjt">살펴볼 조직</label>
+    <select id="pjt"><option value="all"></option></select>
+    <span class="scope" id="scope"></span>
+    <button id="clear">선택 해제</button>
+  </div>
+</aside>
+<main class="workspace"><section class="universe" aria-label="미래 과제의 성운 지도">
+<svg id="sky" viewBox="0 0 1200 720" role="group" aria-label="사람과 미래 과제의 변화"><defs><filter id="blur" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="22"/></filter><filter id="starGlow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3"/></filter><filter id="gas" x="-50%" y="-50%" width="200%" height="200%"><feTurbulence type="fractalNoise" baseFrequency=".019" numOctaves="3" seed="11" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="38"/><feGaussianBlur stdDeviation="9"/></filter></defs><g id="world" class="world"><g id="time"></g><g id="fog"></g><g id="links"></g><g id="persons"></g><g id="tasks"></g></g><g id="labels"></g><g id="skills"></g><g id="html-labels"></g></svg>
+<button id="pjt-back" hidden>← PJT 격자로</button>
+<div class="legend" id="legend"></div>
+<div class="footnote" id="footnote"></div>
+<div class="tooltip" id="tooltip" hidden></div>
+</section></main>
+<aside class="inspector" aria-label="현재 선택 대상 상태">
+  <div class="inspector-head">
+    <span class="eyebrow" id="eyebrow"></span>
+    <h1 id="title"></h1>
+    <p id="subtitle"></p>
+    <div class="numbers" id="numbers"></div>
+  </div>
+  <div class="search"><input id="search" type="search" placeholder="이름 · 미래 과제의 문장 찾기" aria-label="이름 또는 과제 검색"></div>
+  <div class="panel" id="panel" aria-live="polite"></div>
+  <div class="inspector-controls">
+    <button id="play">▶ 자동 발표</button>
+    <button id="prev" aria-label="이전 장면">← 이전</button>
+    <button id="next" aria-label="다음 장면">다음 →</button>
+  </div>
+</aside>
+<footer></footer>
+</div><div id="synthetic-mark" hidden>합성 자료 · 발표 시연</div><dialog id="dialog"><h2>사람에서 과제로, 과제에서 준비로.</h2><p id="about-scale"></p><p><b>첫 장면:</b> <span id="about-layout"></span> 이후 장면의 위치는 과제의 PJT·분류·시간을 설명하기 위한 배치이며, 유사도 거리나 자동 군집 계산 결과가 아닙니다.</p><p><b>성운:</b> PJT 내부에서 사람들이 무엇을 어느 방향으로 바꾸려는지로 묶은 미래 과제군입니다. 업무 분야 분류가 아닙니다. 서로 다른 PJT의 비슷한 단어를 하나로 합치지 않았습니다. 개별 과제가 같은 과제군에 속해도 실행 순서를 의미하지 않습니다.</p><p><b>거리:</b> 원문에 '단기'라고 적힌 과제는 가까이, '장기'는 멀리 놓았습니다. 연도·우선순위·실현 가능성을 나타내지 않습니다. 시점 미명시는 별도 영역에 둡니다.</p><p><b>역량:</b> 같은 과제의 원문에서 직접 연결해 적은 보유 경험과 필요한 역량입니다. 빈 원은 부족하다고 서술한 역량이며, 언급이 없는 부분�� 측정된 gap이 아닙니다. 인원은 고유 작성자 수이고 준비율을 계산하지 않습니다.</p><p>이 HTML은 네트워크 없이 동작합니다. 기존 발표 파일은 변경하지 않았습니다.</p><button id="close">닫기</button></dialog>
 <script id="data" type="application/json">__PAYLOAD__</script><script id="copy" type="application/json">__COPY__</script><script>
 'use strict';
 if(document.getElementById('data').textContent.trim()==='__'+'PAYLOAD__'){
@@ -245,7 +528,7 @@ function save(){try{
  if(S.person!==null)q.set('person',S.person);
  history.replaceState(null,'','#'+q);
 }catch{}}
-const q=new URLSearchParams(location.hash.slice(1));S.mode=q.get('mode')==='story'?'story':'live';document.body.classList.toggle('story',S.mode==='story');$('synthetic-mark').hidden=!(S.mode==='story'&&D.synthetic);const initialScene=Number(q.get('scene'));S.scene=Number.isInteger(initialScene)&&initialScene>=0&&initialScene<=3?initialScene:0;const initialPjt=q.get('pjt');if(initialPjt!==null&&initialPjt!==''&&Number.isInteger(+initialPjt)&&+initialPjt>=0&&+initialPjt<D.pjts.length)S.pjt=String(+initialPjt);$('pjt').value=S.pjt;if(cats.has(q.get('category'))&&(S.pjt==='all'||cats.get(q.get('category')).pjt===+S.pjt))S.category=q.get('category');if(D.tasks.some(t=>t.id===q.get('task')&&(S.pjt==='all'||t.pjt===+S.pjt)))S.task=q.get('task');if(q.has('person')&&q.get('person')!==''&&people.has(+q.get('person')))S.person=+q.get('person');$('about-layout').textContent=layoutNote;
+const q=new URLSearchParams(location.hash.slice(1));S.mode=q.get('mode')==='story'?'story':'live';document.body.classList.toggle('story',S.mode==='story');$('synthetic-mark').hidden=!D.synthetic;const initialScene=Number(q.get('scene'));S.scene=Number.isInteger(initialScene)&&initialScene>=0&&initialScene<=3?initialScene:0;const initialPjt=q.get('pjt');if(initialPjt!==null&&initialPjt!==''&&Number.isInteger(+initialPjt)&&+initialPjt>=0&&+initialPjt<D.pjts.length)S.pjt=String(+initialPjt);$('pjt').value=S.pjt;if(cats.has(q.get('category'))&&(S.pjt==='all'||cats.get(q.get('category')).pjt===+S.pjt))S.category=q.get('category');if(D.tasks.some(t=>t.id===q.get('task')&&(S.pjt==='all'||t.pjt===+S.pjt)))S.task=q.get('task');if(q.has('person')&&q.get('person')!==''&&people.has(+q.get('person')))S.person=+q.get('person');$('about-layout').textContent=layoutNote;
 $('about-scale').textContent=`${D.people.length}명의 기록에서 뽑은 ${D.tasks.length}개 미래 과제를 ${D.pjts.length}개 PJT의 ${D.categories.length}개 미래 과제군으로 배치했습니다.`+(D.synthetic?' 모든 원문과 분류는 합성 자료입니다. 실제 조직의 분석 결과나 LLM 분류 품질의 증거가 아닙니다.':' 원문과 분류는 실제 추출 결과이며, 의미의 정확성은 검토 화면에서 확인해야 합니다.')+(D.approved_only?' 승인된 과제만 포함했습니다.':' 검토 전 초안을 포함합니다.');
 if(!D.synthetic)document.querySelector('.badge').textContent=D.approved_only?'승인 결과':'검토 전 초안 포함';
 if(S.scene<=1){S.pjt='all';$('pjt').value='all';}
