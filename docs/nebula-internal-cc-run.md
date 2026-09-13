@@ -20,8 +20,8 @@ GPT-OSS endpoint를 부르지 않고, **내부망 Claude Code가 `nebula run --a
 - 입력과 `--out`은 리포 밖 내부 폴더(`/secure/...`)에 둔다. `agent-requests/`에는 원문이 담긴 요청이,
   `cache/`에는 답이 그대로 남는다.
 - 리포에는 코드만 들어간다. 커밋·커밋 메시지·이슈·PR에는 원문·인용·과제군 이름을 적지 않는다.
-- 사내망 밖(외부 Claude Code 포함)으로 전달할 수 있는 것은 종료 코드, `stage`, `call_key`, 그리고
-  `status.json`의 건수뿐이다.
+- 사내망 밖(외부 Claude Code 포함)으로 전달할 수 있는 것은 종료 코드, `stage`, `call_key`, `status.json`의 건수,
+  그리고 3절 안정성 비교 출력(PJT 색인과 숫자)뿐이다.
 
 ## 0. 파일 읽기 실측 — 리허설 전에
 
@@ -134,6 +134,63 @@ python3 -c "import json,sys; ids=set(sys.argv[3].split(',')); d=json.load(open(s
 - 마지막 실행의 종료 코드 0
 - `<OUT>/status.json`의 `state`가 `complete`
 - `<OUT>`에 `nebula.html`·`matrix.html`·`review.html`
+
+### 과제군 안정성 확인 — 검토 전에
+
+`--batch-size 1000`이면 PJT 과제 전체가 한 번에 들어가서, 앞 배치의 초안이 뒤로 누적되는 흔들림은 없다(한 PJT가
+과제 1,000개나 과제 목록 20만 자를 넘으면 다시 나뉜다). 그래도 과제를 읽는 순서와 답마다의 차이는 남는다. 사람 순서를
+섞어 분류만 두 번 더 돌리고, 과제들이 같은 과제군으로 묶이는지 비교한다. 추가 턴은 PJT당 3턴 × 2다.
+
+**1.** 섞은 입력을 만들고 추출 캐시를 복사한다. 추출 캐시 키는 원문뿐이라 순서와 무관하게 재사용되고, 읽을 때 다시 검증된다.
+
+```sh
+for s in 1 2; do
+  python3 -c "import json,random,sys; d=json.load(open(sys.argv[1])); random.Random(int(sys.argv[3])).shuffle(d); json.dump(d, open(sys.argv[2],'w'), ensure_ascii=False)" <INPUT> <INPUT>.s$s.json $s
+  mkdir -p <OUT>-s$s/cache
+  cp -Rp <OUT>/cache/tasks <OUT>/cache/capabilities <OUT>/cache/links <OUT>-s$s/cache/
+done
+```
+
+**2.** 두 out을 각각 2절 절차로 돌린다(`<INPUT>`=`<INPUT>.s1.json`, `<OUT>`=`<OUT>-s1`, s2도 같다). 분류 세 단계만
+새로 묻는다. 서로 다른 out이라 동시에 돌려도 된다. 워커는 자기 out만 연다 — 다른 실행의 과제군을 보면 비교가 무의미해진다.
+
+**3.** 비교한다. 출력 형식은 `PJT#1  같이묶임 일치 0.82 0.77  미분류 3/2/4`다.
+
+```sh
+python3 - <OUT> <OUT>-s1 <OUT>-s2 <<'PY'
+import collections, itertools, json, sys
+
+def load(path):
+    d = json.load(open(path + "/result.json"))
+    pjt = {t["id"]: t["pjt"] for t in d["tasks"]}
+    by_cat, pairs = collections.defaultdict(list), collections.defaultdict(set)
+    for a in d["assignments"]:
+        if a["category_id"] is not None:
+            by_cat[a["category_id"]].append(a["task_id"])
+    for ids in by_cat.values():
+        for pair in itertools.combinations(sorted(ids), 2):
+            pairs[pjt[pair[0]]].add(pair)
+    unassigned = collections.Counter(pjt[a["task_id"]] for a in d["assignments"] if a["category_id"] is None)
+    return pairs, unassigned, set(pjt.values())
+
+base, *runs = [load(p) for p in sys.argv[1:]]
+for i, name in enumerate(sorted(base[2]), 1):  # PJT 이름 대신 정렬 순서 색인만 찍는다
+    scores = []
+    for pairs, _, _ in runs:
+        union = base[0][name] | pairs[name]
+        scores.append(f"{len(base[0][name] & pairs[name]) / len(union):.2f}" if union else "-")
+    unassigned = "/".join(str(r[1][name]) for r in [base, *runs])
+    print(f"PJT#{i}  같이묶임 일치 {' '.join(scores)}  미분류 {unassigned}")
+PY
+```
+
+읽는 법:
+
+- 숫자는 기준 실행과 섞은 실행에서 같은 과제군에 묶인 과제 쌍이 얼마나 겹치는지다(0~1). 과제군 이름이 달라도 묶음이
+  같으면 1이다. 미분류는 기준/s1/s2 순서, PJT 색인은 PJT 이름을 정렬한 순서다.
+- 결과를 고르거나 합치는 데 쓰지 않는다. 검토·승인 대상은 기준 실행 `<OUT>`이고, 숫자가 낮은 PJT부터 사람이 과제군을
+  들여다본다. 섞은 실행 중 보기 좋은 쪽을 고르면 우연을 고르는 셈이다.
+- 모든 PJT에서 낮으면 멈추고 사람에게 이 출력을 전한다. 과제군 계약이나 프롬프트를 볼 문제다.
 
 이후 검토·승인은 runbook §7·§8을 따른다. 결과의 `provider`에는 `agent`라고만 남아 어떤 모델이 답했는지
 기록되지 않는다. [[nebula-quality-evaluation]]으로 표본 평가를 하면 `run.model_id`에 세션 모델 id를
