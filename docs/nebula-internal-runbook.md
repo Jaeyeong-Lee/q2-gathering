@@ -206,6 +206,7 @@ HTTP 테스트는 로컬 호환 서버로 수행하며 실제 LLM에 연결하�
 | 캐시·잠금·파일 | `nebula/storage.py` | 검증된 응답만 캐시, 파일 단위 원자적 교체 |
 | 기존 네트워크 입력 | `nebula/network.py` | 사람 ID로 결합, 점수·좌표 보존 |
 | 집계·HTML 생성 | `nebula/render.py` | 고유 인원 집계, 안전한 JSON 삽입 |
+| 실행 간 분류 비교 | `nebula/stability.py` | 이름 없이 PJT 색인·숫자만 출력 |
 | 발표 화면 페이로드 | `nebula/render.py` `build_nebula` | 사람·PJT 색인과 원래 ID 병기, 미분류 보존 |
 | 발표 UI | `nebula/templates/nebula.html` | 네 장면, 좌표 유무 표기, 장면 딥링크 |
 | 탐색·검토 UI | `nebula/templates/` | 오프라인 동작, 원문 접근, 정정 내보내기 |

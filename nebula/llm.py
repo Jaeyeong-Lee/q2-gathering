@@ -133,7 +133,12 @@ class AgentClient:
     """
 
     agent_turn = True
-    cache_identity = {"provider": "agent", "version": 1}
+
+    def __init__(self, model=None):
+        # A named model is recorded in result.provider and keeps its cache apart.
+        self.cache_identity = {"provider": "agent", "version": 1}
+        if model:
+            self.cache_identity["model"] = model
 
     def complete(self, stage, system, payload):
         raise LLMError("AgentClient answers through the output directory, not a call")

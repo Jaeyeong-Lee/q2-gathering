@@ -2,6 +2,7 @@
 
 from typing import Any
 import json
+import random
 from collections import defaultdict
 from pathlib import Path
 from . import prompts
@@ -88,6 +89,7 @@ def run(
     corrections=None,
     network=None,
     reset_corrections=False,
+    task_order_seed=None,
 ):
     with output_lock(out):
         begin_run(out)
@@ -101,6 +103,7 @@ def run(
                 corrections,
                 network,
                 reset_corrections,
+                task_order_seed,
             )
         except AgentTurn:
             raise
@@ -110,7 +113,15 @@ def run(
 
 
 def _run(
-    source, out, client, batch_size, max_chars, corrections, network, reset_corrections
+    source,
+    out,
+    client,
+    batch_size,
+    max_chars,
+    corrections,
+    network,
+    reset_corrections,
+    task_order_seed,
 ):
     need(type(batch_size) is int and batch_size > 0, "batch size must be positive")
     need(type(max_chars) is int and max_chars > 0, "max chars must be positive")
@@ -223,6 +234,11 @@ def _run(
                 for t in groups[pjt]
             ]
             task_hash = digest(minimal)
+            # persons() sorts by id, so input order never reaches classification. A seed
+            # permutes only what these stages read; hashes and corrections stay on `minimal`.
+            ordered = list(minimal)
+            if task_order_seed is not None:
+                random.Random(f"{task_order_seed}:{pjt}").shuffle(ordered)
             write_json(
                 store.out / "task-inputs" / (digest(pjt)[:24] + ".json"),
                 {"pjt": pjt, "input_hash": task_hash, "tasks": minimal},
@@ -243,7 +259,7 @@ def _run(
                 local = taxonomy({"additions": override["categories"]}, pjt, [])
                 active_taxonomies[pjt] = override
             else:
-                for batch in batches(minimal, batch_size, max_chars):
+                for batch in batches(ordered, batch_size, max_chars):
                     payload = {"pjt": pjt, "existing": local, "tasks": batch}
                     need(
                         len(json.dumps(payload, ensure_ascii=False)) <= max_chars * 3,
@@ -274,9 +290,9 @@ def _run(
                 if local:
                     # Bound the final pass; no silent truncation of a large registry.
                     representatives = [
-                        minimal[i]
+                        ordered[i]
                         for i in range(
-                            0, len(minimal), max(1, len(minimal) // batch_size)
+                            0, len(ordered), max(1, len(ordered) // batch_size)
                         )
                     ][:batch_size]
                     final_payload = {
@@ -311,7 +327,7 @@ def _run(
                 }
             )
             categories.extend(local)
-            for batch in batches(minimal, batch_size, max_chars):
+            for batch in batches(ordered, batch_size, max_chars):
                 payload = {"pjt": pjt, "categories": local, "tasks": batch}
                 need(
                     len(json.dumps(payload, ensure_ascii=False)) <= max_chars * 3,

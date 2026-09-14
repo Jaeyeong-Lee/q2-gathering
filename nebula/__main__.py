@@ -32,6 +32,8 @@ def main():
             p.add_argument("--agent", action="store_true")
             p.add_argument("--batch-size", type=int, default=24)
             p.add_argument("--max-chars", type=int, default=24000)
+            p.add_argument("--task-order-seed", type=int)
+            p.add_argument("--agent-model")
     args = parser.parse_args()
     try:
         with output_lock(args.out):
@@ -57,7 +59,7 @@ def main():
                         else source()
                     )
                     client = (
-                        AgentClient()
+                        AgentClient(args.agent_model)
                         if args.agent
                         else (
                             FakeClient()
@@ -84,6 +86,7 @@ def main():
                         corrections,
                         network,
                         args.reset_corrections,
+                        task_order_seed=args.task_order_seed,
                     )
                     if args.command == "demo":
                         write_json(args.out / "synthetic-persons.json", inputs)

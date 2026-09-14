@@ -1,7 +1,11 @@
 """Public pipeline/build contract tests with synthetic sources only."""
 
+import contextlib
 import copy
+import io
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -605,3 +609,118 @@ class NebulaPresentation(unittest.TestCase):
             page = (self.out / f"{name}.html").read_text()
             self.assertNotIn("__PAYLOAD__", page)
         self.assertIn(self.data["run_id"], (self.out / "nebula.html").read_text())
+
+
+class ClassificationOrderSeed(unittest.TestCase):
+    """A seed permutes what the classification stages read, and nothing else."""
+
+    class Recording(FakeClient):
+        def __init__(self):
+            self.orders = []
+
+        def complete(self, stage, system, payload):
+            if stage == "taxonomy":
+                self.orders.append([t["id"] for t in payload["tasks"]])
+            return super().complete(stage, system, payload)
+
+    def _orders(self, seed):
+        client = self.Recording()
+        with tempfile.TemporaryDirectory() as out:
+            data = run(source()[:30], out, client, batch_size=1000, task_order_seed=seed)
+        return client.orders, data
+
+    def test_seed_permutes_classification_input_deterministically(self):
+        plain, base = self._orders(None)
+        seeded, shuffled = self._orders(1)
+        self.assertNotEqual(plain, seeded)
+        self.assertEqual([sorted(o) for o in plain], [sorted(o) for o in seeded])
+        self.assertEqual(seeded, self._orders(1)[0], "resume needs the same order")
+        self.assertEqual(base["tasks"], shuffled["tasks"])
+
+    def test_seed_reuses_extraction_calls(self):
+        class ClassifyOnly(FakeClient):
+            def complete(self, stage, system, payload):
+                assert stage in ("taxonomy", "consolidate", "assign"), stage
+                return super().complete(stage, system, payload)
+
+        with tempfile.TemporaryDirectory() as out:
+            run(source()[:30], out, FakeClient(), batch_size=1000)
+            run(source()[:30], out, ClassifyOnly(), batch_size=1000, task_order_seed=1)
+
+
+class AgentModelProvenance(unittest.TestCase):
+    def test_named_agent_model_enters_cache_identity(self):
+        self.assertEqual(AgentClient().cache_identity, {"provider": "agent", "version": 1})
+        self.assertEqual(
+            AgentClient("opus-5").cache_identity,
+            {"provider": "agent", "version": 1, "model": "opus-5"},
+        )
+
+
+class CommandLineBudget(unittest.TestCase):
+    def test_character_budget_flag_admits_a_long_source(self):
+        long = dict(source()[0], text="앞으로도 맡은 일을 성실히 수행하겠습니다.\n\n" * 2000)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "persons.json"
+            path.write_text(json.dumps([long], ensure_ascii=False))
+
+            def cli(*extra):
+                return subprocess.run(
+                    [sys.executable, "-m", "nebula", "run", "--input", str(path),
+                     "--out", str(Path(tmp) / "out"), "--agent", *extra],
+                    capture_output=True, text=True, cwd=Path(__file__).resolve().parents[1],
+                )
+
+            refused = cli()
+            self.assertEqual(refused.returncode, 1)
+            self.assertIn("source too large", refused.stderr)
+            admitted = cli("--max-chars", "200000", "--batch-size", "1000",
+                           "--task-order-seed", "1", "--agent-model", "opus-5")
+            # argparse also exits 2 on an unknown flag, so the turn message is the real signal.
+            self.assertEqual(admitted.returncode, 2, admitted.stderr)
+            self.assertIn("agent turn", admitted.stderr)
+
+
+class StabilityComparison(unittest.TestCase):
+    def _out(self, root, name, assignments):
+        out = Path(root) / name
+        out.mkdir()
+        data = {
+            "tasks": [{"id": t, "pjt": "비밀 PJT"} for t in assignments],
+            "assignments": [
+                {"task_id": t, "category_id": c, "reason": "r"} for t, c in assignments.items()
+            ],
+        }
+        (out / "result.json").write_text(json.dumps(data, ensure_ascii=False))
+        return str(out)
+
+    def test_partitions_compare_by_grouping_not_by_name(self):
+        from nebula.stability import compare, main
+
+        with tempfile.TemporaryDirectory() as root:
+            base = self._out(root, "a", {"t1": "x", "t2": "x", "t3": "y", "t4": "y", "t5": None})
+            renamed = self._out(root, "b", {"t1": "q", "t2": "q", "t3": "r", "t4": "r", "t5": None})
+            moved = self._out(root, "c", {"t1": "x", "t2": "y", "t3": "y", "t4": None, "t5": "x"})
+            (row,) = compare([base, renamed, moved])
+            printed = io.StringIO()
+            with contextlib.redirect_stdout(printed):
+                main([base, renamed, moved])
+
+        self.assertEqual((row["pjt"], row["tasks"], row["unassigned"]), (1, 5, [1, 1, 1]))
+        pairs = {tuple(p["runs"]): p for p in row["pairs"]}
+        self.assertEqual(set(pairs), {(0, 1), (0, 2), (1, 2)})
+        self.assertEqual(pairs[(0, 1)]["ari"], 1.0)
+        self.assertLess(pairs[(0, 2)]["ari"], 1.0)
+        self.assertEqual((pairs[(0, 2)]["to_assigned"], pairs[(0, 2)]["to_unassigned"]), (1, 1))
+        self.assertNotIn("비밀 PJT", printed.getvalue())
+
+    def test_all_unassigned_is_not_counted_as_one_group(self):
+        from nebula.stability import compare
+
+        with tempfile.TemporaryDirectory() as root:
+            empty = {"t1": None, "t2": None, "t3": None}
+            (row,) = compare([self._out(root, "a", empty), self._out(root, "b", empty)])
+            grouped = self._out(root, "c", {"t1": "x", "t2": "x", "t3": "x"})
+            (mixed,) = compare([self._out(root, "d", empty), grouped])
+        self.assertEqual(row["pairs"][0]["ari"], 1.0)
+        self.assertEqual(mixed["pairs"][0]["ari"], 0.0)
