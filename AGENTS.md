@@ -71,6 +71,10 @@ Full design and vocabulary live in **`docs/task-discovery-coldstart.md`**; artif
 **`docs/task-discovery-pipeline-reference.md`**; internal-network operations in
 **`docs/task-discovery-internal-run-guide.md`**. Anything not here is there.
 
+Before a taxonomy run, if a human is present and `docs/task-discovery-domain-glossary.md` still
+has unresolved gaps, follow **`docs/task-discovery-glossary-review-instructions.md`** first —
+interactive only, never inside a `-p` batch run.
+
 ```bash
 export TEXT_PROVIDER=internal
 export TEXT_API_KEY=<internal key>
