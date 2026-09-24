@@ -1,0 +1,4 @@
+render/*.mp4
+render/*.png
+video/node_modules/
+codex-run.log
