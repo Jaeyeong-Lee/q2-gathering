@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ko" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face{font-family:'Apple SD Gothic Neo';src:local('Apple SD Gothic Neo'),local('AppleSDGothicNeo-Regular')}
+@font-face{font-family:'Avenir Next';src:local('Avenir Next'),local('AvenirNext-Regular')}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#0e1225;font-family:"Apple SD Gothic Neo","Avenir Next",sans-serif}
+#root{width:100%;height:100%;position:relative}
+.scene{width:100%;height:100%;position:relative}
+.bg-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 45% 46%,#25223f99,transparent 66%);pointer-events:none}
+svg#sky{width:100%;height:100%;display:block}
+.title-overlay{position:absolute;bottom:50px;left:0;right:0;text-align:center;pointer-events:none;z-index:5}
+.title-overlay h2{color:#f1eff8;font-size:32px;font-weight:500;letter-spacing:-0.055em;line-height:1.3}
+.title-overlay p{color:#a19eb8;font-size:15px;margin-top:10px;letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="8" data-width="1920" data-height="1080">
+  <div class="scene clip" id="nebula-scene" data-start="0" data-duration="8" data-track-index="0">
+    <div class="bg-glow"></div>
+    <svg id="sky" viewBox="0 0 1200 720" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <filter id="blur" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="22"/></filter>
+        <filter id="starGlow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3"/></filter>
+        <filter id="gas" x="-50%" y="-50%" width="200%" height="200%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.019" numOctaves="3" seed="11" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="38"/>
+          <feGaussianBlur stdDeviation="9"/>
+        </filter>
+      </defs>
+      <g id="nebulas"></g>
+      <g id="cells"></g>
+      <g id="persons"></g>
+      <g id="tasks"></g>
+      <g id="labels"></g>
+    </svg>
+    <div class="title-overlay">
+      <h2>흩어진 과제들이, 성운을 이룹니다.</h2>
+      <p>PJT마다 다른 업무 언어를 존중하며, 비슷한 과제들을 함께 읽습니다.</p>
+    </div>
+  </div>
+</div>
+<script type="application/json" id="data">{"pjts":[{"name":"기술 기획","color":"#7dcfff","count":40},{"name":"데이터 플랫폼","color":"#a7a4ff","count":28}],"categories":[{"id":"604471a1193f56be9e52fe24","pjt":0,"name":"기술 경험 전수","definition":"기술 경험 전수에 관한 미래 업무"},{"id":"ec049a6b2319b6abc432efc3","pjt":0,"name":"투자 판단 기준","definition":"투자 판단 기준에 관한 미래 업무"},{"id":"08c3aa1993b47c684ccad4a3","pjt":0,"name":"파일럿 검증 설계","definition":"파일럿 검증 설계에 관한 미래 업무"},{"id":"39e58bb93fe8aa5919d1bcc8","pjt":1,"name":"기록 식별자 연결","definition":"기록 식별자 연결에 관한 미래 업무"},{"id":"0d6fc8396aedb8e2e544a99b","pjt":1,"name":"데이터 품질 검증","definition":"데이터 품질 검증에 관한 미래 업무"},{"id":"4f14391ce9889f137de6d756","pjt":1,"name":"분석 환경 공유","definition":"분석 환경 공유에 관한 미래 업무"}],"people":[{"id":69,"pjt":0,"x":0.451732,"y":0.024646},{"id":70,"pjt":0,"x":0.548473,"y":0.0},{"id":71,"pjt":0,"x":0.602148,"y":0.184931},{"id":72,"pjt":0,"x":0.494167,"y":0.411307},{"id":73,"pjt":0,"x":0.606324,"y":0.040971},{"id":74,"pjt":0,"x":0.4633,"y":0.167736},{"id":75,"pjt":0,"x":0.41514,"y":0.0},{"id":76,"pjt":0,"x":0.517565,"y":0.104959},{"id":77,"pjt":0,"x":0.600744,"y":0.107183},{"id":79,"pjt":0,"x":0.561972,"y":0.363575},{"id":81,"pjt":0,"x":0.400218,"y":0.189312},{"id":82,"pjt":0,"x":0.437904,"y":0.151996},{"id":83,"pjt":0,"x":0.568959,"y":0.098761},{"id":84,"pjt":0,"x":0.505289,"y":0.18901},{"id":85,"pjt":0,"x":0.547626,"y":0.286924},{"id":86,"pjt":0,"x":0.529649,"y":0.207128},{"id":87,"pjt":0,"x":0.451564,"y":0.319455},{"id":88,"pjt":0,"x":0.394339,"y":0.125559},{"id":90,"pjt":0,"x":0.439185,"y":0.083306},{"id":91,"pjt":0,"x":0.555518,"y":0.058504},{"id":92,"pjt":0,"x":0.452185,"y":0.371329},{"id":93,"pjt":0,"x":0.448491,"y":0.216336},{"id":94,"pjt":0,"x":0.39649,"y":0.277595},{"id":95,"pjt":0,"x":0.373766,"y":0.09892},{"id":96,"pjt":0,"x":0.592304,"y":0.0},{"id":97,"pjt":0,"x":0.49995,"y":0.151795},{"id":98,"pjt":0,"x":0.436796,"y":0.272575},{"id":99,"pjt":0,"x":0.464247,"y":0.116061},{"id":102,"pjt":0,"x":0.365521,"y":0.040875},{"id":103,"pjt":0,"x":0.498165,"y":0.0},{"id":104,"pjt":0,"x":0.529277,"y":0.152937},{"id":105,"pjt":0,"x":0.504742,"y":0.290578},{"id":106,"pjt":0,"x":0.513394,"y":0.033726},{"id":107,"pjt":0,"x":0.483149,"y":0.247406},{"id":108,"pjt":0,"x":0.483172,"y":0.086379},{"id":109,"pjt":0,"x":0.473752,"y":0.0},{"id":110,"pjt":0,"x":0.573158,"y":0.241565},{"id":113,"pjt":0,"x":0.519697,"y":0.261984},{"id":166,"pjt":1,"x":0.770798,"y":0.015812},{"id":168,"pjt":1,"x":0.819591,"y":0.224601},{"id":169,"pjt":1,"x":0.718453,"y":0.407578},{"id":170,"pjt":1,"x":0.838503,"y":0.322275},{"id":171,"pjt":1,"x":0.774719,"y":0.191472},{"id":172,"pjt":1,"x":0.685361,"y":0.118078},{"id":173,"pjt":1,"x":0.842997,"y":0.07173},{"id":175,"pjt":1,"x":0.67829,"y":0.291788},{"id":176,"pjt":1,"x":0.806262,"y":0.185908},{"id":177,"pjt":1,"x":0.705013,"y":0.215947},{"id":179,"pjt":1,"x":0.746124,"y":0.188635},{"id":180,"pjt":1,"x":0.735867,"y":0.150475},{"id":181,"pjt":1,"x":0.818087,"y":0.376105},{"id":182,"pjt":1,"x":0.738845,"y":0.262772},{"id":183,"pjt":1,"x":0.763587,"y":0.24411},{"id":184,"pjt":1,"x":0.715994,"y":0.347858},{"id":185,"pjt":1,"x":0.727543,"y":0.026723},{"id":186,"pjt":1,"x":0.798344,"y":0.146255},{"id":187,"pjt":1,"x":0.730873,"y":0.311833},{"id":188,"pjt":1,"x":0.773412,"y":0.370798},{"id":190,"pjt":1,"x":0.870225,"y":0.207325},{"id":191,"pjt":1,"x":0.791667,"y":0.282219},{"id":192,"pjt":1,"x":0.78448,"y":0.093355},{"id":193,"pjt":1,"x":0.724327,"y":0.072877},{"id":194,"pjt":1,"x":0.86758,"y":0.297601},{"id":196,"pjt":1,"x":0.783986,"y":0.32827}],"tasks":[{"id":"92bae0ca0deb18bb96d7c165","person":69,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.8235269758905114},{"id":"adb88d60a33b6470e0eb822f","person":69,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":1,"seed":0.5337538645914183},{"id":"1222a153bd448f8639ef3261","person":70,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.009496874643838237},{"id":"6226ea37906a94d0df79ae8a","person":71,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.811640023908494},{"id":"f18a4f3745b9bcbb51ba1b7b","person":71,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.2146557737641632},{"id":"7cbe8834ae469e0892c82097","person":72,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.0019403384071635871},{"id":"5745b79d9ff65e2d0aa039e8","person":73,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.17980920806988357},{"id":"ab7707e38909aec3b37dba88","person":73,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":1,"seed":0.05447778479533218},{"id":"8b0a918179783c59a9b03dec","person":74,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.5769205481225905},{"id":"6dc066788e7ceff093800cfe","person":75,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.9609653190618765},{"id":"f7c31aa3b519a873197ac917","person":75,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":1,"seed":0.3484687184329305},{"id":"8ce6299ebc66e6bcb3256795","person":76,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.5905556438003098},{"id":"18707b9e78c06d8573dedc88","person":77,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.3253339723044387},{"id":"f7c4c11045ea431cb19e4455","person":77,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.11722743118117271},{"id":"a4de1abd5564d3b765ad4fc5","person":79,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.6231118549180943},{"id":"0cc81d01f6794af459d4760b","person":81,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.13317206691325922},{"id":"0d36a38ddafda5c1196c2967","person":82,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.44218189721977846},{"id":"98927d6d0cf0b607a771c487","person":82,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.6552614526951829},{"id":"3925a03aa8fa223635b0266b","person":83,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.916864781388283},{"id":"0e4cb89be66e934c30ee2a51","person":84,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.5295517916161455},{"id":"cc0446184f0fff362790e84e","person":84,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.23397942917281284},{"id":"9cd1549935a6f74727c2ebd1","person":85,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.2568602681292361},{"id":"11514bf3ec5649c5e4811b56","person":86,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.7073664913669616},{"id":"bc74db46dfac73fa2627d818","person":86,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":1,"seed":0.8397529678977451},{"id":"ebba46c3c1e9b66c3a7219e4","person":87,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.3318147334111423},{"id":"3850e1c55383a58c90c36a22","person":88,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.8921382270967909},{"id":"f7b6d81ceaae9fadbf69c47f","person":88,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":1,"seed":0.6163666289337834},{"id":"3a18ca17a5388e59fd331136","person":90,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.8563966967296779},{"id":"2beab96587fc92eeb6f7f456","person":91,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.44458579282383104},{"id":"d943aa9bdc847115da1330e3","person":91,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":1,"seed":0.21279429719149934},{"id":"37d4950ca395e1e209438dbc","person":92,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.5060832003378503},{"id":"07e6558b5ef14009b0d304ed","person":93,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.35136210763625847},{"id":"80df043db67dd56957be11d3","person":93,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":1,"seed":0.27842772479132466},{"id":"1f6a7cc2c47b430d9937ef96","person":94,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.6228899479896971},{"id":"5056c32028a0a5a54e7ce37d","person":95,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.5707745010896527},{"id":"81dd664239414cbdc1a12b18","person":95,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":1,"seed":0.8575279453903268},{"id":"eadabefec1e959213d3a66f6","person":96,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.12254420228361716},{"id":"3eb5c928908940ff57fa9727","person":97,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.07376866230596059},{"id":"577f2f6eb141ad8ef56d8175","person":97,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.46000186853576497},{"id":"a576d7ca7b0030c799e5ef51","person":98,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.2751241536520245},{"id":"1ac4fa1f5770f153c06110c8","person":99,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.4397810053638604},{"id":"ce6405e85c73880778dcc254","person":99,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":1,"seed":0.4646755646599167},{"id":"515a97933a06803a28b23584","person":102,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.7940328826182599},{"id":"c783a5bb1e6807fbdc6ac249","person":102,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.2692819766861577},{"id":"51c4a2b027701c4fc7c2e488","person":103,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.28423274175362495},{"id":"06aac81d019272c85d44cdd8","person":104,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.8458514813906167},{"id":"1d3be82eae714ce943506fff","person":104,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.16457166037628698},{"id":"6cd429a96042f52b81fa4436","person":105,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.5244334008368742},{"id":"24262861a4f7d734cc00fd9c","person":106,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.8501311847591146},{"id":"4362ed98b6b0efbd03fcd052","person":106,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":1,"seed":0.5316985225145935},{"id":"ba7faf6c19ed2bb9c0af4824","person":107,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":0,"seed":0.05375604681990949},{"id":"7bead076623bb827844864aa","person":108,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.9130872904586343},{"id":"e800921f7e7e80eb19c2046e","person":108,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":1,"seed":0.47872978064202},{"id":"af3a99b5f6f02146d2f8cdbb","person":109,"pjt":0,"category":"ec049a6b2319b6abc432efc3","seq":0,"seed":0.8070421949511026},{"id":"388ba5b836413bdde51fb87b","person":110,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.5558460919549331},{"id":"87e5b8f7ff0763148907866d","person":110,"pjt":0,"category":"08c3aa1993b47c684ccad4a3","seq":1,"seed":0.8881380737033063},{"id":"5d08afc83a279787613dbc4f","person":113,"pjt":0,"category":"604471a1193f56be9e52fe24","seq":0,"seed":0.4481282568183095},{"id":"546c141b338ff23072d8891e","person":166,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.8708135478363404},{"id":"6f25c5d6b833d5b899f90638","person":166,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":1,"seed":0.13552915587451522},{"id":"3bb7b9cb4f9726c46a344ef9","person":168,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":0,"seed":0.48618047672467785},{"id":"122bf78e55813afbe130dae7","person":169,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.45109849969183524},{"id":"f955a1a8831d64e06b12f486","person":169,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":1,"seed":0.28271706129487534},{"id":"9ee6ac868de88e120a491d47","person":170,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.3721104910066609},{"id":"449bb2f76a145ef6c3ffc534","person":171,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":0,"seed":0.23617950017475045},{"id":"8d8b101e1e9d53171d5a1eca","person":171,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":1,"seed":0.9959830048019027},{"id":"749dc01029cb3a9b165768db","person":172,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.8875625775865192},{"id":"18f636e96e0b8ee9f411170d","person":173,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.7005510960474031},{"id":"bc09489279ef7ef3b53b9295","person":173,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":1,"seed":0.4515060506415335},{"id":"77adb0021a0ad62a60a1e85f","person":175,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.09736806505764091},{"id":"85560b66276b0b3aec8b750a","person":175,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":1,"seed":0.18651300044416286},{"id":"844f84a4f0017956da6b4a32","person":176,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.3104337894614865},{"id":"03f21c7d0ed30763b74e7153","person":177,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.5203913106863367},{"id":"ac0ce8f84e104bc124981c37","person":177,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":1,"seed":0.3050901646039193},{"id":"9b6b7019e0bd2d3b0226c7a9","person":179,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.492610802290172},{"id":"70bb4f3b60011c77e512542e","person":180,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":0,"seed":0.1676040438859733},{"id":"c8245dfd6d7ed918c72a85bd","person":180,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":1,"seed":0.9875876728882053},{"id":"4cb2505510fdb2293c6e692d","person":181,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":0,"seed":0.6190131268508298},{"id":"737d84fb7518d3f242eb225b","person":182,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.04291212559745464},{"id":"bf6f66f7bd428bee21ce01d8","person":182,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":1,"seed":0.8286898643310857},{"id":"66dec1e33a860b349bfdabea","person":183,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.9897247084858186},{"id":"030ab544320a3d118b908093","person":184,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.18481311159786143},{"id":"aa470bf566605b93cf3784c8","person":184,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":1,"seed":0.9516375500130555},{"id":"ce0a81a68faad6638ebda23b","person":185,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.26632858842293},{"id":"9cd7872d2883d88f3e2fb658","person":186,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":0,"seed":0.5249380745284581},{"id":"fa5a681c580bab837cf3d33d","person":186,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":1,"seed":0.5071958807546636},{"id":"d8a3f5bd80c60613df2e9c1c","person":187,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":0,"seed":0.9615869563914805},{"id":"4e10072fef14664c9bee7588","person":188,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.5756008009369487},{"id":"fb82e63c9528dfe6cbce1921","person":188,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":1,"seed":0.4393781729599876},{"id":"f432c5abb22c8cc4cc96da70","person":190,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.39875642103114084},{"id":"2676ccc8efa7fc589d99fa63","person":191,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.23860242432882134},{"id":"580e1f8826393fef30211de7","person":191,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":1,"seed":0.8320336311198849},{"id":"8093a3b13588260adb5fa0ea","person":192,"pjt":1,"category":"4f14391ce9889f137de6d756","seq":0,"seed":0.06104250835744723},{"id":"24665aa39282029885832308","person":193,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.4001739286818015},{"id":"b9d8d84c817c81d0656f6217","person":193,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":1,"seed":0.03210677835906548},{"id":"f0e1b2be0327333f4b310adf","person":194,"pjt":1,"category":"0d6fc8396aedb8e2e544a99b","seq":0,"seed":0.6263463691869626},{"id":"3130793d5eaa9d2df5657196","person":196,"pjt":1,"category":"39e58bb93fe8aa5919d1bcc8","seq":0,"seed":0.5584217180866798}]}</script>
+<script>
+'use strict';
+const D=JSON.parse(document.getElementById('data').textContent);
+const NS='http://www.w3.org/2000/svg';
+const COLS=2;
+function el(tag,attrs){const e=document.createElementNS(NS,tag);if(attrs)for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;}
+
+/* ── position functions (ported from nebula.template.html) ── */
+const originals=new Map();
+D.people.forEach((p,i)=>{
+  if(p.x!==null) originals.set(p.id,[100+p.x*950,95+p.y*465]);
+  else{const a=(i/D.people.length)*Math.PI*2-Math.PI/2;originals.set(p.id,[575+Math.cos(a)*440,327+Math.sin(a)*215]);}
+});
+function pjtCell(i){
+  const rows=Math.max(1,Math.ceil(D.pjts.length/COLS)),w=1040/COLS,h=480/rows;
+  return{x:80+(i%COLS)*w,y:115+Math.floor(i/COLS)*h,width:w,height:h};
+}
+function ring(index,total,rx,ry){
+  const a=(index/Math.max(1,total))*Math.PI*2-Math.PI/2;
+  return total<2?[0,0]:[Math.cos(a)*rx,Math.sin(a)*ry];
+}
+function clusterCenter(c){
+  const sib=D.categories.filter(x=>x.pjt===c.pjt),idx=sib.findIndex(x=>x.id===c.id);
+  const[dx,dy]=ring(idx,sib.length,265,160);return[555+dx,375+dy];
+}
+function offsets(t,r){
+  const angle=t.seed*Math.PI*2,dist=Math.sqrt((Math.sin(t.seed*7919)+1)/2)*r;
+  return[Math.cos(angle)*dist,Math.sin(angle)*dist*.72];
+}
+function phase1Pos(t){const p=originals.get(t.person),a=t.seq*2.1+t.seed;return[p[0]+Math.cos(a)*22,p[1]+Math.sin(a)*22];}
+function pjtCellPos(t){const c=pjtCell(t.pjt),o=offsets(t,Math.min(c.width*.39,c.height*.4));return[c.x+c.width/2+o[0],c.y+c.height*.59+o[1]];}
+function clusterPos(t){const c=D.categories.find(x=>x.id===t.category),[cx,cy]=clusterCenter(c),o=offsets(t,115);return[cx+o[0],cy+o[1]];}
+
+/* ── create person nodes ── */
+const personNodes=[];
+D.people.forEach(p=>{
+  const[x,y]=originals.get(p.id),c=D.pjts[p.pjt].color;
+  const g=el('g',{class:'person'});
+  g.append(el('circle',{r:14,fill:c,opacity:.19,filter:'url(#starGlow)'}),el('circle',{r:5,fill:c}));
+  document.getElementById('persons').append(g);personNodes.push(g);
+});
+
+/* ── create task nodes + precompute positions ── */
+const taskNodes=[],p1Pos=[],cellP=[],clustP=[],pjt0Idx=[],pjt1Idx=[];
+D.tasks.forEach((t,i)=>{
+  const[a,b]=phase1Pos(t),[c,d]=pjtCellPos(t),[e,f]=clusterPos(t),col=D.pjts[t.pjt].color;
+  const g=el('g',{class:'task'});
+  g.append(el('circle',{r:9,fill:col,opacity:.34,filter:'url(#starGlow)'}),el('circle',{r:2.9,fill:col,class:'core'}));
+  document.getElementById('tasks').append(g);
+  taskNodes.push(g);p1Pos.push([a,b]);cellP.push([c,d]);clustP.push([e,f]);
+  if(t.pjt===0)pjt0Idx.push(i);else pjt1Idx.push(i);
+});
+
+/* ── set hero-frame positions (static, before GSAP timeline) ── */
+gsap.set(taskNodes,{x:i=>p1Pos[i][0],y:i=>p1Pos[i][1]});
+gsap.set(personNodes,{x:i=>originals.get(D.people[i].id)[0],y:i=>originals.get(D.people[i].id)[1]});
+
+/* ── create PJT cell outlines + labels ── */
+const cellRects=[],cellLabels=[];
+D.pjts.forEach((pjt,i)=>{
+  const cell=pjtCell(i);
+  const rect=el('rect',{x:cell.x,y:cell.y,width:cell.width,height:cell.height,fill:'none',stroke:pjt.color,'stroke-width':1.5,'stroke-opacity':.3,rx:12});
+  document.getElementById('cells').append(rect);cellRects.push(rect);
+  const label=el('text',{x:cell.x+cell.width/2,y:cell.y+32,'text-anchor':'middle',fill:pjt.color,'font-size':16,'font-family':'"Apple SD Gothic Neo",sans-serif','font-weight':'500','letter-spacing':'.05em'});
+  label.textContent=pjt.name;document.getElementById('labels').append(label);cellLabels.push(label);
+});
+
+/* ── create nebula clouds + category labels (PJT 0 only) ── */
+const nebulaGroups=[],catLabels=[];
+D.categories.filter(c=>c.pjt===0).forEach(c=>{
+  const[cx,cy]=clusterCenter(c),col=D.pjts[0].color;
+  const neb=el('g',{});
+  neb.append(
+    el('ellipse',{cx,cy,rx:160,ry:100,fill:col,opacity:.2,filter:'url(#gas)',transform:'rotate(-22 '+cx+' '+cy+')'}),
+    el('ellipse',{cx:cx+160*.23,cy:cy-100*.18,rx:160*.68,ry:100*.48,fill:col,opacity:.13,filter:'url(#blur)',transform:'rotate(24 '+cx+' '+cy+')'})
+  );
+  document.getElementById('nebulas').append(neb);nebulaGroups.push(neb);
+  const label=el('text',{x:cx,y:cy-103,'text-anchor':'middle',fill:'#d9d2ee','font-size':16,'font-family':'"Apple SD Gothic Neo",sans-serif','font-weight':'500'});
+  label.textContent=c.name;document.getElementById('labels').append(label);catLabels.push(label);
+});
+
+/* ── hide non-phase-1 elements ── */
+gsap.set([cellRects,cellLabels,nebulaGroups,catLabels],{opacity:0});
+
+/* ── build timeline ── */
+const tl=gsap.timeline({paused:true});
+
+/* phase 0: entrance (0 → 1.5s) */
+tl.from(taskNodes,{opacity:0,scale:.2,duration:.8,stagger:.004,ease:'power2.out'},0);
+tl.from(personNodes,{opacity:0,duration:.6,stagger:.008,ease:'power2.out'},0);
+
+/* phase 1→2: move tasks to PJT cells (1.5 → 3.5s) */
+tl.to(taskNodes,{x:i=>cellP[i][0],y:i=>cellP[i][1],duration:2,ease:'power2.inOut'},1.5);
+tl.to(personNodes,{opacity:0,duration:1,ease:'power2.inOut'},1.5);
+tl.to(cellRects,{opacity:1,duration:.8,stagger:.1,ease:'power2.out'},2.2);
+tl.to(cellLabels,{opacity:1,duration:.8,stagger:.1,ease:'power2.out'},2.4);
+
+/* phase 2→3: highlight PJT 0 (3.5 → 4.5s) */
+tl.to(pjt1Idx.map(i=>taskNodes[i]),{opacity:.12,duration:.6,ease:'power2.inOut'},3.5);
+tl.to(cellRects[1],{'stroke-opacity':.08,duration:.6},3.5);
+tl.to(cellLabels[1],{opacity:.12,duration:.6},3.5);
+tl.to(cellRects[0],{'stroke-opacity':.55,'stroke-width':2.5,duration:.6},3.5);
+
+/* phase 3→4: PJT 0 tasks → cluster nebula (4.5 → 7s) */
+const pjt0Clust=pjt0Idx.map(i=>clustP[i]);
+tl.to(pjt0Idx.map(i=>taskNodes[i]),{x:(j)=>pjt0Clust[j][0],y:(j)=>pjt0Clust[j][1],duration:2.5,ease:'power2.inOut'},4.5);
+tl.to(nebulaGroups,{opacity:1,duration:1.5,stagger:.15,ease:'power2.out'},5);
+tl.to(catLabels,{opacity:1,duration:1,stagger:.1,ease:'power2.out'},5.5);
+/* hide cell outlines during nebula phase */
+tl.to(cellRects,{opacity:0,duration:.8,ease:'power2.inOut'},4.5);
+tl.to(cellLabels,{opacity:0,duration:.8,ease:'power2.inOut'},4.5);
+
+/* phase 4: hold (7 → 8s) — nothing, just let it breathe */
+
+window.__timelines=window.__timelines||{};
+window.__timelines['main']=tl;
+tl.seek(0);
+</script>
+</body>
+</html>
