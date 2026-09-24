@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Hyperframes x nebula 장면 렌더 실험 — codex(OpenRouter 종량) 런처
-# 재실행 가능: 같은 스크립트를 다시 돌리면 이어서 진행한다.
+# Hyperframes x nebula — codex(OpenRouter 종량) 런처
+# 사용: run-codex.sh [브리프파일] [모델]   (기본: BRIEF.md, z-ai/glm-5.2)
 set -uo pipefail
 
 WT="/Users/winter/orca/workspaces/nebula-hyperframes"
-LOG="$WT/codex-run.log"
+BRIEF="${1:-BRIEF.md}"
+MODEL="${2:-z-ai/glm-5.2}"
 
 cd "$WT" || exit 1
 
@@ -15,14 +16,16 @@ if [ -z "${OPENROUTER_API_KEY:-}" ]; then
   exit 2
 fi
 
+LOG="$WT/codex-run-$(basename "$BRIEF" .md).log"
+
 {
   echo "=== run start $(date '+%Y-%m-%d %H:%M:%S') ==="
-  echo "cwd=$WT  branch=$(git rev-parse --abbrev-ref HEAD)  model=z-ai/glm-5.2"
+  echo "cwd=$WT  branch=$(git rev-parse --abbrev-ref HEAD)  brief=$BRIEF  model=$MODEL"
 } >> "$LOG"
 
-codex exec -p openrouter -m z-ai/glm-5.2 \
+codex exec -p openrouter -m "$MODEL" \
   --dangerously-bypass-approvals-and-sandbox \
   -C "$WT" \
-  "$(cat "$WT/BRIEF.md")" >> "$LOG" 2>&1 < /dev/null
+  "$(cat "$WT/$BRIEF")" >> "$LOG" 2>&1 < /dev/null
 
 echo "EXIT=$? $(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG"
