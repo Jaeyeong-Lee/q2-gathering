@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <defs>
+    <filter id="gas" x="-50%" y="-50%" width="200%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.019" numOctaves="3" seed="11" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="38"/>
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <g fill="#7dcfff" fill-opacity="0.2" filter="url(#gas)">
+    <ellipse cx="555" cy="215" rx="160" ry="100" transform="rotate(-22 555 215)"/>
+    <ellipse cx="784.496" cy="455" rx="160" ry="100" transform="rotate(-22 784.496 455)"/>
+    <ellipse cx="325.504" cy="455" rx="160" ry="100" transform="rotate(-22 325.504 455)"/>
+  </g>
+</svg>
