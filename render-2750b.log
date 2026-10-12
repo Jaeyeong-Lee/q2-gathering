@@ -1,0 +1,47 @@
+=== scene2 → nebula-scene2-2750.mp4 : 17:52:56 ===
+/dev/disk3s5   460Gi   426Gi   6.2Gi    99%    2.6M   65M    4%   /System/Volumes/Data
+  █████████████████░░░░░░░░  69%  Capturing frame 236/240 (2 workers)
+  █████████████████░░░░░░░░  70%  Capturing frame 238/240 (2 workers)
+  █████████████████░░░░░░░░  70%  Capturing frame 240/240 (2 workers)
+[INFO] [Render:trace] {"renderJobId":"3c2682ad-d155-4051-8be9-cd3acb14f5eb","phase":"capture_disk","status":"end","elapsedMs":113479,"durationMs":103755,"stagePhase":"capturing","needsAlpha":false,"workerCount":2,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"3c2682ad-d155-4051-8be9-cd3acb14f5eb","phase":"encode","status":"start","elapsedMs":113479,"stagePhase":"capturing","hasAudio":false,"isPngSequence":false,"isGif":false,"chunkedEncode":false,"workerCount":2,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+  ██████████████████░░░░░░░  75%  Encoding video
+[INFO] [Render:trace] {"renderJobId":"3c2682ad-d155-4051-8be9-cd3acb14f5eb","phase":"encode","status":"end","elapsedMs":116892,"durationMs":3413,"stagePhase":"capturing","hasAudio":false,"isPngSequence":false,"isGif":false,"chunkedEncode":false,"workerCount":2,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"3c2682ad-d155-4051-8be9-cd3acb14f5eb","phase":"assemble","status":"start","elapsedMs":116892,"stagePhase":"capturing","hasAudio":false,"workerCount":2,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+  ██████████████████████░░░  90%  Assembling final video
+[INFO] [Render:trace] {"renderJobId":"3c2682ad-d155-4051-8be9-cd3acb14f5eb","phase":"assemble","status":"end","elapsedMs":116952,"durationMs":60,"stagePhase":"capturing","hasAudio":false,"workerCount":2,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"3c2682ad-d155-4051-8be9-cd3acb14f5eb","phase":"pipeline","status":"checkpoint","elapsedMs":117004,"message":"artifact validated","totalElapsedMs":117003}
+  █████████████████████████  100%  Render complete
+
+◇  /Users/winter/orca/workspaces/nebula-hyperframes-2750/render/nebula-scene2-2750.mp4
+   5.7 MB · 8.0s video · rendered in 1m 57.0s
+   screenshot capture · hardware gpu · compile 0.1s · extract 0.0s · audio 0.0s · probe 0.0s · setup 9.6s · capture 1m 43.8s · encode 3.4s · assemble 0.1s
+
+real	1m59.042s
+user	1m26.977s
+sys	0m31.250s
+-rw-r--r--@ 1 winter  staff  5993030 Sep 25 17:54 /Users/winter/orca/workspaces/nebula-hyperframes-2750/render/nebula-scene2-2750.mp4
+=== scene2-noglow → nebula-scene2-2750-noglow.mp4 : 17:54:55 ===
+/dev/disk3s5   460Gi   426Gi   6.2Gi    99%    2.6M   65M    4%   /System/Volumes/Data
+  █████████████████░░░░░░░░  69%  Capturing frame 232/240 (5 workers)
+  █████████████████░░░░░░░░  69%  Capturing frame 237/240 (5 workers)
+  █████████████████░░░░░░░░  70%  Capturing frame 240/240 (5 workers)
+[INFO] [Render:trace] {"renderJobId":"7295c2dd-0024-4910-b87b-f687026ae3e1","phase":"capture_disk","status":"end","elapsedMs":40746,"durationMs":36127,"stagePhase":"capturing","needsAlpha":false,"workerCount":5,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"7295c2dd-0024-4910-b87b-f687026ae3e1","phase":"encode","status":"start","elapsedMs":40746,"stagePhase":"capturing","hasAudio":false,"isPngSequence":false,"isGif":false,"chunkedEncode":false,"workerCount":5,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+  ██████████████████░░░░░░░  75%  Encoding video
+[INFO] [Render:trace] {"renderJobId":"7295c2dd-0024-4910-b87b-f687026ae3e1","phase":"encode","status":"end","elapsedMs":44837,"durationMs":4091,"stagePhase":"capturing","hasAudio":false,"isPngSequence":false,"isGif":false,"chunkedEncode":false,"workerCount":5,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"7295c2dd-0024-4910-b87b-f687026ae3e1","phase":"assemble","status":"start","elapsedMs":44838,"stagePhase":"capturing","hasAudio":false,"workerCount":5,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+  ██████████████████████░░░  90%  Assembling final video
+[INFO] [Render:trace] {"renderJobId":"7295c2dd-0024-4910-b87b-f687026ae3e1","phase":"assemble","status":"end","elapsedMs":44899,"durationMs":61,"stagePhase":"capturing","hasAudio":false,"workerCount":5,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"screenshot","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"7295c2dd-0024-4910-b87b-f687026ae3e1","phase":"pipeline","status":"checkpoint","elapsedMs":44952,"message":"artifact validated","totalElapsedMs":44951}
+  █████████████████████████  100%  Render complete
+
+◇  /Users/winter/orca/workspaces/nebula-hyperframes-2750/render/nebula-scene2-2750-noglow.mp4
+   7.7 MB · 8.0s video · rendered in 45.0s
+   screenshot capture · hardware gpu · compile 0.2s · extract 0.0s · audio 0.0s · probe 0.0s · setup 4.4s · capture 36.1s · encode 4.1s · assemble 0.1s
+
+real	0m46.774s
+user	1m3.389s
+sys	0m11.441s
+-rw-r--r--@ 1 winter  staff  8086063 Sep 25 17:55 /Users/winter/orca/workspaces/nebula-hyperframes-2750/render/nebula-scene2-2750-noglow.mp4
+RENDER2 DONE 17:55:42

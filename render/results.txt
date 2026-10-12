@@ -1,0 +1,71 @@
+### lint
+--- expand
+◆  Linting expand/index.html
+
+  ⚠ [/Users/winter/orca/workspaces/nebula-hyperframes-2750/video-2750/expand/index.html:23:3] nested_structure_needs_subcomposition [nebula-scene]: <div id="nebula-scene"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.
+    Fix: Move <div id="nebula-scene"> and its contents into a sub-composition file and mount it with data-composition-src.
+
+◇  0 error(s), 1 warning(s)
+--- scene2
+◆  Linting scene2/index.html
+
+  ⚠ [/Users/winter/orca/workspaces/nebula-hyperframes-2750/video-2750/scene2/index.html:23:3] nested_structure_needs_subcomposition [nebula-scene]: <div id="nebula-scene"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.
+    Fix: Move <div id="nebula-scene"> and its contents into a sub-composition file and mount it with data-composition-src.
+
+◇  0 error(s), 1 warning(s)
+--- scene2-noglow
+◆  Linting scene2-noglow/index.html
+
+  ⚠ [/Users/winter/orca/workspaces/nebula-hyperframes-2750/video-2750/scene2-noglow/index.html:23:3] nested_structure_needs_subcomposition [nebula-scene]: <div id="nebula-scene"> is a timeline element that contains nested <div>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.
+    Fix: Move <div id="nebula-scene"> and its contents into a sub-composition file and mount it with data-composition-src.
+
+◇  0 error(s), 1 warning(s)
+=== expand (사람→과제 전개) : 02:59:39 ===
+  Lint: 0 error(s), 1 warning(s) — run with --lint-verbose for full output.
+  Continuing render despite lint issues. Use --strict to block errors.
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"browser_probe","status":"checkpoint","elapsedMs":139,"message":"duration resolved","durationSeconds":8,"totalFrames":240,"compositionHash":"34e73f76dbb3ae0f","beginFrameStalled":false}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"video_extract","status":"checkpoint","elapsedMs":141,"message":"frames resolved","videoCount":0,"extractedVideoCount":0,"totalFramesExtracted":0,"maxFramesPerVideo":0,"avgFramesPerExtractedVideo":null,"vfrPreflightCount":null,"vfrPreflightMs":null,"cacheHits":null,"cacheMisses":null,"transientRetries":null,"minVideoFrameCoverageRatio":null,"authoredTimedClipCount":2}
+  ██████░░░░░░░░░░░░░░░░░░░  25%  Starting frame capture
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_calibration","status":"start","elapsedMs":572,"stagePhase":"calibrating","forceScreenshot":false,"totalFrames":240,"framesCompleted":0,"captureMode":"drawelement","captureOperation":"drawElement"}
+[INFO] [Render] Calibration config {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","protocolTimeout":30000,"parentProtocolTimeout":300000,"forceScreenshot":false,"totalFrames":240}
+[INFO] Launching browser for capture calibration... {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f"}
+  ██████░░░░░░░░░░░░░░░░░░░  25%  Measuring capture speed
+[initSession:drawelement] drawElement worker encode initialized (9403ms)
+[WARN] [Render] Measured slow frame capture during auto-worker calibration. {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","multiplier":2.24,"p95Ms":1346,"sampledFrames":[0,60,120,180,239]}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_calibration","status":"end","elapsedMs":13913,"durationMs":13341,"stagePhase":"calibrating","forceScreenshot":false,"totalFrames":240,"framesCompleted":0,"captureMode":"drawelement","captureOperation":"drawElement"}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_calibration","status":"checkpoint","elapsedMs":13913,"message":"resolved","forceScreenshot":false,"multiplier":2.24,"p95Ms":1346}
+[WARN] [Render] Reduced auto worker count for high-cost capture workload to avoid Chrome compositor starvation. {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","from":5,"to":1,"costMultiplier":2.24,"reasons":["calibration-p95=1346ms"]}
+[INFO] streaming-encode gate {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","enabled":true,"reason":"single_worker","configFlag":true,"durationCapEnabled":false,"outputFormat":"mp4","workerCount":1,"durationSeconds":8,"maxDurationSeconds":240}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_strategy","status":"checkpoint","elapsedMs":13914,"message":"resolved","workerCount":1,"forceScreenshot":false,"captureBeyondViewport":null,"useStreamingEncode":true,"useLayeredComposite":false,"usePageSideCompositing":false,"hasHdrContent":false,"hasShaderTransitions":false,"isPngSequence":false}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_streaming","status":"start","elapsedMs":13914,"stagePhase":"capturing","workerCount":1,"forceScreenshot":false,"totalFrames":240,"framesCompleted":0,"captureMode":"drawelement","captureOperation":"drawElement"}
+[initSession:drawelement] drawElement worker encode initialized (11781ms)
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_streaming","status":"checkpoint","elapsedMs":43931,"message":"stage still running","stagePhase":"capturing","workerCount":1,"forceScreenshot":false,"totalFrames":240,"framesCompleted":76,"captureMode":"drawelement","captureOperation":"drawElement","heartbeatIndex":1,"stageElapsedMs":30016}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_streaming","status":"checkpoint","elapsedMs":73937,"message":"stage still running","stagePhase":"capturing","workerCount":1,"forceScreenshot":false,"totalFrames":240,"framesCompleted":108,"captureMode":"drawelement","captureOperation":"drawElement","heartbeatIndex":2,"stageElapsedMs":60023}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_streaming","status":"checkpoint","elapsedMs":133938,"message":"stage still running","stagePhase":"capturing","workerCount":1,"forceScreenshot":false,"totalFrames":240,"framesCompleted":176,"captureMode":"drawelement","captureOperation":"drawElement","heartbeatIndex":3,"stageElapsedMs":120024}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"capture_streaming","status":"end","elapsedMs":140870,"durationMs":126956,"stagePhase":"capturing","workerCount":1,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"drawelement","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"assemble","status":"start","elapsedMs":140871,"stagePhase":"capturing","hasAudio":false,"workerCount":1,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"drawelement","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"assemble","status":"end","elapsedMs":140969,"durationMs":98,"stagePhase":"capturing","hasAudio":false,"workerCount":1,"forceScreenshot":false,"totalFrames":240,"framesCompleted":240,"captureMode":"drawelement","captureOperation":"encode"}
+[INFO] [Render:trace] {"renderJobId":"84403c47-5a2e-4d6e-b810-822b4ca1742f","phase":"pipeline","status":"checkpoint","elapsedMs":141024,"message":"artifact validated","totalElapsedMs":141024}
+   drawelement capture · hardware gpu · compile 0.1s · extract 0.0s · audio 0.0s · probe 0.0s · setup 13.8s · capture 2m 7.0s · encode (during capture) 2m 7.0s · assemble 0.1s
+real	2m23.421s
+user	1m30.447s
+sys	0m47.598s
+-rw-r--r--@ 1 winter  staff  5996979 Sep 25 03:02 /Users/winter/orca/workspaces/nebula-hyperframes-2750/render/nebula-expand-2750.mp4
+--- expand (사람→과제 전개) done 03:02:02 ---
+=== scene2 (성운, glow 전체) : 03:02:02 ===
+  Lint: 0 error(s), 1 warning(s) — run with --lint-verbose for full output.
+  Continuing render despite lint issues. Use --strict to block errors.
+real	0m3.089s
+user	0m1.389s
+sys	0m0.283s
+ls: /Users/winter/orca/workspaces/nebula-hyperframes-2750/render/nebula-scene2-2750.mp4: No such file or directory
+--- scene2 (성운, glow 전체) done 03:02:05 ---
+=== scene2-noglow (강조 노드만 glow) : 03:02:05 ===
+  Lint: 0 error(s), 1 warning(s) — run with --lint-verbose for full output.
+  Continuing render despite lint issues. Use --strict to block errors.
+real	0m1.926s
+user	0m1.368s
+sys	0m0.213s
+ls: /Users/winter/orca/workspaces/nebula-hyperframes-2750/render/nebula-scene2-2750-noglow.mp4: No such file or directory
+--- scene2-noglow (강조 노드만 glow) done 03:02:07 ---
+ALL DONE 03:02:07
