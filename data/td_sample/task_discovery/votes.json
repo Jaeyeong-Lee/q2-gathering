@@ -1,0 +1,302 @@
+[
+ {
+  "card_id": "50:future_task:0",
+  "up": 6,
+  "down": 5
+ },
+ {
+  "card_id": "24:future_task:0",
+  "up": 7,
+  "down": 9
+ },
+ {
+  "card_id": "62:future_task:1",
+  "up": 7,
+  "down": 5
+ },
+ {
+  "card_id": "98:future_task:0",
+  "up": 4,
+  "down": 3
+ },
+ {
+  "card_id": "7:future_task:0",
+  "up": 2,
+  "down": 3
+ },
+ {
+  "card_id": "10:future_task:0",
+  "up": 1,
+  "down": 9
+ },
+ {
+  "card_id": "81:future_task:1",
+  "up": 4,
+  "down": 8
+ },
+ {
+  "card_id": "15:future_task:0",
+  "up": 7,
+  "down": 5
+ },
+ {
+  "card_id": "56:future_task:1",
+  "up": 7,
+  "down": 4
+ },
+ {
+  "card_id": "88:future_task:1",
+  "up": 9,
+  "down": 1
+ },
+ {
+  "card_id": "8:future_task:0",
+  "up": 1,
+  "down": 8
+ },
+ {
+  "card_id": "77:future_task:1",
+  "up": 6,
+  "down": 2
+ },
+ {
+  "card_id": "32:future_task:0",
+  "up": 5,
+  "down": 2
+ },
+ {
+  "card_id": "5:future_task:1",
+  "up": 7,
+  "down": 6
+ },
+ {
+  "card_id": "12:future_task:0",
+  "up": 0,
+  "down": 1
+ },
+ {
+  "card_id": "68:future_task:1",
+  "up": 8,
+  "down": 9
+ },
+ {
+  "card_id": "65:future_task:1",
+  "up": 5,
+  "down": 5
+ },
+ {
+  "card_id": "9:future_task:1",
+  "up": 5,
+  "down": 9
+ },
+ {
+  "card_id": "36:future_task:1",
+  "up": 7,
+  "down": 9
+ },
+ {
+  "card_id": "12:future_task:1",
+  "up": 7,
+  "down": 1
+ },
+ {
+  "card_id": "83:future_task:1",
+  "up": 1,
+  "down": 4
+ },
+ {
+  "card_id": "67:future_task:0",
+  "up": 7,
+  "down": 1
+ },
+ {
+  "card_id": "8:future_task:1",
+  "up": 0,
+  "down": 4
+ },
+ {
+  "card_id": "85:future_task:0",
+  "up": 9,
+  "down": 7
+ },
+ {
+  "card_id": "19:future_task:1",
+  "up": 4,
+  "down": 6
+ },
+ {
+  "card_id": "34:future_task:1",
+  "up": 5,
+  "down": 0
+ },
+ {
+  "card_id": "95:future_task:1",
+  "up": 7,
+  "down": 5
+ },
+ {
+  "card_id": "95:future_task:0",
+  "up": 2,
+  "down": 9
+ },
+ {
+  "card_id": "116:future_task:0",
+  "up": 1,
+  "down": 7
+ },
+ {
+  "card_id": "108:future_task:1",
+  "up": 0,
+  "down": 3
+ },
+ {
+  "card_id": "86:future_task:1",
+  "up": 4,
+  "down": 2
+ },
+ {
+  "card_id": "104:future_task:1",
+  "up": 3,
+  "down": 6
+ },
+ {
+  "card_id": "119:future_task:1",
+  "up": 6,
+  "down": 7
+ },
+ {
+  "card_id": "118:future_task:1",
+  "up": 1,
+  "down": 2
+ },
+ {
+  "card_id": "34:future_task:0",
+  "up": 7,
+  "down": 6
+ },
+ {
+  "card_id": "6:future_task:1",
+  "up": 8,
+  "down": 4
+ },
+ {
+  "card_id": "84:future_task:0",
+  "up": 2,
+  "down": 6
+ },
+ {
+  "card_id": "22:future_task:0",
+  "up": 8,
+  "down": 4
+ },
+ {
+  "card_id": "45:future_task:0",
+  "up": 6,
+  "down": 5
+ },
+ {
+  "card_id": "111:future_task:1",
+  "up": 6,
+  "down": 3
+ },
+ {
+  "card_id": "23:future_task:0",
+  "up": 2,
+  "down": 1
+ },
+ {
+  "card_id": "82:future_task:0",
+  "up": 2,
+  "down": 2
+ },
+ {
+  "card_id": "19:future_task:0",
+  "up": 3,
+  "down": 3
+ },
+ {
+  "card_id": "86:future_task:0",
+  "up": 0,
+  "down": 7
+ },
+ {
+  "card_id": "47:future_task:0",
+  "up": 9,
+  "down": 2
+ },
+ {
+  "card_id": "84:future_task:1",
+  "up": 4,
+  "down": 4
+ },
+ {
+  "card_id": "28:future_task:0",
+  "up": 0,
+  "down": 2
+ },
+ {
+  "card_id": "16:future_task:0",
+  "up": 6,
+  "down": 8
+ },
+ {
+  "card_id": "88:future_task:0",
+  "up": 5,
+  "down": 9
+ },
+ {
+  "card_id": "105:future_task:0",
+  "up": 9,
+  "down": 5
+ },
+ {
+  "card_id": "29:future_task:0",
+  "up": 2,
+  "down": 8
+ },
+ {
+  "card_id": "57:future_task:1",
+  "up": 9,
+  "down": 0
+ },
+ {
+  "card_id": "117:future_task:0",
+  "up": 7,
+  "down": 8
+ },
+ {
+  "card_id": "83:future_task:0",
+  "up": 6,
+  "down": 6
+ },
+ {
+  "card_id": "9:future_task:0",
+  "up": 6,
+  "down": 6
+ },
+ {
+  "card_id": "108:future_task:0",
+  "up": 1,
+  "down": 7
+ },
+ {
+  "card_id": "104:future_task:0",
+  "up": 6,
+  "down": 0
+ },
+ {
+  "card_id": "31:future_task:0",
+  "up": 3,
+  "down": 1
+ },
+ {
+  "card_id": "76:future_task:1",
+  "up": 3,
+  "down": 7
+ },
+ {
+  "card_id": "81:future_task:0",
+  "up": 2,
+  "down": 1
+ }
+]

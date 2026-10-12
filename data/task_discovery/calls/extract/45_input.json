@@ -1,0 +1,6 @@
+{
+ "stage": "extract",
+ "call_id": 45,
+ "prompt": "다음은 안선우(CL3, 공정기술/고장분석(FA))의 근원경쟁력 회고다. 3단 구성(①상반기 성과·하반기 전략 ②커리어 회고·확보 역량 ③미래 업무)이 원칙이나 미준수 문서도 있다. 미래과제·보유역량·필요역량·지향방향을 추출하라.\nJSON 객체로만 답하라. 형식:\n{\"signal_present\": true/false,\n \"future_task\": [{\"text\": \"대상·방법·이유를 담은 서술\", \"horizon\": \"단기|장기|불명\", \"quotes\": [\"원문 발췌\"]}],\n \"capability_have\": [{\"text\": \"...\", \"quotes\": [\"...\"]}],\n \"capability_gap\": [{\"text\": \"...\", \"quotes\": [\"...\"]}],\n \"direction\": {\"text\": \"지향 방향 1문장\", \"quotes\": [\"...\"]} 또는 null}\n규칙: quotes는 반드시 원문에서 글자 그대로 발췌한다. text는 quote의 복사가 아니라 서술이어야 한다.\n내용이 없으면 빈 배열. 무내용(선언적) 문서는 signal_present=false 로 하고 모든 축을 비운다.\n\n원문:\n올해는 MBT(Monitoring Burn-in Test) 신뢰성 강화 관련 일을 많이 했습니다. ATE 스크립팅도 익혔고요. 앞으로 DPPM 품질 개선을 위한 선제 진단를 해보고 싶은데 HFT(High-temp Final Test) 커버리지 확대도 관심이 있습니다. 그동안 배운 파이썬 데이터 분석를 살려서 팀에 도움이 되면 좋겠습니다. 이것저것 하다 보니 정리가 잘 안 되네요.",
+ "timestamp": "2026-08-09T22:25:49+00:00"
+}

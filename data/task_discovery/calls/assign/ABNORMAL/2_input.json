@@ -1,0 +1,6 @@
+{
+ "stage": "assign",
+ "call_id": 2,
+ "prompt": "아래 카테고리에서 이 항목이 속할 카테고리 하나를 고른다. 맞는 게 없으면 \"Other\".\n새 카테고리를 지어내지 말 것. 근거로 항목에서 인용을 하나 뽑는다.\nJSON 객체로만 답하라: {\"category\": \"카테고리명 또는 Other\", \"quote\": \"항목 근거 인용\"}\n\n카테고리:\n[{\"name\": \"Burn-in 신뢰성\", \"definition\": \"d\", \"inclusion\": \"i\"}, {\"name\": \"ATE 운영\", \"definition\": \"d\", \"inclusion\": \"i\"}]\n\n항목:\n동일 텍스트 항목",
+ "timestamp": "2026-08-30T11:54:23+00:00"
+}

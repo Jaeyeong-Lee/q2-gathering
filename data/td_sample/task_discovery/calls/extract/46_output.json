@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"DPPM 품질 개선을 위한 선제 진단\"]}, {\"text\": \"STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"STDF 기반 고장분석(FA) 자동화\"]}], \"capability_have\": [{\"text\": \"머신러닝 이상탐지 역량을 실무에 적용해 왔다\", \"quotes\": [\"머신러닝 이상탐지\"]}, {\"text\": \"ATE 스크립팅 역량을 실무에 적용해 왔다\", \"quotes\": [\"ATE 스크립팅\"]}], \"capability_gap\": [{\"text\": \"HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"HFT(High-temp Final Test) 커버리지 확대\"]}], \"direction\": {\"text\": \"DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"DPPM 품질 개선을 위한 선제 진단\"]}}",
+ "success": true
+}

@@ -1,0 +1,6 @@
+{
+ "stage": "taxonomy",
+ "call_id": "relations",
+ "prompt": "아래는 확정된 역량/방향 카테고리 목록이다. 카테고리 사이의 관계만\n뽑아라. 새 카테고리를 만들거나 이름을 바꾸지 말고, 목록에 있는 name만 쓴다.\ntype은 두 가지뿐이다 — broader는 from이 to의 상위 개념일 때, related는 단순 연관일 때.\n확실하지 않은 관계는 넣지 마라(적게 넣는 편이 낫다). 관계가 없으면 빈 배열.\nJSON 객체로만 답하라: {\"relations\": [{\"from\": \"...\", \"to\": \"...\", \"type\": \"broader\"}]}\n\n카테고리:\n[{\"name\": \"Burn-in 신뢰성\", \"definition\": \"정의\"}]",
+ "timestamp": "2026-09-06T22:58:48+00:00"
+}

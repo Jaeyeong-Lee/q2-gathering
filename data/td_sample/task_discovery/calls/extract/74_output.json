@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"Magnum 테스터 Para 병렬 테스트 효율화\"]}, {\"text\": \"양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"양산 Yield 저하 원인 분석·개선\"]}], \"capability_have\": [{\"text\": \"ATE 스크립팅 역량을 실무에 적용해 왔다\", \"quotes\": [\"ATE 스크립팅\"]}, {\"text\": \"머신러닝 이상탐지 역량을 실무에 적용해 왔다\", \"quotes\": [\"머신러닝 이상탐지\"]}], \"capability_gap\": [{\"text\": \"Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"Teradyne 플랫폼 멀티사이트 확대\"]}], \"direction\": {\"text\": \"Magnum 테스터 Para 병렬 테스트 효율화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"Magnum 테스터 Para 병렬 테스트 효율화\"]}}",
+ "success": true
+}

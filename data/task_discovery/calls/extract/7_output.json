@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"과제 서술 올해는 Tera\", \"horizon\": \"단기\", \"quotes\": [\"올해는 Tera\"]}], \"capability_have\": [], \"capability_gap\": [], \"direction\": null}",
+ "success": true
+}

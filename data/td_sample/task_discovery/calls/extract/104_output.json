@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"신제품 D1b 초기 양산 Yield 안정화\"]}, {\"text\": \"Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"Advantest V93000 Test PGM 디버깅 시간 단축\"]}], \"capability_have\": [{\"text\": \"STDF 파싱 자동화 역량을 실무에 적용해 왔다\", \"quotes\": [\"STDF 파싱 자동화\"]}, {\"text\": \"통계적 공정관리(SPC) 역량을 실무에 적용해 왔다\", \"quotes\": [\"통계적 공정관리(SPC)\"]}], \"capability_gap\": [], \"direction\": {\"text\": \"신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"신제품 D1b 초기 양산 Yield 안정화\"]}}",
+ "success": true
+}

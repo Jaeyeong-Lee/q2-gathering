@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"MBT(Monitoring Burn-in Test) 신뢰성 강화\"]}, {\"text\": \"DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"DPPM 품질 개선을 위한 선제 진단\"]}], \"capability_have\": [{\"text\": \"파이썬 데이터 분석 역량을 실무에 적용해 왔다\", \"quotes\": [\"파이썬 데이터 분석\"]}, {\"text\": \"STDF 파싱 자동화 역량을 실무에 적용해 왔다\", \"quotes\": [\"STDF 파싱 자동화\"]}], \"capability_gap\": [{\"text\": \"STDF 기반 고장분석(FA) 자동화 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"STDF 기반 고장분석(FA) 자동화\"]}], \"direction\": {\"text\": \"MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"MBT(Monitoring Burn-in Test) 신뢰성 강화\"]}}",
+ "success": true
+}

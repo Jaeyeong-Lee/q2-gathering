@@ -1,0 +1,4 @@
+{
+ "response": "{\"relations\": [{\"from\": \"병렬 테스트·멀티사이트 효율화\", \"to\": \"Test PGM 디버깅·구조 최적화\", \"type\": \"broader\"}, {\"from\": \"STDF 기반 고장분석 자동화\", \"to\": \"AX 기반 테스트 데이터 분석\", \"type\": \"related\"}, {\"from\": \"DPPM 품질 선제진단\", \"to\": \"Burn-in 신뢰성·BIB 관리\", \"type\": \"related\"}, {\"from\": \"D1b 신제품 램프업\", \"to\": \"양산 Yield 안정화\", \"type\": \"related\"}]}",
+ "success": true
+}

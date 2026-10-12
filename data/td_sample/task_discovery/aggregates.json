@@ -1,0 +1,185 @@
+{
+ "categories": [
+  {
+   "name": "AX 기반 테스트 데이터 분석",
+   "people": 74,
+   "pjt_spread": 3,
+   "cl_spread": 3,
+   "have": 75,
+   "gap": 7,
+   "readiness": "이미 함",
+   "pjts": [
+    "공정기술",
+    "기획운영",
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "DPPM 품질 선제진단",
+   "people": 56,
+   "pjt_spread": 3,
+   "cl_spread": 3,
+   "have": 37,
+   "gap": 5,
+   "readiness": "이미 함",
+   "pjts": [
+    "공정기술",
+    "기획운영",
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "Test PGM 디버깅·구조 최적화",
+   "people": 55,
+   "pjt_spread": 3,
+   "cl_spread": 3,
+   "have": 34,
+   "gap": 8,
+   "readiness": "이미 함",
+   "pjts": [
+    "공정기술",
+    "기획운영",
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "STDF 기반 고장분석 자동화",
+   "people": 49,
+   "pjt_spread": 3,
+   "cl_spread": 3,
+   "have": 32,
+   "gap": 5,
+   "readiness": "이미 함",
+   "pjts": [
+    "공정기술",
+    "기획운영",
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "고온·챔버 테스트 조건 정교화",
+   "people": 38,
+   "pjt_spread": 1,
+   "cl_spread": 3,
+   "have": 0,
+   "gap": 19,
+   "readiness": "갭만 있음",
+   "pjts": [
+    "공정기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "설비 운영·자동화 표준화",
+   "people": 34,
+   "pjt_spread": 3,
+   "cl_spread": 3,
+   "have": 26,
+   "gap": 3,
+   "readiness": "이미 함",
+   "pjts": [
+    "공정기술",
+    "기획운영",
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "병렬 테스트·멀티사이트 효율화",
+   "people": 33,
+   "pjt_spread": 1,
+   "cl_spread": 3,
+   "have": 0,
+   "gap": 18,
+   "readiness": "갭만 있음",
+   "pjts": [
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "Burn-in 신뢰성·BIB 관리",
+   "people": 33,
+   "pjt_spread": 1,
+   "cl_spread": 3,
+   "have": 0,
+   "gap": 7,
+   "readiness": "갭만 있음",
+   "pjts": [
+    "공정기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "D1b 신제품 램프업",
+   "people": 31,
+   "pjt_spread": 2,
+   "cl_spread": 3,
+   "have": 0,
+   "gap": 7,
+   "readiness": "갭만 있음",
+   "pjts": [
+    "기획운영",
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3",
+    "CL4"
+   ]
+  },
+  {
+   "name": "양산 Yield 안정화",
+   "people": 17,
+   "pjt_spread": 1,
+   "cl_spread": 2,
+   "have": 0,
+   "gap": 6,
+   "readiness": "갭만 있음",
+   "pjts": [
+    "양산기술"
+   ],
+   "cls": [
+    "CL2",
+    "CL3"
+   ]
+  }
+ ],
+ "minority": []
+}

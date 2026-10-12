@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"테스트 타임 단축을 위한 PGM 구조 최적화\"]}, {\"text\": \"Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"Advantest V93000 Test PGM 디버깅 시간 단축\"]}], \"capability_have\": [{\"text\": \"파이썬 데이터 분석 역량을 실무에 적용해 왔다\", \"quotes\": [\"파이썬 데이터 분석\"]}, {\"text\": \"STDF 파싱 자동화 역량을 실무에 적용해 왔다\", \"quotes\": [\"STDF 파싱 자동화\"]}], \"capability_gap\": [], \"direction\": {\"text\": \"테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"테스트 타임 단축을 위한 PGM 구조 최적화\"]}}",
+ "success": true
+}

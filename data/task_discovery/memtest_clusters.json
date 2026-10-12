@@ -1,0 +1,3271 @@
+[
+ {
+  "cluster_id": 0,
+  "items": [
+   {
+    "person_id": 5,
+    "name": "전지유",
+    "cl_level": "CL2",
+    "text": "ATE 설비의 가동률 향상을 위한 점검 프로세스를 정립하고, 예방 보전 활동을 강화하여 비계획적 다운타임을 줄이는 방안을 수립하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "ATE 가동률 향상",
+     "예방 보전 강화"
+    ]
+   },
+   {
+    "person_id": 9,
+    "name": "강선우",
+    "cl_level": "CL2",
+    "text": "Burn-in Chamber 설비 운영 데이터 기반으로 예방 정비 스케줄을 최적화하고 싶습니다. 이를 통해 갑작스러운 Chamber 다운타임을 줄이고 Test PGM의 안정적인 실행 환경을 확보할 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Chamber 설비\n예방 정비",
+     "다운타임 감소"
+    ]
+   },
+   {
+    "person_id": 12,
+    "name": "신소율",
+    "cl_level": "CL2",
+    "text": "Burn-in Chamber의 온도 및 전압 조건을 실시간으로 모니터링하고 이상 발생 시 신속하게 대응하는 체계를 구축하고 싶습니다. 이는 HFT 결과의 신뢰성 확보에 필수적입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Chamber 조건\n실시간 모니터링",
+     "HFT 신뢰성 확보"
+    ]
+   },
+   {
+    "person_id": 14,
+    "name": "조다은",
+    "cl_level": "CL2",
+    "text": "Burn-in Chamber 및 Handler의 정기 점검 및 예방 정비 프로세스를 개선하고 싶습니다. 설비 운영 효율을 높여 DPPM 발생 가능성을 최소화하는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Chamber/Handler\n정비 개선",
+     "DPPM 최소화"
+    ]
+   },
+   {
+    "person_id": 20,
+    "name": "홍주원",
+    "cl_level": "CL3",
+    "text": "Handler의 비정상 동작을 예측하고 예방할 수 있는 모니터링 시스템을 구축하고 싶습니다. 이를 통해 Handler Downtime을 줄이고 전체 설비 운영 효율을 개선하는 데 기여하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 비정상 예측",
+     "모니터링 시스템 구축",
+     "설비 운영 효율 개선"
+    ]
+   },
+   {
+    "person_id": 44,
+    "name": "오지호",
+    "cl_level": "CL3",
+    "text": "테스트 Handler에서 발생하는 오작동을 실시간으로 감지하고 Auto Diag 기능을 AX와 연계하여, 문제 발생 시 즉각적인 조치를 가능하게 하는 시스템을 구축하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Handler 오작동\n실시간 AX 감지",
+     "Auto Diag 연계\n즉각 조치"
+    ]
+   },
+   {
+    "person_id": 66,
+    "name": "송예린",
+    "cl_level": "CL2",
+    "text": "Chamber 내 온도/습도 등 환경 조건 모니터링 시스템을 개선하고 싶습니다. 실시간 데이터 수집 및 이상 알람 기능을 강화하여 설비 운영 안정성을 확보하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Chamber 환경 모니터링 개선",
+     "실시간 데이터 수집 강화"
+    ]
+   },
+   {
+    "person_id": 69,
+    "name": "임시우",
+    "cl_level": "CL4",
+    "text": "Handler와 Chamber 간의 인터페이스 프로토콜을 최적화하여 데이터 전송 속도를 향상시키고 장비 간 통신 오류를 최소화하고 싶습니다. 이를 통해 전체 Burn-in 라인의 처리 효율을 높일 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler-Chamber 인터페이스 최적화",
+     "장비 통신 오류 최소화"
+    ]
+   },
+   {
+    "person_id": 69,
+    "name": "임시우",
+    "cl_level": "CL4",
+    "text": "고성능 Handler의 가동률을 극대화하기 위한 예방 보전(Preventive Maintenance) 프로그램을 고도화하고 싶습니다. 예상치 못한 설비 다운타임을 줄여 생산성을 확보하는 것이 중요합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Handler 가동률 극대화",
+     "예방 보전 프로그램 고도화"
+    ]
+   },
+   {
+    "person_id": 74,
+    "name": "강소율",
+    "cl_level": "CL2",
+    "text": "Handler 설비 운영의 비효율성을 개선하기 위해 자동화된 자재 관리 시스템 도입을 검토하여 생산성을 높이는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 설비 운영 효율화",
+     "자재 관리 자동화",
+     "생산성 향상"
+    ]
+   },
+   {
+    "person_id": 86,
+    "name": "송건우",
+    "cl_level": "CL2",
+    "text": "Handler 설비의 일상적인 운영 효율을 높이기 위해 예방 보전 스케줄을 최적화하고, 소모품 교체 주기를 데이터 기반으로 관리하여 Test time 지연 요소를 줄이겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 운영 효율",
+     "예방 보전 최적화",
+     "Test time 지연 감소"
+    ]
+   },
+   {
+    "person_id": 110,
+    "name": "류우진",
+    "cl_level": "CL3",
+    "text": "Advantest 테스터 및 Handler의 고장 진단 기능을 고도화하여 설비 운영의 안정성을 확보하고 예기치 않은 다운타임을 최소화하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Advantest 진단 기능 고도화",
+     "설비 안정성 확보",
+     "다운타임 최소화"
+    ]
+   },
+   {
+    "person_id": 123,
+    "name": "권다은",
+    "cl_level": "CL2",
+    "text": "HFT 공정 중 Handler 설비의 OEE(종합 설비 효율)를 향상시키기 위해 예방 보전 스케줄을 최적화하고, 경미한 오류에 대한 신속 대응 체계를 구축하여 가동률을 높일 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler OEE 향상",
+     "예방 보전 최적화",
+     "신속 대응 체계"
+    ]
+   },
+   {
+    "person_id": 129,
+    "name": "송다은",
+    "cl_level": "CL2",
+    "text": "Handler 오작동 발생 시 Auto Diag 시스템 초기화를 통해 문제 원점 파악 시간을 단축하고, 전반적인 설비 운영 효율성을 높이고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 오작동 시",
+     "Auto Diag 초기화로\n원점 파악 시간 단축"
+    ]
+   },
+   {
+    "person_id": 131,
+    "name": "홍다은",
+    "cl_level": "CL3",
+    "text": "CLT(Chamber형 LFT Test) 챔버형 테스트 설비의 예방 보전 시스템을 강화하기 위해 IoT 센서 데이터를 활용한 이상 감지 Auto Diag 시스템을 도입하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT 설비 예방 보전",
+     "IoT 센서 Auto Diag 도입"
+    ]
+   },
+   {
+    "person_id": 133,
+    "name": "장민준",
+    "cl_level": "CL4",
+    "text": "Handler 교체 부품의 재고 관리를 자동화하고, 사용 수명 예측을 통해 MBT/HFT 공정의 가동 중단 시간을 최소화하는 시스템을 개발하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 부품 재고 자동화",
+     "수명 예측으로 가동 중단 최소화"
+    ]
+   },
+   {
+    "person_id": 134,
+    "name": "강도윤",
+    "cl_level": "CL2",
+    "text": "특정 Handler 모델의 반복적인 오작동을 줄이기 위해, 예방 정비 절차를 Auto Diag 시스템과 연동하여 자동화하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 오작동 감소",
+     "예방 정비 자동화 연동"
+    ]
+   },
+   {
+    "person_id": 136,
+    "name": "오하은",
+    "cl_level": "CL2",
+    "text": "Handler에서 수집되는 실시간 데이터를 활용하여, 설비 운영 현황을 직관적으로 보여주는 대시보드를 구축하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 실시간 데이터",
+     "직관적 대시보드 구축"
+    ]
+   }
+  ]
+ },
+ {
+  "cluster_id": 1,
+  "items": [
+   {
+    "person_id": 1,
+    "name": "안도윤",
+    "cl_level": "CL2",
+    "text": "차세대 D1b 공정 제품에 대한 새로운 Test PGM 개발에 참여하여, 초기 양산 Yield 안정화에 기여하고 싶습니다. 신규 공정 도입 시 발생할 수 있는 잠재적 문제점을 선제적으로 파악하는 것이 중요합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b PGM 개발 참여",
+     "초기 Yield 안정화 기여"
+    ]
+   },
+   {
+    "person_id": 9,
+    "name": "강선우",
+    "cl_level": "CL2",
+    "text": "D1b 공정 노드의 초기 MBT 데이터 수집 및 고장 분석(FA) 프로세스를 체계화하는 것이 목표입니다. 신규 제품의 초기 불량 원인을 신속하게 파악하여 Yield 개선에 기여하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b MBT 데이터\n체계화",
+     "초기 불량 FA"
+    ]
+   },
+   {
+    "person_id": 12,
+    "name": "신소율",
+    "cl_level": "CL2",
+    "text": "MBT 데이터의 주기적인 검토를 통해 초기 불량 트렌드를 파악하고, 이를 고장 분석(FA) 팀과 공유하는 프로세스를 정립하고자 합니다. 유기적인 협력을 통해 Yield 개선에 기여할 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT 데이터\n트렌드 파악",
+     "FA 팀과 협력"
+    ]
+   },
+   {
+    "person_id": 16,
+    "name": "최수아",
+    "cl_level": "CL4",
+    "text": "글로벌 표준에 부합하는 D1b 제품군의 Burn-in 신뢰성 검증 가이드라인을 수립하고, 이를 Test PGM 및 설비 운영에 반영하는 프로젝트를 리드할 것입니다. 최고 수준의 품질(DPPM) 목표 달성에 기여하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "글로벌 표준\nD1b 가이드라인",
+     "최고 품질\n목표 달성"
+    ]
+   },
+   {
+    "person_id": 23,
+    "name": "김지호",
+    "cl_level": "CL4",
+    "text": "STDF 데이터를 활용한 전사적인 Yield 관리 시스템을 구축하는 프로젝트를 리드하고자 합니다. 각 테스트 공정별 Yield 현황을 실시간으로 파악하고, 문제 발생 시 즉각적인 FA 연동이 가능한 체계를 만들 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "전사적 Yield 관리",
+     "STDF 데이터 기반",
+     "실시간 현황 파악"
+    ]
+   },
+   {
+    "person_id": 30,
+    "name": "류다은",
+    "cl_level": "CL2",
+    "text": "D1b 공정의 MBT 및 CLT 설비 운영을 지원하며, Test PGM 변경 시 발생하는 Test time 변화를 모니터링하고 기본적인 데이터 분석을 수행하여 선배 엔지니어들의 의사결정을 돕겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b MBT/CLT 지원",
+     "Test time 변화 모니터링",
+     "기본 데이터 분석"
+    ]
+   },
+   {
+    "person_id": 36,
+    "name": "서예린",
+    "cl_level": "CL4",
+    "text": "전 공정 테스트 단계의 Yield 데이터를 통합 분석하여, 잠재적 품질 이슈를 선제적으로 파악하고 테스트 커버리지를 최적화하는 전략을 수립하여 D1b 제품의 신뢰도를 극대화할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Yield 데이터 통합 분석",
+     "테스트 커버리지\n최적화 전략"
+    ]
+   },
+   {
+    "person_id": 38,
+    "name": "홍시우",
+    "cl_level": "CL2",
+    "text": "신규 도입되는 D1b 공정 제품의 MBT 테스트 셋업 및 안정화 작업을 지원하고, 테스트 과정에서 발생하는 초기 불량 데이터를 정확히 분석하여 품질 이슈를 조기에 파악하는 데 기여하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b MBT 셋업 지원",
+     "초기 불량 분석 기여"
+    ]
+   },
+   {
+    "person_id": 40,
+    "name": "안소율",
+    "cl_level": "CL2",
+    "text": "신규 D1b 제품의 HFT 공정에서 발생하는 불량에 대한 상세 데이터를 수집하고, 기본적인 고장 분석(FA) 정보를 취합하여 품질 개선을 위한 기초 자료를 제공하는 역할을 수행하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b HFT 불량 데이터",
+     "FA 기초 자료 제공"
+    ]
+   },
+   {
+    "person_id": 50,
+    "name": "윤예린",
+    "cl_level": "CL3",
+    "text": "Final Test 공정에서 Handler 설비의 운영 효율을 극대화하고 싶습니다. 특히 D1b 제품군에서의 Handler 최적 셋업을 통해 가동률을 높이고 불필요한 Downtime을 줄이는 데 기여하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 운영 효율 극대화",
+     "D1b Handler 최적 셋업"
+    ]
+   },
+   {
+    "person_id": 50,
+    "name": "윤예린",
+    "cl_level": "CL3",
+    "text": "신규 BIB(Burn-in Board) 및 Test PGM 도입 시, 초도 생산 과정에서 발생하는 문제점을 신속하게 파악하고 개선하는 역할을 수행하고 싶습니다. 이를 통해 초기 Yield 안정화에 기여하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB/PGM 초도 문제점",
+     "초기 Yield 안정화 기여"
+    ]
+   },
+   {
+    "person_id": 53,
+    "name": "정선우",
+    "cl_level": "CL4",
+    "text": "MBIT(Monitoring Burn-in Test) 단계에서 확보되는 데이터와 최종 품질 결과 간의 상관관계를 분석하여, Burn-in 조건 최적화 및 불량 선별 효율 증대에 기여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBIT-품질 상관관계 분석",
+     "Burn-in 조건 최적화"
+    ]
+   },
+   {
+    "person_id": 54,
+    "name": "김서연",
+    "cl_level": "CL3",
+    "text": "신규 D1b 제품의 Test PGM 검증 프로세스에 참여하여, 테스트 커버리지 및 효율성 평가를 지원하고 불량 검출력 향상을 위한 데이터 분석을 수행하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b PGM 검증 지원",
+     "불량 검출력 향상"
+    ]
+   },
+   {
+    "person_id": 55,
+    "name": "황다은",
+    "cl_level": "CL3",
+    "text": "신규 HFT(High-temp Final Test) 공정 도입 시, 안정적인 초도 셋업 및 테스트 검증을 지원하고 관련 문서화 작업을 수행하여 팀의 업무 부담을 줄이는 데 기여하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT 초도 셋업 지원",
+     "문서화 작업 수행"
+    ]
+   },
+   {
+    "person_id": 56,
+    "name": "조우진",
+    "cl_level": "CL3",
+    "text": "기존 Test PGM의 문제점을 분석하고, 짧은 시간 내에 디버깅 및 개선을 통해 Yield Loss를 최소화하는 역할을 하고 싶습니다. 특히 Magnum 테스터 환경에서의 PGM 최적화에 집중하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "PGM 디버깅 및 개선",
+     "Yield Loss 최소화",
+     "Magnum PGM 최적화"
+    ]
+   },
+   {
+    "person_id": 79,
+    "name": "오예린",
+    "cl_level": "CL2",
+    "text": "D1b 공정에서 발생하는 주요 고장 유형에 대한 상세한 고장 분석(FA) 기법을 학습하고, 선배 엔지니어들과 협력하여 Yield 개선에 기여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 주요 FA 학습",
+     "선배 엔지니어 협력",
+     "Yield 개선 기여"
+    ]
+   },
+   {
+    "person_id": 91,
+    "name": "서도윤",
+    "cl_level": "CL4",
+    "text": "전체 테스트 공정의 Yield 향상을 위해 각 테스트 단계별(MBT, HFT 등) DPPM 발생 원인을 통합 분석하고, Test PGM 및 설비 운영 최적화 전략을 수립하여 Yield 목표 달성을 주도하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "전체 공정 Yield 향상",
+     "DPPM 원인 통합 분석",
+     "설비 운영 최적화 전략"
+    ]
+   },
+   {
+    "person_id": 93,
+    "name": "서다은",
+    "cl_level": "CL2",
+    "text": "초기 생산 단계에서 발생하는 불량 유형들을 세밀하게 분류하고, 해당 불량이 D1b 공정의 어떤 특성과 연관되는지 분석하여 선행 품질 관리에 기여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "불량 유형 세밀 분류",
+     "D1b 공정 연관성 분석",
+     "선행 품질 관리 기여"
+    ]
+   },
+   {
+    "person_id": 95,
+    "name": "이지호",
+    "cl_level": "CL3",
+    "text": "고장 분석(FA) 결과를 기반으로 신뢰성 평가 방법론을 고도화하고, D1b 공정의 잠재적 약점을 테스트 스펙에 반영하여 초기 불량률을 획기적으로 낮추는 데 기여하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "FA 기반 신뢰성 방법론",
+     "D1b 잠재 약점 반영",
+     "초기 불량률 저감"
+    ]
+   },
+   {
+    "person_id": 103,
+    "name": "임민준",
+    "cl_level": "CL3",
+    "text": "대용량 테스트 데이터의 저장 및 처리를 위한 클라우드 기반 솔루션을 검토하고, 데이터 보안 및 거버넌스 정책을 수립하는 데 기여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "클라우드 기반 데이터 솔루션",
+     "데이터 보안 및 거버넌스"
+    ]
+   },
+   {
+    "person_id": 107,
+    "name": "정민준",
+    "cl_level": "CL2",
+    "text": "EDS 설비 운영의 숙련도를 높이고, 기본적인 Test PGM 수정 및 데이터 로깅 방식을 익혀 초기 웨이퍼 불량에 대한 신속한 대응 역량을 확보하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "EDS 설비 숙련도 향상",
+     "Test PGM 수정 숙달",
+     "초기 불량 신속 대응"
+    ]
+   },
+   {
+    "person_id": 115,
+    "name": "김건우",
+    "cl_level": "CL2",
+    "text": "신규 Handler 모델의 안정적인 설비 운영을 지원하고, 초기 Test PGM 셋업 과정에서 발생할 수 있는 문제점들을 파악하여 해결에 기여하겠습니다. 신규 설비의 조기 안정화가 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "신규 Handler 안정화",
+     "초기 PGM 셋업 지원"
+    ]
+   },
+   {
+    "person_id": 115,
+    "name": "김건우",
+    "cl_level": "CL2",
+    "text": "기존 MBT PGM의 운영 프로세스를 숙지하고, 간단한 고장 분석(FA) 초기 단계에서 데이터를 수집하고 보고하는 역할을 수행하겠습니다. 불량 발생 시 신속한 정보 공유를 통해 Yield 손실을 최소화할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT PGM 운영 숙지",
+     "FA 데이터 수집"
+    ]
+   },
+   {
+    "person_id": 119,
+    "name": "조예준",
+    "cl_level": "CL2",
+    "text": "현장에서 발생한 Magnum 테스터의 고장 발생 시 초기 진단을 수행하고, 신속하게 문제를 해결하거나 상위 엔지니어에게 정확한 정보를 전달하는 역할을 수행하겠습니다. 가동 중단 시간을 최소화하는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum 테스터 초기 진단",
+     "가동 중단 최소화"
+    ]
+   },
+   {
+    "person_id": 119,
+    "name": "조예준",
+    "cl_level": "CL2",
+    "text": "신규 Test PGM 릴리즈 후 초기 검증 과정에 적극 참여하여 잠재적인 버그를 찾아내고 디버깅을 지원하겠습니다. PGM의 안정적인 양산 적용에 기여하는 것이 중요합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "신규 PGM 초기 검증",
+     "버그 디버깅 지원"
+    ]
+   },
+   {
+    "person_id": 120,
+    "name": "김채원",
+    "cl_level": "CL3",
+    "text": "HFT(High-temp Final Test) PGM의 안정성과 신뢰성을 더욱 향상시키기 위한 방안을 강구하고, 품질(DPPM) 저하의 근본 원인을 분석하여 개선 활동을 주도하겠습니다. 고온 테스트의 중요성을 인식하고 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT PGM 안정성/신뢰성",
+     "DPPM 저하 원인 분석"
+    ]
+   },
+   {
+    "person_id": 128,
+    "name": "안서연",
+    "cl_level": "CL3",
+    "text": "MBT에서 발견되는 불량 모드를 D1b 공정 단계와 연계 분석하여 공정 개선 피드백 루프를 구축하고, 이를 통해 최종 Yield 향상에 기여하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "MBT 불량-D1b 공정 연계",
+     "공정 개선 피드백",
+     "Yield 향상 기여"
+    ]
+   },
+   {
+    "person_id": 131,
+    "name": "홍다은",
+    "cl_level": "CL3",
+    "text": "신규 D1b 제품의 Yield 최적화를 위해 설비 운영 데이터를 기반으로 Test PGM 파라미터를 자동으로 조정하는 AX 솔루션 개발에 참여하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b Yield 최적화",
+     "설비 데이터 기반 PGM 조정",
+     "AX 솔루션 개발 기여"
+    ]
+   },
+   {
+    "person_id": 135,
+    "name": "송우진",
+    "cl_level": "CL2",
+    "text": "D1b 제품의 테스트 Yield 변동 원인을 Handler 설비 데이터와 연계하여 분석하고, AI 기반으로 최적화된 Test PGM 조정 방안을 제시하는 데 기여하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b Yield 변동 원인 분석",
+     "Handler 데이터 연계",
+     "AI 기반 PGM 조정 방안"
+    ]
+   },
+   {
+    "person_id": 140,
+    "name": "송시우",
+    "cl_level": "CL2",
+    "text": "Handler 및 Tester의 기본적인 설비 운영 방법을 숙달하고, Daily Report 작성에 필요한 STDF 데이터를 정확하게 추출하고 활용하는 능력을 기르고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "설비 운영 숙달",
+     "STDF 데이터 추출 및 활용"
+    ]
+   },
+   {
+    "person_id": 142,
+    "name": "임예준",
+    "cl_level": "CL4",
+    "text": "새로운 D램 제품 개발 시, Test PGM 설계 단계부터 STDF 데이터 구조를 표준화하고, Auto Diag 기능을 내재화하여 초기 Yield 안정화 기간을 단축하는 데 기여하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 데이터 구조 표준화",
+     "PGM 내 Auto Diag 내재화",
+     "초기 Yield 안정화 단축"
+    ]
+   }
+  ]
+ },
+ {
+  "cluster_id": 2,
+  "items": [
+   {
+    "person_id": 2,
+    "name": "신지호",
+    "cl_level": "CL4",
+    "text": "전사적 AX(AI Transformation) 전략에 발맞춰, AI 기반 Yield 최적화 솔루션을 Test PGM 개발에 적극 도입하여 전체 공정의 생산성을 혁신적으로 개선하는 것을 목표로 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 Yield 최적화",
+     "Test PGM에 AI 도입"
+    ]
+   },
+   {
+    "person_id": 11,
+    "name": "최채원",
+    "cl_level": "CL4",
+    "text": "AI Transformation(AX) 관점에서 Burn-in Chamber의 이상 감지 및 Test PGM 최적화를 위한 머신러닝 모델을 개발하고 현장에 적용하는 프로젝트를 추진할 것입니다. 이를 통해 DPPM을 획기적으로 개선하고 Yield 안정성을 확보하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반\nChamber 이상 감지",
+     "PGM 최적화 ML 모델"
+    ]
+   },
+   {
+    "person_id": 16,
+    "name": "최수아",
+    "cl_level": "CL4",
+    "text": "Burn-in Chamber 설비의 예측 유지보수 시스템을 AI Transformation(AX) 관점에서 구축하고자 합니다. MBT, CLT, HFT 등 모든 Burn-in 단계의 데이터를 통합 분석하여 설비 고장을 사전에 예측하고, 가동률을 최대화하는 것이 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Chamber 예측\n유지보수 AX",
+     "Burn-in 데이터\n통합 분석"
+    ]
+   },
+   {
+    "person_id": 21,
+    "name": "황채원",
+    "cl_level": "CL3",
+    "text": "STDF 데이터와 공정 데이터를 통합하여 D1b 제품의 Yield 예측 모델을 개발하고 싶습니다. AX(AI Transformation) 기술을 접목하여 예측 정확도를 높이고 의사결정을 지원하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "STDF-공정 데이터 통합",
+     "D1b Yield 예측 모델",
+     "AX 기술 접목"
+    ]
+   },
+   {
+    "person_id": 29,
+    "name": "오서연",
+    "cl_level": "CL4",
+    "text": "AX(AI Transformation) 전략의 일환으로, Test PGM의 각 스텝별 Test time과 Yield 데이터를 실시간으로 모니터링하고 예측하는 시스템을 구축하여, Test time 단축과 DPPM 품질 목표 달성을 위한 최적의 PGM을 제안하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 전략 일환",
+     "PGM 실시간 예측 시스템",
+     "Test time & DPPM 최적 PGM"
+    ]
+   },
+   {
+    "person_id": 36,
+    "name": "서예린",
+    "cl_level": "CL4",
+    "text": "AX 기반의 자동 진단(Auto Diag) 시스템을 구축하여, 테스트 실패 패턴을 실시간으로 분석하고 고장 분석(FA) 프로세스에 직접 연동함으로써 DPPM 제로에 도전하는 지능형 테스트 시스템을 구현하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 Auto Diag 시스템",
+     "DPPM 제로 도전"
+    ]
+   },
+   {
+    "person_id": 39,
+    "name": "한시우",
+    "cl_level": "CL3",
+    "text": "AI/ML (AX) 기술을 활용하여 테스트 데이터에서 이상치를 자동으로 탐지하고, 잠재적 신뢰성 불량을 예측하는 시스템을 개발함으로써, 인력 의존도를 줄이고 테스트 품질을 일관되게 유지하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 이상치 탐지",
+     "신뢰성 불량 예측 시스템"
+    ]
+   },
+   {
+    "person_id": 41,
+    "name": "강서연",
+    "cl_level": "CL3",
+    "text": "Advantest 테스터에서 발생하는 설비 이상 징후를 AX 기반으로 사전 탐지하는 시스템을 구축하여, 예상치 못한 장비 다운타임을 최소화하고 테스트 효율을 극대화하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반\n설비 이상 징후 탐지",
+     "테스터 다운타임\n최소화"
+    ]
+   },
+   {
+    "person_id": 43,
+    "name": "임유나",
+    "cl_level": "CL4",
+    "text": "전체 테스트 공정의 AX 전환 전략을 수립하고 실행하여, 테스트 데이터 기반의 의사결정 체계를 확립하고 DPPM(Defective Parts Per Million) 수준을 혁신적으로 개선하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "전체 테스트 공정\nAX 전환 전략",
+     "DPPM 혁신적 개선"
+    ]
+   },
+   {
+    "person_id": 45,
+    "name": "안예린",
+    "cl_level": "CL4",
+    "text": "Teradyne 및 Advantest 테스터의 방대한 STDF 데이터를 AX 기반으로 통합 분석하여, Para(병렬 테스트) 효율을 극대화하고 새로운 테스트 전략을 수립하는 데 활용하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Teradyne/Advantest STDF\nAX 통합 분석",
+     "Para 효율 극대화\n새 테스트 전략"
+    ]
+   },
+   {
+    "person_id": 46,
+    "name": "임수아",
+    "cl_level": "CL2",
+    "text": "AX 모델 학습을 위한 MBT(Monitoring Burn-in Test) 데이터의 전처리 및 라벨링 작업을 효율화하고, 데이터 품질을 높이는 데 기여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "AX 모델 학습용\nMBT 데이터 전처리",
+     "데이터 품질 향상"
+    ]
+   },
+   {
+    "person_id": 47,
+    "name": "전유나",
+    "cl_level": "CL2",
+    "text": "현재 운영 중인 Test PGM의 실행 로그 데이터를 분석하여 비효율적인 구간을 식별하고, AX 도입을 위한 기초 데이터를 확보하는 작업을 수행하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Test PGM 실행 로그 분석",
+     "AX 도입 기초 데이터 확보"
+    ]
+   },
+   {
+    "person_id": 48,
+    "name": "전현우",
+    "cl_level": "CL3",
+    "text": "Magnum 테스터의 설비 운영 데이터를 AX 기반으로 분석하여, 부품 교체 시기를 예측하고 예방 정비를 통해 설비 가동률을 최대화하는 시스템을 개발하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum 설비 운영 데이터\nAX 분석",
+     "예방 정비로\n가동률 최대화"
+    ]
+   },
+   {
+    "person_id": 48,
+    "name": "전현우",
+    "cl_level": "CL3",
+    "text": "HFT(High-temp Final Test) 공정에서 발생하는 Yield 저하의 근본 원인을 AX를 활용하여 심층 분석하고, 개선 포인트를 도출하여 생산 Yield를 향상시키고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT Yield 저하\nAX 심층 분석",
+     "생산 Yield 향상"
+    ]
+   },
+   {
+    "person_id": 60,
+    "name": "류주원",
+    "cl_level": "CL4",
+    "text": "AX(AI Transformation) 전략의 일환으로 AI 기반의 Test PGM 자동 생성 및 최적화 시스템 구축 프로젝트를 리딩하여 개발 기간 단축 및 테스트 효율을 극대화하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX: AI PGM 자동화 리딩",
+     "개발 기간 단축"
+    ]
+   },
+   {
+    "person_id": 65,
+    "name": "한유나",
+    "cl_level": "CL4",
+    "text": "Burn-in 신뢰성 강화를 위해 AX 기반의 이상 감지 및 예측 시스템을 구축하고 싶습니다. 이를 통해 MBT/CLT 공정에서의 잠재적 불량을 조기 발견하여 Yield 안정화에 기여하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 시스템 구축",
+     "MBT/CLT 조기 불량 감지"
+    ]
+   },
+   {
+    "person_id": 75,
+    "name": "김가은",
+    "cl_level": "CL4",
+    "text": "전사적 AX(AI Transformation) 이니셔티브에 맞춰 테스터 데이터 기반의 머신러닝 모델을 도입하여 고장 분석의 정확도를 혁신적으로 높이는 과제를 수행할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 이니셔티브",
+     "테스터 데이터 머신러닝",
+     "FA 정확도 혁신"
+    ]
+   },
+   {
+    "person_id": 80,
+    "name": "김도윤",
+    "cl_level": "CL4",
+    "text": "테스트 데이터를 기반으로 AX(AI Transformation) 전략을 수립하여 공정 전반의 품질을 혁신하고, 궁극적으로 고객 만족도를 극대화하는 것을 목표로 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 전략 수립",
+     "공정 품질 혁신",
+     "고객 만족도 극대화"
+    ]
+   },
+   {
+    "person_id": 84,
+    "name": "최민준",
+    "cl_level": "CL4",
+    "text": "AX(AI Transformation) 관점에서 Test PGM 자동 생성 및 최적화 모듈을 개발하여 신규 제품 양산 초기 단계의 Test time 단축에 혁신적으로 기여할 계획입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 관점",
+     "PGM 자동 생성",
+     "양산 초기 Test time 단축"
+    ]
+   },
+   {
+    "person_id": 87,
+    "name": "정시우",
+    "cl_level": "CL4",
+    "text": "AX(AI Transformation) 기술을 활용하여 테스트 데이터로부터 실시간으로 패턴을 분석하고, Test PGM의 동적 변경 및 설비 운영 파라미터를 최적화하는 AI 기반의 Auto Diag 시스템을 구축하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기술 활용",
+     "실시간 패턴 분석",
+     "AI 기반 Auto Diag"
+    ]
+   },
+   {
+    "person_id": 91,
+    "name": "서도윤",
+    "cl_level": "CL4",
+    "text": "AX(AI Transformation) 기술을 테스트 공정에 도입하여 데이터 기반의 자동화된 품질 관리 시스템을 구축하고, 예측 유지보수 및 불량 패턴 예측을 통해 품질 경쟁력을 확보할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기술 도입",
+     "자동화 품질 관리 시스템",
+     "품질 경쟁력 확보"
+    ]
+   },
+   {
+    "person_id": 97,
+    "name": "최선우",
+    "cl_level": "CL4",
+    "text": "AX 기반 통합 데이터 분석 플랫폼을 구축하여 MBT부터 HFT까지 전 테스트 공정 데이터를 연계하고, D1b 공정의 초기 단계에서부터 Yield 및 DPPM 문제점을 예측하는 시스템을 개발하고자 합니다. 이를 통해 전체적인 품질 향상 및 개발 기간 단축에 기여할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 통합\n데이터 플랫폼",
+     "Yield & DPPM\n문제 예측 시스템"
+    ]
+   },
+   {
+    "person_id": 97,
+    "name": "최선우",
+    "cl_level": "CL4",
+    "text": "신규 AX 모델 도입 및 운영을 위한 팀원 역량 강화 프로그램을 기획하고, 데이터 과학자와의 협업 체계를 마련하여 테스트 엔지니어링의 AX 전환을 주도할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "팀원 AX 역량 강화",
+     "AX 전환 주도"
+    ]
+   },
+   {
+    "person_id": 98,
+    "name": "최지유",
+    "cl_level": "CL2",
+    "text": "Handler 및 Tester (Advantest, Teradyne)에서 발생하는 설비 로그 데이터를 AX 기반으로 실시간 분석하여, 이상 징후를 조기 감지하고 설비 운영 효율성을 증대하는 시스템 구축에 참여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Tester 로그 실시간 분석",
+     "설비 이상 조기 감지"
+    ]
+   },
+   {
+    "person_id": 100,
+    "name": "강수아",
+    "cl_level": "CL2",
+    "text": "STDF 데이터에 AX 기반의 데이터 시각화 기법을 적용하여, Para 테스트 시 발생하는 불균일한 패턴이나 이상 데이터를 빠르게 인지하고 BIB 문제점을 효율적으로 파악하는 데 기여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF AX 시각화",
+     "Para 테스트 이상 패턴 인지"
+    ]
+   },
+   {
+    "person_id": 101,
+    "name": "조채원",
+    "cl_level": "CL3",
+    "text": "Handler 및 주요 Tester (Magnum)의 설비 운영 데이터를 AX 기반으로 분석하여, 부품 교체 시기 예측 및 사전 유지보수 시스템을 구축하고자 합니다. 이를 통해 unplanned downtime을 최소화하고 Para 테스트 가동률을 극대화할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "설비 운영 AX 분석",
+     "예측 유지보수 시스템"
+    ]
+   },
+   {
+    "person_id": 101,
+    "name": "조채원",
+    "cl_level": "CL3",
+    "text": "CLT (Chamber형 LFT Test) 설비에서 발생하는 센서 데이터를 AX로 분석하여, 테스트 챔버 내부 환경 변화가 D1b 제품 품질에 미치는 영향을 정량화하고 싶습니다.",
+    "horizon": "불명",
+    "quotes": [
+     "CLT 센서 데이터 AX 분석",
+     "챔버 환경-품질 영향 정량화"
+    ]
+   },
+   {
+    "person_id": 102,
+    "name": "전도윤",
+    "cl_level": "CL3",
+    "text": "HFT 과정에서 발생하는 D1b 제품의 미세한 품질 저하 패턴을 AX 기반의 이상 감지 모델로 조기에 포착하고, 이를 Test PGM에 반영하여 DPPM을 획기적으로 낮추는 시스템을 개발하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "HFT 품질 저하 AX 감지",
+     "Test PGM 연동 DPPM 개선"
+    ]
+   },
+   {
+    "person_id": 102,
+    "name": "전도윤",
+    "cl_level": "CL3",
+    "text": "각 테스터 (Advantest, Teradyne)에서 수집되는 STDF 및 내부 로그 데이터를 AX 기반으로 통합 분석하여, Yield 변동성의 근본 원인을 심층적으로 파악하는 데 집중하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "테스터 STDF/로그 통합 분석",
+     "Yield 변동성 원인 심층 파악"
+    ]
+   },
+   {
+    "person_id": 103,
+    "name": "임민준",
+    "cl_level": "CL3",
+    "text": "AX 분석을 위한 안정적이고 효율적인 데이터 인프라를 구축하고 싶습니다. MBT, CLT, HFT에서 발생하는 STDF 및 다양한 로그 데이터를 통합하고 표준화하여 데이터 파이프라인을 고도화하는 것이 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 데이터 인프라 구축",
+     "데이터 파이프라인 고도화"
+    ]
+   },
+   {
+    "person_id": 104,
+    "name": "서우진",
+    "cl_level": "CL2",
+    "text": "HFT 데이터에서 특정 파라미터의 분포 변화를 AX 기반으로 모니터링하여, 초기 불량 신호를 감지하고 품질 문제 발생을 사전에 예방하는 방안을 연구하고 싶습니다.",
+    "horizon": "불명",
+    "quotes": [
+     "HFT 파라미터 AX 모니터링",
+     "초기 불량 신호 감지"
+    ]
+   },
+   {
+    "person_id": 106,
+    "name": "홍하은",
+    "cl_level": "CL4",
+    "text": "테스트 데이터를 AX(AI Transformation)에 접목하여 STDF 분석의 자동화를 구현하고, Yield 예측 모델을 구축하여 선제적인 품질 관리를 가능하게 할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 STDF 자동 분석",
+     "Yield 예측 모델 구축",
+     "선제적 품질 관리"
+    ]
+   },
+   {
+    "person_id": 111,
+    "name": "안채원",
+    "cl_level": "CL4",
+    "text": "AX(AI Transformation) 기술을 활용하여 Test PGM 및 설비 운영 데이터를 분석, 테스터와 Handler의 예지 보전 시스템을 구축하여 FA 부하를 줄이고 가동률을 높이겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 예지 보전",
+     "FA 부하 감소",
+     "설비 가동률 향상"
+    ]
+   },
+   {
+    "person_id": 113,
+    "name": "홍민준",
+    "cl_level": "CL4",
+    "text": "AX 기반의 Test PGM 자동 진단 및 고장 예측 시스템을 구축하여 설비 운영 효율을 극대화하고, 인력 의존도를 줄이는 혁신을 이루겠습니다. 이를 통해 비정상 상황에 대한 신속한 대응력을 확보할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 PGM 자동 진단",
+     "고장 예측 시스템"
+    ]
+   },
+   {
+    "person_id": 117,
+    "name": "장소율",
+    "cl_level": "CL4",
+    "text": "AX 기술을 활용하여 ATE 설비의 예지 보전 시스템을 구축하고, 설비 고장으로 인한 가동 중단 시간을 최소화하겠습니다. 데이터 기반의 예측 정비로 설비 운영 안정성을 높이는 것이 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 설비 예지 보전",
+     "가동 중단 시간 최소화"
+    ]
+   },
+   {
+    "person_id": 120,
+    "name": "김채원",
+    "cl_level": "CL3",
+    "text": "AX 기반 Yield 예측 모델의 학습 데이터셋을 구축하고 검증하는 작업을 지원하여 예측 모델의 정확도를 높이는 데 기여하겠습니다. 데이터의 품질이 모델 성능에 직결됨을 인지하고 있습니다.",
+    "horizon": "불명",
+    "quotes": [
+     "AX Yield 예측 데이터셋 구축",
+     "모델 정확도 향상 지원"
+    ]
+   },
+   {
+    "person_id": 132,
+    "name": "홍현우",
+    "cl_level": "CL4",
+    "text": "전체 테스트 라인의 Handler 및 Teradyne, Advantest 등 테스터에 걸친 통합 Auto Diag 플랫폼을 구축하여 전사적 AX 전환을 가속화하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "통합 Auto Diag 플랫폼 구축",
+     "전사적 AX 전환 가속화"
+    ]
+   },
+   {
+    "person_id": 144,
+    "name": "임건우",
+    "cl_level": "CL3",
+    "text": "고장 분석(FA) 데이터와 STDF Test PGM 로그를 AX 기반으로 통합 분석하여, 특정 불량 모드에 대한 Test PGM의 검출 한계를 정확히 파악하고, PGM 개선을 통해 품질(DPPM)을 획기적으로 낮추는 방안을 모색하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "FA-STDF AX 통합 분석",
+     "PGM 검출 한계 파악",
+     "품질(DPPM) 획기적 개선"
+    ]
+   }
+  ]
+ },
+ {
+  "cluster_id": 3,
+  "items": [
+   {
+    "person_id": 2,
+    "name": "신지호",
+    "cl_level": "CL4",
+    "text": "Teradyne ULX 플랫폼을 활용한 MBT(Monitoring Burn-in Test) 및 CLT(Chamber형 LFT Test) 공정의 효율을 극대화하고, 이를 통해 전반적인 제품 품질(DPPM)을 향상시키고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Teradyne ULX MBT/CLT 효율 극대화",
+     "제품 품질(DPPM) 향상"
+    ]
+   },
+   {
+    "person_id": 4,
+    "name": "정예린",
+    "cl_level": "CL2",
+    "text": "신규 CLT(Chamber형 LFT Test) Test PGM을 개발하고 안정화하여, 신뢰성 테스트의 정확도를 높이고 불량 검출율을 향상시키고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "신규 CLT PGM 개발",
+     "신뢰성 테스트 정확도 향상"
+    ]
+   },
+   {
+    "person_id": 10,
+    "name": "박예린",
+    "cl_level": "CL3",
+    "text": "CLT(Chamber형 LFT Test)의 테스트 조건을 D1b 공정의 특성에 맞춰 미세 조정하는 과제를 수행하고자 합니다. 실제 양산 환경에서의 신뢰성 확보와 Yield 안정화를 목표로 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "CLT 조건\n미세 조정",
+     "D1b 신뢰성 확보"
+    ]
+   },
+   {
+    "person_id": 11,
+    "name": "최채원",
+    "cl_level": "CL4",
+    "text": "차세대 D1b 이상의 공정 노드를 위한 Burn-in 신뢰성 평가 방법론을 정립하고 싶습니다. 특히 MBT와 CLT의 조건을 예측 모델 기반으로 최적화하여 개발 기간 단축에 기여하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "차세대 D1b\nBurn-in 방법론",
+     "예측 모델 기반\n조건 최적화"
+    ]
+   },
+   {
+    "person_id": 15,
+    "name": "이지유",
+    "cl_level": "CL3",
+    "text": "신규 D1b 공정 노드의 Burn-in 신뢰성 강화를 위해 CLT(Chamber형 LFT Test) 데이터와 HFT 결과의 상관관계를 분석하고, 이를 바탕으로 Test PGM을 최적화하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b Burn-in\n신뢰성 강화",
+     "CLT-HFT 상관관계\n분석"
+    ]
+   },
+   {
+    "person_id": 33,
+    "name": "임지호",
+    "cl_level": "CL3",
+    "text": "D1b 공정 노드의 제품 신뢰성 보증을 위해 CLT 및 HFT 데이터를 활용한 예측 모델을 개발하여, 필드 불량 발생 가능성을 사전에 예측하고 선제적 대응 체계를 구축하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b 신뢰성 보증",
+     "예측 모델 개발"
+    ]
+   },
+   {
+    "person_id": 34,
+    "name": "안수아",
+    "cl_level": "CL3",
+    "text": "다양한 신뢰성 테스트 데이터(CLT, HFT)를 통합 분석하여 D램 제품의 수명 예측 정확도를 향상시키고, 필드 DPPM을 획기적으로 낮출 수 있는 새로운 신뢰성 평가 지표를 수립하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "다중 신뢰성 데이터 통합 분석",
+     "DPPM 저감을 위한\n신규 지표 수립"
+    ]
+   },
+   {
+    "person_id": 44,
+    "name": "오지호",
+    "cl_level": "CL3",
+    "text": "CLT(Chamber형 LFT Test) 데이터의 특징을 AI로 학습하여 초기 불량 예측 정확도를 높이고, 선제적인 품질 관리 프로세스를 도입하는 방안을 연구하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT 데이터\nAI 불량 예측",
+     "선제적 품질 관리\n프로세스 도입"
+    ]
+   },
+   {
+    "person_id": 51,
+    "name": "오소율",
+    "cl_level": "CL4",
+    "text": "신뢰성 테스트인 CLT(Chamber형 LFT Test) 및 HFT 공정의 Test PGM 최적화를 주도하여, 더 효율적이면서도 높은 불량 검출률을 달성하는 방안을 모색하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT/HFT PGM 최적화",
+     "높은 불량 검출률"
+    ]
+   },
+   {
+    "person_id": 55,
+    "name": "황다은",
+    "cl_level": "CL3",
+    "text": "CLT(Chamber형 LFT Test) 설비 운영 및 유지보수 역량을 강화하여, 테스트 스케줄 준수 및 설비 가동률 향상에 기여하고 싶습니다. 효율적인 설비 운영을 통해 생산성을 높이는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT 설비 운영 역량 강화",
+     "생산성 향상"
+    ]
+   },
+   {
+    "person_id": 67,
+    "name": "홍예린",
+    "cl_level": "CL4",
+    "text": "D1b 노드 신뢰성 검증을 위한 CLT/HFT 프로파일을 고도화하고 싶습니다. 다양한 고장 모드를 효과적으로 검출할 수 있는 스트레스 조건 및 테스트 패턴을 개발하는 것이 핵심입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b CLT/HFT 프로파일 고도화",
+     "고장 모드 효과적 검출"
+    ]
+   },
+   {
+    "person_id": 68,
+    "name": "류예준",
+    "cl_level": "CL3",
+    "text": "Chamber 내 온습도 편차를 최소화하는 설비 운영 방안을 연구하고 싶습니다. 균일한 Burn-in 환경을 조성하여 제품별 신뢰성 편차를 줄이는 것이 중요합니다.",
+    "horizon": "중기",
+    "quotes": [
+     "Chamber 온습도 편차 최소화",
+     "균일 Burn-in 환경 조성"
+    ]
+   },
+   {
+    "person_id": 70,
+    "name": "조현우",
+    "cl_level": "CL4",
+    "text": "Burn-in 신뢰성 불량 발생 시 DPPM(Defective Parts Per Million)을 효율적으로 줄이기 위한 HFT(High-temp Final Test) 프로세스 개선을 추진하고 싶습니다. Post-Burn-in test의 검출력과 정확도를 높이는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 저감을 위한 HFT",
+     "Post-Burn-in 검출력 향상"
+    ]
+   },
+   {
+    "person_id": 70,
+    "name": "조현우",
+    "cl_level": "CL4",
+    "text": "Chamber 내부의 공기 흐름 및 열 분포를 시뮬레이션하여 Burn-in 중 제품에 가해지는 스트레스를 균일하게 관리하는 시스템을 개발하고 싶습니다. 신뢰성 품질을 한 단계 더 향상시키는 데 기여할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Chamber 열 분포 시뮬레이션",
+     "균일 스트레스 관리 시스템"
+    ]
+   },
+   {
+    "person_id": 71,
+    "name": "이예준",
+    "cl_level": "CL4",
+    "text": "차세대 D램(D1b+ 이후 노드)에 적합한 Burn-in 신뢰성 평가 아키텍처를 설계하고 싶습니다. 기존 MBT/BIB/CLT/HFT의 한계를 극복하고, 새로운 고장 모드를 효과적으로 검출할 수 있는 통합 솔루션을 구상 중입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "차세대 D램 Burn-in 아키텍처",
+     "통합 솔루션 구상"
+    ]
+   },
+   {
+    "person_id": 71,
+    "name": "이예준",
+    "cl_level": "CL4",
+    "text": "Burn-in 공정의 에너지 효율을 높이는 친환경 Chamber 운영 모델을 개발하고 싶습니다. 전력 소비를 줄이면서도 신뢰성 검증 기준을 만족시키는 것이 중요하다고 생각합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "친환경 Chamber 운영",
+     "에너지 효율 개선"
+    ]
+   },
+   {
+    "person_id": 76,
+    "name": "송선우",
+    "cl_level": "CL4",
+    "text": "CLT(Chamber형 LFT Test) 및 HFT(High-temp Final Test)의 새로운 테스트 방법론을 연구하여 불량 검출력을 높이고, 신뢰성 향상에 기여하는 과제를 추진할 계획입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "CLT/HFT 신 테스트 방법론",
+     "불량 검출력 향상",
+     "신뢰성 향상 기여"
+    ]
+   },
+   {
+    "person_id": 82,
+    "name": "한예준",
+    "cl_level": "CL3",
+    "text": "Yield 하락의 주된 원인이 되는 특정 Fail Bin을 대상으로 CLT 테스트 조건을 정밀하게 분석하여 테스트 시간을 단축하면서도 품질을 유지하는 방법을 모색할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Yield 하락 원인",
+     "CLT 조건 정밀 분석",
+     "품질 유지하며 시간 단축"
+    ]
+   },
+   {
+    "person_id": 85,
+    "name": "임다은",
+    "cl_level": "CL3",
+    "text": "특정 불량 모드에 대한 CLT (Chamber형 LFT Test)의 테스트 조건을 최적화하여, 기존 대비 더 적은 시간으로 해당 불량을 효과적으로 스크린하고 Yield 손실을 최소화할 계획입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "불량 모드별 CLT",
+     "테스트 조건 최적화",
+     "Yield 손실 최소화"
+    ]
+   },
+   {
+    "person_id": 92,
+    "name": "안우진",
+    "cl_level": "CL3",
+    "text": "CLT(Chamber형 LFT Test) 환경에서의 테스트 조건 안정화 및 정밀도를 향상시키기 위해 챔버 내 온도/습도 제어 로직을 고도화하고 테스트 재현성을 확보할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT 테스트 안정화",
+     "온/습도 제어 고도화",
+     "테스트 재현성 확보"
+    ]
+   },
+   {
+    "person_id": 94,
+    "name": "서지유",
+    "cl_level": "CL3",
+    "text": "D1b 공정의 신뢰성 보증을 위해 CLT 및 MBT 테스트 데이터의 경향성을 분석하고, 잠재적인 불량 요인을 조기에 발견하여 선제적인 품질 개선 활동을 전개하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b 신뢰성 보증",
+     "테스트 데이터 경향성",
+     "선제적 품질 개선"
+    ]
+   },
+   {
+    "person_id": 95,
+    "name": "이지호",
+    "cl_level": "CL3",
+    "text": "MBT와 CLT 테스트에서 얻어지는 방대한 신뢰성 데이터를 통합 분석하는 시스템을 구축하여 제품의 생애 주기 전반에 걸친 품질 신뢰성을 예측하고 DPPM 관리를 최적화할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "신뢰성 데이터 통합 분석",
+     "생애 주기 품질 예측",
+     "DPPM 관리 최적화"
+    ]
+   },
+   {
+    "person_id": 106,
+    "name": "홍하은",
+    "cl_level": "CL4",
+    "text": "D1b 제품의 잠재적 불량을 조기에 선별하여 DPPM을 낮추기 위해 Chamber형 LFT Test (CLT) 및 High-temp Final Test (HFT)의 테스트 커버리지를 확장하고 방법론을 고도화하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 잠재 불량 선별",
+     "CLT/HFT 고도화",
+     "DPPM 저감"
+    ]
+   },
+   {
+    "person_id": 110,
+    "name": "류우진",
+    "cl_level": "CL3",
+    "text": "D1b 제품의 장기 신뢰성 문제를 조기에 검출하기 위한 MBT 및 CLT 기반의 새로운 테스트 방법론을 연구하고 적용하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b 신뢰성 조기 검출",
+     "MBT/CLT 방법론 연구",
+     "신규 테스트 적용"
+    ]
+   },
+   {
+    "person_id": 118,
+    "name": "정하은",
+    "cl_level": "CL3",
+    "text": "CLT(Chamber형 LFT Test) 테스트 결과와 고장 분석(FA) 데이터를 연계하여 불량 원인 분석 프로세스를 개선하고, PGM 수정 및 재검증 시간을 단축하겠습니다. 근본 원인 해결에 집중할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT-FA 연계 분석",
+     "불량 원인 프로세스 개선"
+    ]
+   },
+   {
+    "person_id": 121,
+    "name": "한예린",
+    "cl_level": "CL4",
+    "text": "D1b 공정 노드의 MBT 챔버 조건을 AI/ML 기반으로 최적화하여 신뢰성 테스트 효율을 극대화하고, 불량 예측 정확도를 높이는 모델을 개발하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b MBT 챔버 최적화",
+     "AI/ML 기반 예측",
+     "불량 예측 정확도↑"
+    ]
+   },
+   {
+    "person_id": 122,
+    "name": "임선우",
+    "cl_level": "CL4",
+    "text": "CLT 데이터를 D1b Yield 및 최종 품질(DPPM) 데이터와 통합하여 초기 신뢰성 예측 정확도를 높이는 시스템을 구축하고, 이를 통해 공정-테스트 간 피드백 루프를 강화할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "CLT 데이터 통합",
+     "초기 신뢰성 예측",
+     "공정-테스트 피드백 강화"
+    ]
+   },
+   {
+    "person_id": 125,
+    "name": "홍선우",
+    "cl_level": "CL4",
+    "text": "CLT 결과와 실제 시장에서의 필드 신뢰성 데이터 간의 상관관계를 심층 분석하여 CLT 테스트 커버리지를 개선하고, 신뢰성 평가의 정확도를 높일 수 있는 방법을 모색하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "CLT-필드 신뢰성 분석",
+     "테스트 커버리지 개선",
+     "평가 정확도 향상"
+    ]
+   },
+   {
+    "person_id": 126,
+    "name": "전지호",
+    "cl_level": "CL2",
+    "text": "CLT 챔버의 워밍업 및 쿨다운 절차를 표준화하고, 이를 바탕으로 안정적인 챔버 환경을 유지하여 테스트 결과의 재현성을 높이는 데 기여할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT 챔버 절차 표준화",
+     "안정적 환경 유지",
+     "테스트 재현성 향상"
+    ]
+   },
+   {
+    "person_id": 127,
+    "name": "오선우",
+    "cl_level": "CL3",
+    "text": "HFT Test PGM을 정밀하게 튜닝하여 미세한 온도 변화에 따른 불량을 더 효과적으로 검출하고, 고장 분석(FA)과의 연계를 강화하여 불량 모드 식별을 고도화할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT PGM 정밀 튜닝",
+     "온도 불량 효과적 검출",
+     "FA 연계 고도화"
+    ]
+   },
+   {
+    "person_id": 138,
+    "name": "신가은",
+    "cl_level": "CL3",
+    "text": "CLT 및 BIB 데이터를 활용하여 Burn-in 불량의 근본 원인을 파악하고, D1b 공정과의 연계성을 분석하여 설계/공정 단계에서 불량을 선제적으로 개선할 수 있는 피드백 체계를 구축하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Burn-in 불량 근원 파악",
+     "D1b 공정 연계\n피드백 체계 구축"
+    ]
+   }
+  ]
+ },
+ {
+  "cluster_id": 4,
+  "items": [
+   {
+    "person_id": 4,
+    "name": "정예린",
+    "cl_level": "CL2",
+    "text": "STDF(Standard Test Data Format) 데이터를 활용하여 고장 분석(FA) 자동화 시스템 구축에 참여하고, 이를 통해 분석 시간 단축 및 생산성 향상에 기여하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 FA 자동화",
+     "분석 시간 단축 기여"
+    ]
+   },
+   {
+    "person_id": 10,
+    "name": "박예린",
+    "cl_level": "CL3",
+    "text": "HFT(High-temp Final Test) 과정에서 발생하는 DPPM(불량률) 데이터를 상세 고장 분석(FA) 결과와 연동하여 자동 진단(Auto Diag) 로직을 개선하고 싶습니다. 이를 통해 품질 예측 정확도를 높일 수 있습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "HFT DPPM\n자동 진단",
+     "FA 연동 로직 개선"
+    ]
+   },
+   {
+    "person_id": 15,
+    "name": "이지유",
+    "cl_level": "CL3",
+    "text": "Burn-in 단계에서 발생하는 잠재적 품질(DPPM) 이슈를 선제적으로 감지하기 위한 자동 진단(Auto Diag) 시스템을 고도화하고자 합니다. 이를 통해 최종 품질을 향상시키고 Yield 손실을 줄일 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 이슈\n선제적 감지",
+     "자동 진단 시스템\n고도화"
+    ]
+   },
+   {
+    "person_id": 17,
+    "name": "김예준",
+    "cl_level": "CL3",
+    "text": "신규 D1b 제품의 HFT(High-temp Final Test) Yield 분석을 고도화하고자 합니다. STDF 데이터를 활용하여 특정 불량 패턴과 설비 이상 간의 상관관계를 파악하여 Yield 개선 방안을 도출할 계획입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b HFT Yield",
+     "STDF 데이터 활용",
+     "불량 패턴과 설비"
+    ]
+   },
+   {
+    "person_id": 18,
+    "name": "정서연",
+    "cl_level": "CL3",
+    "text": "신규 제품의 고장 분석(FA) 효율을 높이기 위해 Auto Diag 시스템 연동을 추진하고자 합니다. STDF 데이터를 기반으로 자동화된 불량 위치 추정 기능을 강화하여 FA 소요 시간을 단축하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "FA 효율 높이기",
+     "Auto Diag 시스템 연동",
+     "불량 위치 추정 강화"
+    ]
+   },
+   {
+    "person_id": 19,
+    "name": "안건우",
+    "cl_level": "CL3",
+    "text": "Yield 저하가 발생했을 때, 공정(D1b) 데이터와 테스트 데이터를 통합 분석하여 근본 원인을 신속하게 파악하는 방법론을 구축하고자 합니다. 이를 통해 FA 시간을 대폭 단축하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Yield 저하 원인",
+     "공정-테스트 통합 분석",
+     "FA 시간 단축"
+    ]
+   },
+   {
+    "person_id": 20,
+    "name": "홍주원",
+    "cl_level": "CL3",
+    "text": "초기 불량 패턴을 STDF 데이터에서 추출하여 DPPM(품질)을 예측하고, 선제적으로 품질 문제에 대응할 수 있는 가이드라인을 수립하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "초기 불량 패턴 추출",
+     "DPPM 예측 및 대응",
+     "품질 가이드라인"
+    ]
+   },
+   {
+    "person_id": 21,
+    "name": "황채원",
+    "cl_level": "CL3",
+    "text": "특정 테스트 구간에서 발생하는 Fail Count 급증 현상에 대한 Auto Diag 기능을 강화하고자 합니다. 이를 통해 문제 발생 시 Test PGM과 연동하여 즉각적인 분석이 가능하게 할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Fail Count 급증",
+     "Auto Diag 강화",
+     "PGM 연동 분석"
+    ]
+   },
+   {
+    "person_id": 22,
+    "name": "오민준",
+    "cl_level": "CL3",
+    "text": "FA(고장 분석) 결과와 Yield 데이터를 연계하여, 오진율이 높은 FA 케이스를 식별하고 이를 줄이는 프로세스를 수립하고 싶습니다. 이를 통해 불필요한 리소스 낭비를 막을 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "FA-Yield 연계 분석",
+     "FA 오진율 식별",
+     "리소스 낭비 방지"
+    ]
+   },
+   {
+    "person_id": 24,
+    "name": "장지유",
+    "cl_level": "CL4",
+    "text": "차세대 Auto Diag 시스템을 설계하고 구현하고 싶습니다. STDF 데이터뿐만 아니라 MBT, CLT, HFT 등 다양한 테스트 공정에서 수집되는 빅데이터를 통합 분석하여 불량 원인을 자동으로 추적하고 진단하는 AI 기반 시스템을 목표로 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "차세대 Auto Diag",
+     "STDF 등 빅데이터",
+     "AI 기반 원인 추적"
+    ]
+   },
+   {
+    "person_id": 26,
+    "name": "조서연",
+    "cl_level": "CL3",
+    "text": "STDF 데이터를 실시간으로 분석하여 Test PGM의 이상 징후를 자동으로 감지하고, Yield에 미치는 영향을 예측하는 Auto Diag 시스템을 구현하여 예방적 유지보수와 테스트 효율을 높이고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 실시간 분석",
+     "Auto Diag 시스템 구현",
+     "Yield 영향 예측"
+    ]
+   },
+   {
+    "person_id": 28,
+    "name": "임소율",
+    "cl_level": "CL3",
+    "text": "MBT 공정에서 발생한 고장 분석(FA) 결과를 Test PGM에 즉시 반영하는 자동화된 피드백 시스템을 구축하여, 재발 방지 및 Test time 단축에 기여하고 싶습니다.",
+    "horizon": "불명",
+    "quotes": [
+     "MBT FA 결과 반영",
+     "자동화된 피드백",
+     "재발 방지, Test time 단축"
+    ]
+   },
+   {
+    "person_id": 31,
+    "name": "오유나",
+    "cl_level": "CL3",
+    "text": "STDF 데이터에 기반한 Auto Diag 룰을 고도화하여, Test PGM의 특정 패턴에서 발생하는 불량 증가를 자동으로 예측하고 Test time 단축과 품질(DPPM) 향상에 기여하고 싶습니다.",
+    "horizon": "불명",
+    "quotes": [
+     "STDF 기반 Auto Diag",
+     "불량 증가 자동 예측",
+     "Test time & DPPM 향상"
+    ]
+   },
+   {
+    "person_id": 39,
+    "name": "한시우",
+    "cl_level": "CL3",
+    "text": "테스트 Yield 하락의 근본 원인을 파악하기 위해 STDF 데이터를 심층 분석하고, 특정 패러미터가 Yield와 DPPM에 미치는 영향을 규명하여 테스트 조건을 정밀하게 튜닝하는 작업을 수행할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 데이터 심층 분석",
+     "Yield 하락 원인 규명"
+    ]
+   },
+   {
+    "person_id": 42,
+    "name": "송예준",
+    "cl_level": "CL3",
+    "text": "각 테스트 공정(CLT, HFT)에서 발생하는 불량 데이터에 대한 AI 기반의 고장 분석(FA) 시스템을 구축하여, 불량 원인 규명 시간을 단축하고 재발을 방지하는 데 기여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT, HFT 불량\nAI 기반 FA 구축",
+     "원인 규명 시간 단축"
+    ]
+   },
+   {
+    "person_id": 45,
+    "name": "안예린",
+    "cl_level": "CL4",
+    "text": "HFT(High-temp Final Test)에서 발생하는 난해한 불량 패턴에 대한 AI 기반 고장 분석(FA) 시스템을 개발하여, 기존 FA에 소요되는 시간을 획기적으로 단축하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT 불량 패턴\nAI 기반 FA",
+     "FA 소요 시간\n획기적 단축"
+    ]
+   },
+   {
+    "person_id": 49,
+    "name": "오건우",
+    "cl_level": "CL4",
+    "text": "웨이퍼 테스트(EDS) 단계에서 Auto Diag 기능을 강화하여 불량 원인 분석 시간을 단축하고, 초기 Yield 손실을 최소화하는 데 기여하고 싶습니다. 이를 통해 제품 개발 사이클 가속화를 목표로 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "EDS Auto Diag 강화",
+     "초기 Yield 손실 최소화"
+    ]
+   },
+   {
+    "person_id": 51,
+    "name": "오소율",
+    "cl_level": "CL4",
+    "text": "D1b 공정 노드의 EDS 및 Final Test 데이터 간 연관성 분석을 통해 잠재 불량을 조기에 탐지하고, Yield 예측 정확도를 향상시키는 시스템을 구축하고 싶습니다. 이를 통해 전체적인 품질(DPPM) 개선에 기여할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "EDS-Final 데이터 연관 분석",
+     "Yield 예측 정확도 향상",
+     "품질(DPPM) 개선"
+    ]
+   },
+   {
+    "person_id": 52,
+    "name": "윤도윤",
+    "cl_level": "CL4",
+    "text": "테스터 Auto Diag 시스템을 고도화하여 설비 고장 분석(FA) 시간을 단축하고, 예방 보전 체계를 구축하는 것을 목표로 합니다. 이는 설비의 안정적인 운영에 필수적입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "테스터 Auto Diag 고도화",
+     "예방 보전 체계 구축"
+    ]
+   },
+   {
+    "person_id": 54,
+    "name": "김서연",
+    "cl_level": "CL3",
+    "text": "STDF 데이터를 활용한 자동화된 Yield 분석 리포팅 시스템을 구축하고 싶습니다. 이를 통해 제품별, 공정별 Yield 현황을 실시간으로 모니터링하고, 잠재적인 Yield 하락 요인을 조기에 발견하는 데 기여하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF Yield 리포팅 자동화",
+     "Yield 하락 요인 조기 발견"
+    ]
+   },
+   {
+    "person_id": 57,
+    "name": "송현우",
+    "cl_level": "CL3",
+    "text": "STDF 데이터를 활용한 자동화된 Yield 분석 툴을 개발하여 불량 패턴을 조기에 식별하고, Test PGM 개선 방안을 신속하게 도출하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 Yield 분석 툴 개발",
+     "불량 패턴 조기 식별"
+    ]
+   },
+   {
+    "person_id": 59,
+    "name": "최시우",
+    "cl_level": "CL2",
+    "text": "고장 분석(FA) 팀과의 긴밀한 협업을 위해 Test PGM 내에 FA 진단 효율을 높일 수 있는 진단 기능을 추가하고, 상호 연동 시스템을 구축하는 것이 장기 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "FA 연동 PGM 진단 강화",
+     "협업 시스템 구축"
+    ]
+   },
+   {
+    "person_id": 62,
+    "name": "박선우",
+    "cl_level": "CL3",
+    "text": "고장 분석(FA) 결과와 Test PGM 데이터를 연동하여 자동 고장 진단(Auto Diag) 시스템을 구현함으로써 불량 원인 분석 시간을 획기적으로 단축하는 것을 목표로 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "FA-PGM 연동 Auto Diag",
+     "분석 시간 단축"
+    ]
+   },
+   {
+    "person_id": 67,
+    "name": "홍예린",
+    "cl_level": "CL4",
+    "text": "Burn-in Fail 샘플에 대한 고장 분석(FA) 프로세스를 AI 기반 Auto Diag 시스템과 연계하여 초기 분석 시간을 단축하고, FA 결과의 정확도를 높이고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Burn-in Fail FA 프로세스",
+     "AI 기반 Auto Diag 연계"
+    ]
+   },
+   {
+    "person_id": 68,
+    "name": "류예준",
+    "cl_level": "CL3",
+    "text": "MBT 데이터를 활용하여 Burn-in Yield에 영향을 미치는 주요 파라미터를 식별하고, 실시간으로 Yield 트렌드를 예측하는 시스템을 구축하고 싶습니다. 이를 통해 조기 경보 체계를 마련하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT 데이터 활용",
+     "Yield 트렌드 예측 시스템"
+    ]
+   },
+   {
+    "person_id": 71,
+    "name": "이예준",
+    "cl_level": "CL4",
+    "text": "공급망 전체 Burn-in 데이터(STDF)를 통합하여 end-to-end 품질 추적 시스템을 구축하고자 합니다. 이를 통해 Burn-in 신뢰성 문제의 전후방 파급 효과를 분석하고 선제적으로 대응할 수 있습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "공급망 Burn-in 데이터 통합",
+     "end-to-end 품질 추적 시스템"
+    ]
+   },
+   {
+    "person_id": 75,
+    "name": "김가은",
+    "cl_level": "CL4",
+    "text": "D1b 공정의 STDF 데이터를 활용하여 고장 발생 전 예측 가능한 Auto Diag 시스템을 개발하고, 이를 통해 선제적인 Yield 개선 활동을 주도하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b STDF 활용",
+     "FA 예측 시스템 개발",
+     "선제적 Yield 개선 주도"
+    ]
+   },
+   {
+    "person_id": 78,
+    "name": "장지호",
+    "cl_level": "CL3",
+    "text": "STDF 데이터를 활용하여 Test PGM 단계별 Yield 손실 구간을 정확히 찾아내고, 이를 기반으로 Auto Diag 알고리즘을 개선하여 고장 분석 시간을 획기적으로 줄이고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF Yield 손실 구간",
+     "Auto Diag 알고리즘 개선",
+     "FA 시간 획기적 단축"
+    ]
+   },
+   {
+    "person_id": 80,
+    "name": "김도윤",
+    "cl_level": "CL4",
+    "text": "모든 테스트 단계의 STDF 데이터를 통합하여 실시간 Yield 및 DPPM(Defective Parts Per Million) 모니터링 시스템을 구축하고, 이상 발생 시 즉각적인 알림과 진단이 가능하도록 만들고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 통합 실시간 Yield/DPPM",
+     "모니터링 시스템 구축",
+     "즉각적 알림 및 진단"
+    ]
+   },
+   {
+    "person_id": 83,
+    "name": "전건우",
+    "cl_level": "CL3",
+    "text": "STDF 데이터를 자동 분석하는 스크립트 개발을 통해 Test time이 길어지는 구간을 자동 진단(Auto Diag)하고, 개선 우선순위를 도출하는 시스템을 구축하여 효율적인 시간 단축에 기여할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 자동 분석",
+     "Auto Diag 시스템",
+     "Test time 우선순위 도출"
+    ]
+   },
+   {
+    "person_id": 88,
+    "name": "서소율",
+    "cl_level": "CL3",
+    "text": "고장 분석(FA) 효율성 증대를 위해 Auto Diag 시스템을 고도화하고, 테스터에서 수집되는 STDF 데이터 외에 추가적인 정보를 연동하여 FA 소요 시간을 획기적으로 단축하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "FA 효율성 증대",
+     "Auto Diag 고도화",
+     "STDF 데이터 연동"
+    ]
+   },
+   {
+    "person_id": 89,
+    "name": "이선우",
+    "cl_level": "CL2",
+    "text": "현재 운영 중인 Advantest 테스터의 Auto Diag 기능을 활용, 테스트 결과 데이터(STDF)를 자동으로 분석하여 설비 고장 진단 시간을 단축하고 운영 효율을 높일 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Advantest Auto Diag",
+     "STDF 자동 분석",
+     "고장 진단 시간 단축"
+    ]
+   },
+   {
+    "person_id": 90,
+    "name": "전민준",
+    "cl_level": "CL3",
+    "text": "테스트 과정에서 발생하는 불량품에 대한 고장 분석(FA) 프로세스를 자동화하고, AI/ML 기반의 Auto Diag 시스템을 도입하여 불량 원인 분석의 정확도와 속도를 높이고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "FA 프로세스 자동화",
+     "AI/ML 기반 Auto Diag",
+     "FA 정확도/속도 향상"
+    ]
+   },
+   {
+    "person_id": 93,
+    "name": "서다은",
+    "cl_level": "CL2",
+    "text": "각 테스터에서 생성되는 STDF(Standard Test Data Format) 데이터를 효율적으로 취합하고 정리하여 불량 패턴 분석의 기초 자료로 활용될 수 있도록 데이터 관리 체계를 개선하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 데이터 관리 체계",
+     "불량 패턴 분석 기초 자료"
+    ]
+   },
+   {
+    "person_id": 99,
+    "name": "정예준",
+    "cl_level": "CL3",
+    "text": "MBT와 CLT에서 얻은 데이터를 HFT 결과와 연동하여 AX 기반의 Auto Diag 시스템을 구현하고 싶습니다. 이를 통해 D1b 제품의 고장 분석(FA) 시간을 대폭 단축하고 Test PGM의 진단 정확도를 향상시킬 수 있습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "MBT·CLT·HFT 데이터 연동",
+     "AX 기반 Auto Diag 시스템"
+    ]
+   },
+   {
+    "person_id": 105,
+    "name": "박현우",
+    "cl_level": "CL4",
+    "text": "Handler 및 Magnum 테스터에서 발생하는 고장에 대해 Auto Diag 로직을 개발하여 고장 분석(FA) 시간을 단축하고 설비 운영 효율성을 높이겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Handler, Magnum Auto Diag",
+     "FA 시간 단축",
+     "설비 운영 효율화"
+    ]
+   },
+   {
+    "person_id": 108,
+    "name": "조가은",
+    "cl_level": "CL2",
+    "text": "고장 분석(FA) 팀을 지원하여 STDF 데이터를 기반으로 불량 패턴의 초기 분류 작업을 수행하고, 원인 분석의 기초 자료를 제공하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "FA 지원",
+     "STDF 불량 패턴 분류",
+     "원인 분석 기초 자료 제공"
+    ]
+   },
+   {
+    "person_id": 112,
+    "name": "이서연",
+    "cl_level": "CL3",
+    "text": "EDS 및 Final Test에서 수집되는 STDF 데이터 분석 절차를 표준화하여 불량 유형 분류의 정확도를 높이고, 효율적인 고장 분석(FA)을 지원하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 분석 표준화",
+     "불량 유형 정확도 향상",
+     "효율적 FA 지원"
+    ]
+   },
+   {
+    "person_id": 114,
+    "name": "윤유나",
+    "cl_level": "CL3",
+    "text": "STDF 데이터를 기반으로 Yield 변화를 자동으로 분석하고 이상 징후를 감지하는 시스템을 구축하여 사전 예방적 대응이 가능하도록 지원하고 싶습니다. 이를 통해 품질 이슈를 조기에 파악할 수 있습니다.",
+    "horizon": "불명",
+    "quotes": [
+     "STDF Yield 자동 분석",
+     "이상 징후 조기 감지"
+    ]
+   },
+   {
+    "person_id": 123,
+    "name": "권다은",
+    "cl_level": "CL2",
+    "text": "STDF 데이터를 활용하여 초기 고온 Burn-in 불량 패턴을 분석하고, 고장 분석(FA) 팀과의 협업을 통해 주요 불량 모드를 식별하는 데 기여하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 데이터 분석",
+     "고온 불량 패턴 식별",
+     "FA 협업 기여"
+    ]
+   },
+   {
+    "person_id": 127,
+    "name": "오선우",
+    "cl_level": "CL3",
+    "text": "MBT에서 발생하는 다양한 불량 패턴에 대해 Auto Diag 시스템의 기능을 확장하고, 머신러닝 기반의 패턴 인식을 도입하여 진단 정확도와 속도를 향상시키고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "MBT 불량 Auto Diag 확장",
+     "ML 패턴 인식 도입",
+     "진단 정확도/속도 향상"
+    ]
+   },
+   {
+    "person_id": 130,
+    "name": "권가은",
+    "cl_level": "CL3",
+    "text": "Advantest 테스터의 STDF 로그 데이터를 기반으로 Auto Diag 시스템을 고도화하여, 고장 분석(FA) 시간을 획기적으로 단축하는 AX 프로젝트를 리드하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Advantest STDF 데이터 기반",
+     "Auto Diag 고도화",
+     "AX 프로젝트 리딩"
+    ]
+   },
+   {
+    "person_id": 132,
+    "name": "홍현우",
+    "cl_level": "CL4",
+    "text": "MBT, HFT 등 각 테스트 단계에서 발생하는 방대한 STDF 데이터를 활용, AI 기반 고장 분석(FA) 자동화 시스템을 구현하여 품질(DPPM)을 최소화하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "MBT/HFT STDF 활용",
+     "AI 기반 FA 자동화",
+     "DPPM 최소화"
+    ]
+   },
+   {
+    "person_id": 133,
+    "name": "장민준",
+    "cl_level": "CL4",
+    "text": "Teradyne Magnum 테스터에서 생성되는 STDF 데이터를 표준화하고, 이를 활용한 빅데이터 기반의 Auto Diag 및 예측 보전 시스템을 구축하여 설비 운영 효율을 극대화하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum STDF 데이터 표준화",
+     "빅데이터 Auto Diag/예측 보전"
+    ]
+   },
+   {
+    "person_id": 135,
+    "name": "송우진",
+    "cl_level": "CL2",
+    "text": "MBT 공정 중 발생하는 불량 패턴을 Auto Diag 시스템으로 자동 분류하여, 초기 단계에서 품질(DPPM) 문제 발생 가능성을 줄이고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT 불량 패턴 자동 분류",
+     "초기 DPPM 문제 감소"
+    ]
+   },
+   {
+    "person_id": 136,
+    "name": "오하은",
+    "cl_level": "CL2",
+    "text": "Auto Diag 시스템에서 생성되는 진단 결과를 자동으로 보고서 형태로 변환하여, 고장 분석(FA) 팀의 업무 효율을 향상시키겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Auto Diag 진단 결과",
+     "자동 보고서 변환",
+     "FA 팀 업무 효율 향상"
+    ]
+   },
+   {
+    "person_id": 137,
+    "name": "홍건우",
+    "cl_level": "CL3",
+    "text": "고객 품질(DPPM) 기준 강화를 목표로, 고장 분석(FA) 결과와 STDF 데이터를 연계하여 특정 Test PGM의 불량 검출력과 실제 필드 불량 간의 상관관계를 분석하여, Test coverage를 재검토하고 보완할 계획입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 감소 목표",
+     "FA-STDF 연계\n테스트 커버리지 보완"
+    ]
+   },
+   {
+    "person_id": 138,
+    "name": "신가은",
+    "cl_level": "CL3",
+    "text": "STDF 데이터 내의 Test parameter 값 변화를 모니터링하여 설비(Handler, Tester) 이상 징후를 조기 감지하고, 예방 정비 스케줄링에 기여하는 자동화 시스템 개발에 참여하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 파라미터 모니터링",
+     "설비 이상 조기 감지"
+    ]
+   },
+   {
+    "person_id": 139,
+    "name": "강현우",
+    "cl_level": "CL4",
+    "text": "Yield 저하 패턴을 자동으로 감지하고 원인을 추정하는 AX 기반의 Auto Diag 시스템을 구축하여, Man-power 의존도를 낮추고 대응 시간을 획기적으로 단축하는 것이 목표입니다. 이는 STDF 데이터 활용의 궁극적인 지향점입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 Auto Diag 시스템",
+     "Man-power 의존도 하락",
+     "STDF 활용의 궁극적 목표"
+    ]
+   },
+   {
+    "person_id": 141,
+    "name": "박가은",
+    "cl_level": "CL4",
+    "text": "Advantest 및 Teradyne 테스터의 설비 운영 데이터를 STDF와 통합 분석하여, 장비별 미세한 성능 차이가 Yield에 미치는 영향을 분석하고 최적의 설비 배치 및 운영 전략을 수립하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "테스터 운영 데이터 통합",
+     "Yield 영향 분석",
+     "최적 설비 운영 전략"
+    ]
+   },
+   {
+    "person_id": 143,
+    "name": "전하은",
+    "cl_level": "CL3",
+    "text": "HFT 공정 중 발생하는 불규칙적인 Yield Drop 현상을 STDF 데이터와 설비 운영 로그를 통합 분석하여 예측하고, Auto Diag 기능을 통해 즉각적인 원인 분석 및 조치 방안을 제시하는 시스템을 구축할 계획입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "HFT Yield Drop 예측",
+     "STDF-설비 로그 통합 분석",
+     "Auto Diag 기반 즉각 조치"
+    ]
+   },
+   {
+    "person_id": 144,
+    "name": "임건우",
+    "cl_level": "CL3",
+    "text": "D1b 제품의 Test Yield 안정화를 위해, Handler와 Tester의 Auto Diag 기능을 고도화하여 설비 고장 시 예상되는 원인과 필요한 조치를 자동으로 추천하는 시스템을 구축하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Test Yield 안정화",
+     "Handler/Tester Auto Diag 고도화",
+     "자동 원인 분석 및 조치"
+    ]
+   }
+  ]
+ },
+ {
+  "cluster_id": 5,
+  "items": [
+   {
+    "person_id": 3,
+    "name": "송지유",
+    "cl_level": "CL3",
+    "text": "HFT(High-temp Final Test) 공정에서 발생할 수 있는 DPPM 최소화를 위해 기존 Test PGM을 정밀하게 개선하고, 신뢰성 향상 방안을 모색하여 양산 품질을 높이는 데 기여하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT DPPM 최소화",
+     "PGM 정밀 개선"
+    ]
+   },
+   {
+    "person_id": 6,
+    "name": "서현우",
+    "cl_level": "CL2",
+    "text": "신규 D1b 제품의 초기 Yield 향상을 위해 Test PGM 파라미터를 정밀하게 튜닝하고, 수율 저하 원인을 분석하여 빠르게 개선하는 작업을 수행하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b Yield 향상",
+     "PGM 파라미터 튜닝"
+    ]
+   },
+   {
+    "person_id": 7,
+    "name": "정건우",
+    "cl_level": "CL4",
+    "text": "차세대 D1b 공정 제품에 최적화된 Test PGM 아키텍처를 선제적으로 설계하고, 개발 단계부터 효율성과 유연성을 확보하여 양산 적용까지의 리스크를 최소화하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b PGM 아키텍처 설계",
+     "효율성/유연성 확보"
+    ]
+   },
+   {
+    "person_id": 8,
+    "name": "신유나",
+    "cl_level": "CL4",
+    "text": "전 공정 연계 품질(DPPM) 향상을 위한 Test PGM 통합 전략을 수립하고, 테스트 단계별 데이터 분석을 통해 잠재적 불량 요인을 사전에 제거하는 시스템을 구축하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "전 공정 연계 DPPM 향상",
+     "테스트 데이터 분석 시스템 구축"
+    ]
+   },
+   {
+    "person_id": 13,
+    "name": "홍지유",
+    "cl_level": "CL3",
+    "text": "Para(병렬) 테스트 환경에서 MBT 데이터의 신뢰성을 확보하기 위한 최적화 방안을 마련하고자 합니다. D1b 제품의 대량 생산에 앞서 안정적인 테스트 환경을 구축하는 것이 중요합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Para 테스트\n신뢰성 확보",
+     "D1b 대량 생산\n안정화"
+    ]
+   },
+   {
+    "person_id": 17,
+    "name": "김예준",
+    "cl_level": "CL3",
+    "text": "MBT(Monitoring Burn-in Test) 과정에서 발생하는 비정상적인 전력 소모 패턴을 탐지하는 Test PGM 로직을 개발하고 싶습니다. 이를 통해 조기 불량 예측 정확도를 높이고 품질(DPPM)을 개선하는 데 기여할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT 전력 소모 패턴",
+     "비정상 탐지 PGM",
+     "품질(DPPM) 개선"
+    ]
+   },
+   {
+    "person_id": 22,
+    "name": "오민준",
+    "cl_level": "CL3",
+    "text": "D1b 신규 제품의 테스트 시간 단축을 위한 Test PGM 최적화 작업을 진행하고자 합니다. 불필요한 테스트 스텝을 제거하고 Para(병렬 테스트) 효율을 극대화하여 생산성을 높일 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 테스트 시간 단축",
+     "PGM 최적화",
+     "Para 효율 극대화"
+    ]
+   },
+   {
+    "person_id": 23,
+    "name": "김지호",
+    "cl_level": "CL4",
+    "text": "DRAM D1b 공정의 고도화에 발맞춰, 신규 Test PGM 개발 및 기존 PGM의 최적화 로드맵을 수립하고 싶습니다. AI/ML 기반의 AX(AI Transformation) 기술을 적극 도입하여 테스트 효율과 품질을 동시에 잡는 것이 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b PGM 로드맵",
+     "AX 기술 도입",
+     "효율+품질 목표"
+    ]
+   },
+   {
+    "person_id": 24,
+    "name": "장지유",
+    "cl_level": "CL4",
+    "text": "DRAM 품질(DPPM)을 획기적으로 개선하기 위한 전략적 로드맵을 수립하고 싶습니다. 제조-테스트-FA 전 과정에서 데이터 기반의 품질 게이트를 강화하고, 잠재적 불량을 사전에 탐지하는 시스템을 구축할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 획기적 개선",
+     "데이터 기반 품질 게이트",
+     "잠재 불량 사전 탐지"
+    ]
+   },
+   {
+    "person_id": 25,
+    "name": "송지호",
+    "cl_level": "CL4",
+    "text": "D1b 공정 노드에서 MBT와 HFT의 Para 병렬 테스트 효율을 극대화하기 위해 기존 Test PGM 구조를 최적화하고, STDF 데이터를 활용한 Auto Diag 기능을 강화하여 Test time 단축을 달성하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b MBT/HFT",
+     "Para 테스트 효율 극대화",
+     "Auto Diag로 Test time 단축"
+    ]
+   },
+   {
+    "person_id": 27,
+    "name": "조지유",
+    "cl_level": "CL4",
+    "text": "AX 기반의 Test PGM 자동 생성 및 최적화 시스템을 구축하여, 새로운 공정 노드(D1b)의 Test PGM 개발 주기를 단축하고, 초기 Yield 안정화에 기여하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 PGM 자동 생성",
+     "D1b PGM 개발 주기 단축",
+     "초기 Yield 안정화"
+    ]
+   },
+   {
+    "person_id": 29,
+    "name": "오서연",
+    "cl_level": "CL4",
+    "text": "D1b 공정에서 신규 도입되는 Tester (Teradyne)의 Para 병렬 테스트 기능을 최대한 활용하기 위한 Test PGM 아키텍처를 설계하고, 초기 안정화 및 효율 극대화 방안을 마련할 계획입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 신규 Teradyne",
+     "Para 테스트 아키텍처 설계",
+     "초기 안정화 및 효율 극대화"
+    ]
+   },
+   {
+    "person_id": 32,
+    "name": "장가은",
+    "cl_level": "CL3",
+    "text": "품질(DPPM)을 유지하면서 Test time을 단축할 수 있는 AX 기반의 Test PGM 최적화 모델을 개발하고, 이를 D1b 공정에 적용하여 생산성 향상에 기여하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 유지 & Test time 단축",
+     "AX 기반 PGM 최적화 모델",
+     "D1b 공정 생산성 향상"
+    ]
+   },
+   {
+    "person_id": 33,
+    "name": "임지호",
+    "cl_level": "CL3",
+    "text": "MBT 환경에서 Test PGM 최적화를 통해 초기 잠재 불량 검출력을 극대화하고, 이를 바탕으로 출하 DPPM 지표를 혁신적으로 개선하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT PGM 최적화로",
+     "DPPM 혁신 개선"
+    ]
+   },
+   {
+    "person_id": 41,
+    "name": "강서연",
+    "cl_level": "CL3",
+    "text": "D1b 공정 노드의 MBT 테스트 데이터를 AI로 분석하여 불량 패턴을 조기에 식별하고, 이를 통해 Test PGM의 최적화 방안을 도출하여 품질을 향상시키고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b MBT\nAI 불량 패턴 식별",
+     "Test PGM 최적화로\n품질 향상"
+    ]
+   },
+   {
+    "person_id": 42,
+    "name": "송예준",
+    "cl_level": "CL3",
+    "text": "AX 기반의 Test PGM 자동 최적화 시스템을 개발하여, 새로운 D1b 공정 노드의 테스트 시간은 줄이면서도 Yield는 유지하거나 개선하는 것을 목표로 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX Test PGM\n자동 최적화",
+     "D1b 테스트 시간 단축\nYield 개선"
+    ]
+   },
+   {
+    "person_id": 53,
+    "name": "정선우",
+    "cl_level": "CL4",
+    "text": "D1b 공정 노드에서 발생하는 미세 불량(latent defect)을 조기에 검출할 수 있는 새로운 Test PGM 개발에 주력하고자 합니다. 이를 통해 잠재적인 필드 불량을 방지하고 품질(DPPM) 신뢰성을 극대화할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b 미세 불량 검출",
+     "PGM 신규 개발",
+     "품질 신뢰성 극대화"
+    ]
+   },
+   {
+    "person_id": 57,
+    "name": "송현우",
+    "cl_level": "CL3",
+    "text": "D1b 공정 노드 제품의 Advantest 테스터용 Test PGM을 최적화하여 Para 테스트 효율을 극대화하고 전반적인 Yield를 개선하는 것이 단기 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b PGM 최적화",
+     "Advantest Para 테스트\n          효율성 극대화"
+    ]
+   },
+   {
+    "person_id": 58,
+    "name": "이도윤",
+    "cl_level": "CL2",
+    "text": "신규 D1b 제품군 도입 시 CLT 및 HFT 공정에서 사용될 Teradyne 테스터의 Test PGM 개발 초기 단계부터 참여하여 안정적인 양산 전환을 지원하고자 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Teradyne PGM 개발 지원",
+     "CLT/HFT 양산 전환"
+    ]
+   },
+   {
+    "person_id": 59,
+    "name": "최시우",
+    "cl_level": "CL2",
+    "text": "D1b 제품의 Test PGM 디버깅을 심화하여 초기 Yield 하락의 근본 원인을 명확히 분석하고, DPPM(Defective Parts Per Million)을 개선할 수 있는 PGM 최적화 방안을 단기적으로 마련해야 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b PGM 디버깅 심화",
+     "Yield 하락 원인 분석",
+     "DPPM 개선"
+    ]
+   },
+   {
+    "person_id": 61,
+    "name": "송수아",
+    "cl_level": "CL3",
+    "text": "Para 테스트 효율을 극대화하기 위한 새로운 Test PGM 아키텍처를 연구하고, D1b 노드에 최적화된 병렬 테스트 로직을 개발하는 것이 장기 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Para 테스트 효율 극대화",
+     "새로운 PGM 아키텍처"
+    ]
+   },
+   {
+    "person_id": 62,
+    "name": "박선우",
+    "cl_level": "CL3",
+    "text": "D1b 제품의 HFT 공정에서 발생하는 특정 불량 패턴을 정확히 감지하고 분류할 수 있도록 Test PGM 진단 로직을 추가 개발하여 DPPM 감소에 기여하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT 불량 패턴 진단",
+     "DPPM 감소 기여"
+    ]
+   },
+   {
+    "person_id": 63,
+    "name": "신하은",
+    "cl_level": "CL2",
+    "text": "신규 D1b Test PGM의 초기 검증 절차를 표준화하고, 검증 결과를 체계적으로 문서화하여 개발 프로세스의 안정성과 신뢰도를 단기적으로 향상시키고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b PGM 초기 검증",
+     "문서화 프로세스 개선"
+    ]
+   },
+   {
+    "person_id": 65,
+    "name": "한유나",
+    "cl_level": "CL4",
+    "text": "D1b 공정 노드에서의 Burn-in 스트레스 최적화를 위한 Test PGM 개발이 필요합니다. 과도한 스트레스로 인한 제품 손상을 방지하고, 효율적인 고장 검출률을 확보하는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b Burn-in 스트레스 최적화",
+     "효율적 고장 검출률 확보"
+    ]
+   },
+   {
+    "person_id": 73,
+    "name": "윤주원",
+    "cl_level": "CL3",
+    "text": "D1b 공정 노드 제품의 초기 테스트 단계에서 marginal fail을 조기에 검출하기 위해 Test PGM의 진단 로직을 고도화하여 Yield 분석 시간을 단축하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b marginal fail 조기 검출",
+     "Test PGM 진단 로직 고도화",
+     "Yield 분석 시간 단축"
+    ]
+   },
+   {
+    "person_id": 76,
+    "name": "송선우",
+    "cl_level": "CL4",
+    "text": "신규 D1b 제품 도입 시 Advantest 또는 Teradyne 테스터의 Para 테스트 효율을 극대화하여 테스트 시간을 단축하고, 초기 Yield 안정화를 지원하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 제품 Para 테스트 효율",
+     "테스트 시간 단축",
+     "초기 Yield 안정화"
+    ]
+   },
+   {
+    "person_id": 81,
+    "name": "류가은",
+    "cl_level": "CL2",
+    "text": "D1b 공정 노드 HFT의 Test PGM 스텝별 분석을 통해 불필요한 테스트 구간을 식별하고 제거하여 단기적인 테스트 시간 단축을 목표합니다. 이를 통해 설비 가동률을 높일 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT PGM 스텝 분석",
+     "불필요 구간 제거",
+     "설비 가동률 ↑"
+    ]
+   },
+   {
+    "person_id": 84,
+    "name": "최민준",
+    "cl_level": "CL4",
+    "text": "D1b와 같은 차세대 공정 노드 제품의 Para 병렬 테스트 효율 극대화를 위해 Advantest 및 Teradyne 테스터의 아키텍처를 분석하여 최적의 테스트 자원 할당 전략을 수립하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "차세대 D1b",
+     "Para 효율 극대화",
+     "자원 할당 전략 수립"
+    ]
+   },
+   {
+    "person_id": 85,
+    "name": "임다은",
+    "cl_level": "CL3",
+    "text": "Test time 단축 노력과 함께 DPPM (Defective Parts Per Million) 품질 지표를 연계하여, 짧아진 테스트 시간에도 불구하고 품질 저하가 없는지 정량적으로 검증하는 프로세스를 수립하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Test time 단축",
+     "DPPM 품질 연계",
+     "정량적 검증 프로세스"
+    ]
+   },
+   {
+    "person_id": 88,
+    "name": "서소율",
+    "cl_level": "CL3",
+    "text": "D1b 공정 노드 제품의 HFT (High-temp Final Test) Test PGM을 분석하여 초기 불량 검출율을 높이는 테스트 시퀀스를 도입하고, 이를 통해 후공정 재작업을 줄여 Test time 및 비용을 절감하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b HFT PGM",
+     "초기 불량 검출율 ↑",
+     "후공정 재작업 감소"
+    ]
+   },
+   {
+    "person_id": 89,
+    "name": "이선우",
+    "cl_level": "CL2",
+    "text": "D1b 공정의 HFT(High-temp Final Test) DPPM 개선을 위해 테스터 설비의 예방 보전 주기와 Test PGM 최적화 방안을 수립하여 최종 제품의 품질을 높이고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b HFT DPPM 개선",
+     "테스터 PGM 최적화",
+     "최종 품질 향상"
+    ]
+   },
+   {
+    "person_id": 96,
+    "name": "권채원",
+    "cl_level": "CL2",
+    "text": "각기 다른 Teradyne 및 Advantest 테스터 간의 DPPM 편차를 정량적으로 분석하고, 그 원인을 설비 운영, Test PGM, 혹은 Handler 설정에서 찾아 개선 방안을 도출하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "테스터 DPPM 편차 분석",
+     "원인 분석 및 개선 방안",
+     "설비/PGM/Handler 설정"
+    ]
+   },
+   {
+    "person_id": 96,
+    "name": "권채원",
+    "cl_level": "CL2",
+    "text": "특정 불량 유형이 자주 발생하는 경우, 해당 불량에 대한 Test PGM의 테스트 조건 및 파라미터를 미세 조정하여 불량 검출률을 높이고 DPPM을 효과적으로 관리할 수 있도록 지원하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "불량 유형별 PGM 조건",
+     "파라미터 미세 조정",
+     "DPPM 효과적 관리"
+    ]
+   },
+   {
+    "person_id": 98,
+    "name": "최지유",
+    "cl_level": "CL2",
+    "text": "D1b 공정의 특정 Test PGM 구간에서 발생하는 Yield 저하 원인을 AX를 활용한 패턴 분석을 통해 규명하고, 개선 방안을 도출하는 과제를 수행하고 싶습니다.",
+    "horizon": "불명",
+    "quotes": [
+     "D1b Yield 저하 원인",
+     "AX 패턴 분석"
+    ]
+   },
+   {
+    "person_id": 105,
+    "name": "박현우",
+    "cl_level": "CL4",
+    "text": "D1b 공정 노드의 웨이퍼 테스트 시간을 획기적으로 단축하고 Yield를 극대화하기 위해 EDS Test PGM의 병렬(Para) 테스트 효율을 개선할 계획입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 웨이퍼 Test PGM",
+     "Para 테스트 효율 개선",
+     "Yield 극대화 기여"
+    ]
+   },
+   {
+    "person_id": 109,
+    "name": "윤가은",
+    "cl_level": "CL3",
+    "text": "D1b 공정 노드에서 발생하는 EDS Yield 저하의 주요 원인을 STDF 데이터를 통해 심층 분석하고, Test PGM 최적화를 위한 개선 방안을 제시하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b EDS Yield 저하 분석",
+     "STDF 심층 분석",
+     "PGM 최적화 방안 제시"
+    ]
+   },
+   {
+    "person_id": 111,
+    "name": "안채원",
+    "cl_level": "CL4",
+    "text": "D1b 제품의 최종 품질(DPPM) 목표 달성을 위해 Final Test 전 과정의 Test PGM을 전반적으로 검토하고, 핵심 불량 항목에 대한 커버리지를 강화하는 방향으로 최적화할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b Final Test 품질",
+     "PGM 전반 검토",
+     "불량 커버리지 강화"
+    ]
+   },
+   {
+    "person_id": 112,
+    "name": "이서연",
+    "cl_level": "CL3",
+    "text": "High-temp Final Test (HFT) 결과를 면밀히 분석하여 미스크리닝 되는 잠재 불량 디바이스를 선별하기 위한 Test PGM 수정안을 도출하고 검증하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT 결과 분석",
+     "잠재 불량 선별 PGM",
+     "수정안 도출 및 검증"
+    ]
+   },
+   {
+    "person_id": 113,
+    "name": "홍민준",
+    "cl_level": "CL4",
+    "text": "D1b 공정 노드에 최적화된 Advantest 테스터 PGM을 선행 개발하여 차세대 제품의 초기 Yield 안정화에 기여하겠습니다. 복잡성이 증가하는 새로운 제품에 대한 테스트 커버리지를 확보하는 것이 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b PGM 선행 개발",
+     "초기 Yield 안정화"
+    ]
+   },
+   {
+    "person_id": 116,
+    "name": "신도윤",
+    "cl_level": "CL4",
+    "text": "D1b+ 노드 제품을 위한 차세대 Test PGM 개발 표준을 정립하고, 이를 기반으로 고품질의 PGM을 빠르게 양산에 적용하는 체계를 구축하겠습니다. 개발 프로세스의 효율화와 품질 향상이 핵심 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b+ PGM 개발 표준화",
+     "고품질 PGM 양산 적용"
+    ]
+   },
+   {
+    "person_id": 124,
+    "name": "권하은",
+    "cl_level": "CL4",
+    "text": "D1b 노드 제품의 MBT 스트레스 커버리지를 AI 기반으로 확장하여 잠재적 불량을 조기에 검출하고, 최종 품질(DPPM)을 획기적으로 개선하는 데 집중할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b MBT 커버리지 확장",
+     "AI 기반 불량 조기 검출",
+     "DPPM 획기적 개선"
+    ]
+   },
+   {
+    "person_id": 137,
+    "name": "홍건우",
+    "cl_level": "CL3",
+    "text": "D1b 공정의 MBT 및 HFT Yield를 향상시키기 위해 STDF 데이터를 심층 분석하여 불량 패턴과 원인을 정밀하게 파악하고, 이를 통해 Test PGM 최적화 방안을 도출하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT Yield 향상",
+     "STDF 심층 분석 통한\nPGM 최적화"
+    ]
+   },
+   {
+    "person_id": 141,
+    "name": "박가은",
+    "cl_level": "CL4",
+    "text": "현재 D1b 제품의 HFT 공정에서 발생하는 품질(DPPM) 이슈를 근원적으로 해결하기 위해, STDF의 상세한 Test PGM Log와 FA 데이터를 연계하여 불량 메커니즘을 규명하고 Test coverage를 개선하여 Zero-DPPM에 도전할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "HFT DPPM 이슈 해결",
+     "STDF-FA 연계 불량 메커니즘",
+     "Zero-DPPM 도전"
+    ]
+   }
+  ]
+ },
+ {
+  "cluster_id": 6,
+  "items": [
+   {
+    "person_id": 1,
+    "name": "안도윤",
+    "cl_level": "CL2",
+    "text": "ATE 장비의 Test PGM 디버깅 시간을 단축하고 효율을 최적화하기 위해 Advantest V9300 플랫폼에 특화된 스크립트 개발 능력을 향상시키고자 합니다. 이는 개발 속도 증진에 기여할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "V9300 스크립트 개발",
+     "디버깅 시간 단축"
+    ]
+   },
+   {
+    "person_id": 3,
+    "name": "송지유",
+    "cl_level": "CL3",
+    "text": "Magnum MX Tester와 Handler의 연동을 최적화하여 Para(병렬 테스트) 효율을 극대화하고, 이를 통해 테스트 시간 단축 및 생산성 향상에 기여할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum-Handler 연동 최적화",
+     "Para 테스트 효율 극대화"
+    ]
+   },
+   {
+    "person_id": 5,
+    "name": "전지유",
+    "cl_level": "CL2",
+    "text": "Magnum MX Tester의 Test PGM 기본 구조를 심도 있게 학습하고, 간단한 테스트 패턴 추가 및 변경 작업을 능숙하게 수행할 수 있도록 역량을 키우겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum PGM 구조 학습",
+     "테스트 패턴 추가/변경"
+    ]
+   },
+   {
+    "person_id": 6,
+    "name": "서현우",
+    "cl_level": "CL2",
+    "text": "Teradyne UltraFLEX ATE 장비의 활용도를 극대화하기 위해 Multi-site Para(병렬 테스트) 효율을 개선하고, 테스트 시간을 최적화하는 방안을 연구하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "UltraFLEX 활용 극대화",
+     "Para 효율 개선 연구"
+    ]
+   },
+   {
+    "person_id": 7,
+    "name": "정건우",
+    "cl_level": "CL4",
+    "text": "Advantest와 Magnum 등 멀티 테스터 환경에서 Test PGM의 호환성을 확보하고, 통합된 개발 및 관리 시스템을 구축하여 개발 생산성을 높이는 것을 목표로 합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "멀티 테스터 PGM 호환성",
+     "통합 개발/관리 시스템"
+    ]
+   },
+   {
+    "person_id": 8,
+    "name": "신유나",
+    "cl_level": "CL4",
+    "text": "BIB(Burn-in Board) 및 Chamber형 LFT Test 효율화 방안을 모색하고, 이를 Test PGM에 반영하여 테스트 장비의 가동률 및 신뢰성을 동시에 높이겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "BIB, LFT Test 효율화",
+     "PGM 반영 및 신뢰성 향상"
+    ]
+   },
+   {
+    "person_id": 13,
+    "name": "홍지유",
+    "cl_level": "CL3",
+    "text": "Magnum 테스터를 활용한 BIB 자체 진단 Test PGM을 개발하고 싶습니다. 이를 통해 BIB 불량 판정 시간을 단축하고, 설비 운영 효율을 극대화할 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum 테스터\nBIB 자체 진단",
+     "불량 판정 시간 단축"
+    ]
+   },
+   {
+    "person_id": 19,
+    "name": "안건우",
+    "cl_level": "CL3",
+    "text": "Teradyne Magnum 테스터의 Para(병렬 테스트) 효율을 극대화하는 Test PGM 최적화 방안을 연구하고 싶습니다. 테스트 시간 단축을 통해 생산성 향상에 기여하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum Para 효율",
+     "PGM 최적화",
+     "테스트 시간 단축"
+    ]
+   },
+   {
+    "person_id": 25,
+    "name": "송지호",
+    "cl_level": "CL4",
+    "text": "차세대 Tester (Advantest/Teradyne) 도입에 맞춰 AX 기반의 지능형 Test PGM 개발을 선도하여, Test time 단축과 DPPM 품질 목표를 동시에 만족시키는 전략을 수립할 계획입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 기반 지능형 Test PGM",
+     "차세대 Tester 전략 수립",
+     "품질과 Test time의 조화"
+    ]
+   },
+   {
+    "person_id": 26,
+    "name": "조서연",
+    "cl_level": "CL3",
+    "text": "현재 운영 중인 CLT 설비의 Test PGM을 분석하여 불필요한 테스트 스텝을 제거하고, Para 병렬 테스트 시 유휴 시간을 최소화하여 Test time을 15% 단축하는 것을 목표로 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "CLT Test PGM 분석",
+     "유휴 시간 최소화",
+     "Test time 15% 단축"
+    ]
+   },
+   {
+    "person_id": 27,
+    "name": "조지유",
+    "cl_level": "CL4",
+    "text": "D1b 공정의 BIB 및 Handler 효율성 개선을 위해 HFT Test PGM 내 Parallelism을 극대화하고, 설비 운영 데이터를 기반으로 최적의 테스트 로드를 배분하여 Test time을 획기적으로 단축할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "D1b BIB/Handler 효율 개선",
+     "HFT PGM Parallelism",
+     "Test time 획기적 단축"
+    ]
+   },
+   {
+    "person_id": 28,
+    "name": "임소율",
+    "cl_level": "CL3",
+    "text": "HFT 공정에서 Magnum 테스터의 Para 병렬 테스트 효율을 높이기 위해, Test PGM 내 비효율적인 루프 구조를 개선하고 Handler의 부하 분산을 최적화하여 Test time을 줄이고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum HFT 효율 증대",
+     "Para 테스트 루프 개선",
+     "Handler 부하 분산"
+    ]
+   },
+   {
+    "person_id": 31,
+    "name": "오유나",
+    "cl_level": "CL3",
+    "text": "Magnum 테스터를 이용한 HFT 공정에서 Para 병렬 테스트 시 발생하는 Yield 저하 요인을 고장 분석(FA) 데이터와 연계하여 심층 분석하고, Test PGM 개선을 통해 Test time 단축과 Yield 회복을 동시에 달성하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum HFT Para 테스트",
+     "Yield 저하 FA 연계 분석",
+     "Test time 단축 & Yield 회복"
+    ]
+   },
+   {
+    "person_id": 32,
+    "name": "장가은",
+    "cl_level": "CL3",
+    "text": "MBT 공정에서 Test time 단축을 위해 기존 Test PGM의 로직을 검토하고, 불필요한 스텝을 제거하거나 Para 병렬 테스트 조건을 최적화하여 10% 이상의 효율 증대를 목표로 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT Test time 단축",
+     "PGM 로직 검토",
+     "Para 테스트 조건 최적화"
+    ]
+   },
+   {
+    "person_id": 35,
+    "name": "강채원",
+    "cl_level": "CL3",
+    "text": "Para 테스트 기법을 활용하여 최종 HFT 공정의 처리량을 증가시키면서도, 테스트 품질(DPPM) 저하 없이 효율적인 불량 스크리닝이 가능하도록 테스트 PGM을 최적화하는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Para 테스트 효율 증대",
+     "HFT 품질 유지"
+    ]
+   },
+   {
+    "person_id": 49,
+    "name": "오건우",
+    "cl_level": "CL4",
+    "text": "Final Test PGM 최적화를 위해 머신러닝 기반의 AX(AI Transformation) 기술을 도입하여 테스트 커버리지는 유지하되, 전체 테스트 시간을 획기적으로 줄이는 방안을 연구하고 싶습니다. 특히 Para 테스트 적용률을 극대화할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "AX 통한 PGM 최적화",
+     "테스트 시간 획기적 단축",
+     "Para 테스트 극대화"
+    ]
+   },
+   {
+    "person_id": 52,
+    "name": "윤도윤",
+    "cl_level": "CL4",
+    "text": "Magnum 테스터를 포함한 주요 테스트 설비의 Para(병렬 테스트) 효율을 극대화하여 테스트 CAPA를 증대시키고 싶습니다. 이를 위해 PGM 구조 개선과 설비 운영 최적화 방안을 함께 연구할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum Para 효율 극대화",
+     "테스트 CAPA 증대"
+    ]
+   },
+   {
+    "person_id": 56,
+    "name": "조우진",
+    "cl_level": "CL3",
+    "text": "EDS 테스트 흐름에서 발생하는 비효율적인 구간을 파악하여, Test PGM 변경이나 설비 조건 조정을 통해 전체적인 테스트 시간을 단축하는 방안을 제안하고 실행하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "EDS 비효율 구간 파악",
+     "테스트 시간 단축 제안"
+    ]
+   },
+   {
+    "person_id": 58,
+    "name": "이도윤",
+    "cl_level": "CL2",
+    "text": "Magnum 테스터의 설비 운영 효율성을 극대화하기 위해 Handler 연동 최적화 및 예방 보전 프로세스를 강화하여 가동률을 높이는 것이 당면 과제입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum 운영 효율성",
+     "Handler 연동 최적화"
+    ]
+   },
+   {
+    "person_id": 60,
+    "name": "류주원",
+    "cl_level": "CL4",
+    "text": "MBT, CLT, HFT 등 전체 테스트 공정에 걸쳐 Test Cost 절감과 동시에 최고 수준의 품질(DPPM)을 확보할 수 있는 차세대 Test 전략을 수립하고 실행하는 것이 중요합니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Test Cost 절감 전략",
+     "최고 품질 확보"
+    ]
+   },
+   {
+    "person_id": 61,
+    "name": "송수아",
+    "cl_level": "CL3",
+    "text": "Advantest 테스터 환경에서의 Handler 연동 안정화를 최우선 과제로 삼고, Test PGM 개발 시 표준화된 가이드라인을 정립하여 개발 효율을 높이고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler 연동 안정화",
+     "PGM 개발 표준 가이드라인"
+    ]
+   },
+   {
+    "person_id": 63,
+    "name": "신하은",
+    "cl_level": "CL2",
+    "text": "BIB(Burn-in Board) 설계 및 검증 과정에서 Test PGM과의 연동 효율을 높여 개발 및 검증 시간을 단축하는 방안을 마련하는 것이 장기적인 목표입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "BIB-PGM 연동 효율화",
+     "개발/검증 시간 단축"
+    ]
+   },
+   {
+    "person_id": 64,
+    "name": "강우진",
+    "cl_level": "CL3",
+    "text": "Teradyne 테스터의 Para 테스트 성능을 극대화하기 위해 설비 셋업을 최적화하고 Test PGM의 병렬 처리 로직을 튜닝하여 전반적인 Throughput을 개선하는 것이 단기 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne Para 테스트",
+     "설비 셋업 최적화",
+     "Throughput 개선"
+    ]
+   },
+   {
+    "person_id": 64,
+    "name": "강우진",
+    "cl_level": "CL3",
+    "text": "신규 테스터 도입 시 초기 구축 단계부터 Test 효율과 운영 편의성을 고려한 통합 솔루션을 제안하고, 이를 실제 시스템에 적용하는 것이 장기적인 비전입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "신규 테스터 통합 솔루션",
+     "Test 효율/운영 편의성"
+    ]
+   },
+   {
+    "person_id": 67,
+    "name": "홍예린",
+    "cl_level": "CL4",
+    "text": "Magnum 테스터를 활용한 병렬 테스트(Para) 효율을 극대화하여 Burn-in 공정의 처리량을 증대하는 방안을 연구하고 싶습니다. 이를 통해 장비 활용률을 높이고 비용을 절감하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum Para 테스트 효율",
+     "처리량 증대 및 비용 절감"
+    ]
+   },
+   {
+    "person_id": 72,
+    "name": "안주원",
+    "cl_level": "CL3",
+    "text": "Burn-in Chamber의 에너지 소비 효율을 개선하는 Test PGM 로직을 개발하고 싶습니다. 불필요한 테스트 스텝을 제거하거나 최적화하여 전력 사용량을 줄이는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Chamber 에너지 효율 PGM",
+     "전력 사용량 최적화"
+    ]
+   },
+   {
+    "person_id": 77,
+    "name": "오수아",
+    "cl_level": "CL3",
+    "text": "Burn-in test 시간 단축 및 효율 증대를 위해 Test PGM의 패턴 최적화와 함께 설비 운영의 자동화 수준을 높이는 방안을 모색할 것입니다.",
+    "horizon": "불명",
+    "quotes": [
+     "Burn-in 시간 단축",
+     "PGM 패턴 최적화",
+     "설비 운영 자동화 모색"
+    ]
+   },
+   {
+    "person_id": 81,
+    "name": "류가은",
+    "cl_level": "CL2",
+    "text": "Handler 운영 중 발생하는 Idle time 최소화를 위해 로딩/언로딩 자동화 스크립트를 개선하고 싶습니다. 이를 통해 Para 테스트 효율을 더욱 끌어올릴 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Handler Idle time",
+     "스크립트 개선",
+     "Para 효율 극대화"
+    ]
+   },
+   {
+    "person_id": 82,
+    "name": "한예준",
+    "cl_level": "CL3",
+    "text": "Magnum 테스터의 Para 병렬 테스트 효율성을 극대화하기 위해 각 Test PGM의 스레드 할당 및 자원 관리 로직을 최적화하고 싶습니다. 이를 통해 전반적인 테스트 처리량을 증가시킬 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum Para 효율",
+     "PGM 스레드 최적화",
+     "처리량 증가"
+    ]
+   },
+   {
+    "person_id": 86,
+    "name": "송건우",
+    "cl_level": "CL2",
+    "text": "기본 Test PGM의 불필요한 루프나 변수 초기화 구간을 찾아내어 간소화하는 작업을 통해, 개별 테스트 스텝의 시간을 미세하게나마 단축시키고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "PGM 불필요 루프",
+     "변수 초기화 간소화",
+     "테스트 스텝 시간 단축"
+    ]
+   },
+   {
+    "person_id": 87,
+    "name": "정시우",
+    "cl_level": "CL4",
+    "text": "전사적인 Test time 단축 로드맵을 수립하고, Advantest, Teradyne, Magnum 등 여러 플랫폼에 걸친 Para 병렬 테스트의 표준화된 효율화 방안을 제시하여 전체 테스트 공정의 병목 현상을 해소할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "전사적 Test time 로드맵",
+     "Para 테스트 표준화",
+     "공정 병목 해소"
+    ]
+   },
+   {
+    "person_id": 91,
+    "name": "서도윤",
+    "cl_level": "CL4",
+    "text": "다수의 테스터(Advantest, Teradyne)를 활용한 Para(병렬 테스트) 효율을 극대화하여 테스트 생산성을 높이고, 이를 통해 전체 생산 비용 절감 및 TAT 단축에 기여하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Para 테스트 효율 극대화",
+     "생산성 향상",
+     "TAT 단축 기여"
+    ]
+   },
+   {
+    "person_id": 94,
+    "name": "서지유",
+    "cl_level": "CL3",
+    "text": "Advantest 및 Teradyne 테스터의 Para(병렬 테스트) 효율을 극대화하기 위한 Test PGM 최적화 작업을 수행하여 테스트 시간 단축과 Yield 향상을 동시에 달성하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Para 테스트 효율 극대화",
+     "Test PGM 최적화",
+     "Yield/시간 단축 동시 달성"
+    ]
+   },
+   {
+    "person_id": 99,
+    "name": "정예준",
+    "cl_level": "CL3",
+    "text": "Para 테스트 효율성 증대를 위해 테스터 간 데이터 불균형을 AX로 보정하고, 최적의 병렬 테스트 환경을 구축하는 방안을 모색하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Para 테스트 효율 증대",
+     "테스터 간 데이터 보정"
+    ]
+   },
+   {
+    "person_id": 109,
+    "name": "윤가은",
+    "cl_level": "CL3",
+    "text": "Magnum 테스터의 Para(병렬 테스트) 효율을 극대화하기 위한 Test PGM 구조 변경 및 테스트 아이템 재배치를 통해 전체 테스트 시간을 단축할 계획입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum Para 효율 극대화",
+     "PGM 구조 변경",
+     "테스트 시간 단축"
+    ]
+   },
+   {
+    "person_id": 113,
+    "name": "홍민준",
+    "cl_level": "CL4",
+    "text": "Teradyne 및 Magnum 테스터 자원 활용률 분석을 통해 Para 테스트 효율을 최적화하고, 전체 테스트 Cost를 절감하는 방안을 수립하고자 합니다. 더 많은 칩을 동시에 테스트하여 생산성을 높이는 것이 핵심입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "ATE 자원 최적화",
+     "Para 테스트 효율 극대화"
+    ]
+   },
+   {
+    "person_id": 114,
+    "name": "윤유나",
+    "cl_level": "CL3",
+    "text": "HFT 및 CLT 테스트 PGM의 실행 시간을 단축하고 효율을 높여 전체 테스트 공정의 병목 현상을 해소하겠습니다. 특히 반복적인 루틴을 최적화하는 데 집중할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT/CLT PGM 시간 단축",
+     "테스트 병목 해소"
+    ]
+   },
+   {
+    "person_id": 116,
+    "name": "신도윤",
+    "cl_level": "CL4",
+    "text": "Magnum 및 Teradyne 테스터의 Para 테스트 효율을 극대화하여 테스트 시간과 비용을 절감하고, 불량 칩의 DPPM을 효과적으로 줄여 전체 품질을 향상시키겠습니다. 동시 테스트 채널 최적화에 주력할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Para 테스트 효율 극대화",
+     "DPPM 감소로 품질 향상"
+    ]
+   },
+   {
+    "person_id": 116,
+    "name": "신도윤",
+    "cl_level": "CL4",
+    "text": "Test PGM 개발팀의 전반적인 역량을 강화하기 위한 교육 프로그램 및 기술 공유 플랫폼을 마련하여 팀원들의 성장을 지원하고, 차세대 기술 적용에 대한 기반을 다지겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "PGM 개발팀 역량 강화",
+     "기술 공유/교육 플랫폼"
+    ]
+   },
+   {
+    "person_id": 117,
+    "name": "장소율",
+    "cl_level": "CL4",
+    "text": "Advantest, Teradyne, Magnum 등 다양한 ATE 플랫폼 간의 Test PGM 호환성을 확보하고, 통합 개발 환경을 구축하여 PGM 개발 효율을 획기적으로 증대시키겠습니다. 이는 개발 시간 단축과 자원 절감에 기여할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "ATE 플랫폼 PGM 호환성",
+     "통합 개발 환경 구축"
+    ]
+   },
+   {
+    "person_id": 117,
+    "name": "장소율",
+    "cl_level": "CL4",
+    "text": "Test PGM의 코드 최적화와 Para 테스트 적용 확대를 통해 테스트 시간을 단축하고, 전반적인 생산 비용을 절감하는 데 집중하겠습니다. 이는 경쟁력 확보에 필수적입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "PGM 코드 최적화",
+     "테스트 시간/비용 절감"
+    ]
+   },
+   {
+    "person_id": 118,
+    "name": "정하은",
+    "cl_level": "CL3",
+    "text": "Advantest PGM 디버깅 자동화 스크립트를 개발하여 반복적인 디버깅 작업을 줄이고, 새로운 PGM 개발 시 초기 검증 시간을 단축하는 데 기여하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "PGM 디버깅 자동화",
+     "초기 검증 시간 단축"
+    ]
+   },
+   {
+    "person_id": 121,
+    "name": "한예린",
+    "cl_level": "CL4",
+    "text": "병렬 HFT 시 발생하는 BIB 간의 성능 편차를 정밀 분석하고, 이를 줄이기 위한 BIB 설계 및 Test PGM 개선 방안을 수립하여 테스트 일관성을 확보할 것입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 편차 감소",
+     "병렬 HFT 일관성",
+     "Test PGM 개선"
+    ]
+   },
+   {
+    "person_id": 122,
+    "name": "임선우",
+    "cl_level": "CL4",
+    "text": "다양한 제품군에 걸쳐 BIB 설계 표준화를 추진하고, Multi-Para(병렬) 테스트 효율을 극대화하는 범용 Test PGM 개발을 주도하여 개발 리드타임을 단축하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 설계 표준화",
+     "Multi-Para 효율 극대화",
+     "개발 리드타임 단축"
+    ]
+   },
+   {
+    "person_id": 130,
+    "name": "권가은",
+    "cl_level": "CL3",
+    "text": "High-temp Final Test(HFT) 공정에서 Handler의 Test PGM 자동 업로드 시스템을 구현하여 수동 오류를 줄이고 설비 가동률을 향상시키고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "HFT Handler Test PGM",
+     "자동 업로드 구현"
+    ]
+   },
+   {
+    "person_id": 139,
+    "name": "강현우",
+    "cl_level": "CL4",
+    "text": "다양한 Tester(Advantest, Teradyne, Magnum)의 Test PGM 간 성능 차이를 표준화하고, Para 테스트 효율을 극대화하여 전체 생산 Capa 증대에 기여하는 통합 관리 시스템을 설계하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "PGM 성능 표준화",
+     "Para 테스트 효율 극대화",
+     "생산 Capa 증대 기여"
+    ]
+   },
+   {
+    "person_id": 142,
+    "name": "임예준",
+    "cl_level": "CL4",
+    "text": "Magnum 테스터를 활용한 Para 테스트 효율을 극대화하기 위해, Test PGM 최적화와 함께 Handler 인터페이스 개선을 통해 총 테스트 시간을 단축하고 Yield 손실 없이 생산성을 향상시키고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum Para 테스트 효율",
+     "Test PGM 최적화",
+     "Yield 손실 없는 생산성 향상"
+    ]
+   }
+  ]
+ },
+ {
+  "cluster_id": 7,
+  "items": [
+   {
+    "person_id": 10,
+    "name": "박예린",
+    "cl_level": "CL3",
+    "text": "BIB(Burn-in Board)의 효율적인 관리 및 진단 자동화 시스템을 구축하고 싶습니다. 이를 통해 불량 BIB로 인한 Test PGM 오류를 줄이고, 장비 가동률을 극대화할 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 진단\n자동화",
+     "PGM 오류 감소"
+    ]
+   },
+   {
+    "person_id": 18,
+    "name": "정서연",
+    "cl_level": "CL3",
+    "text": "Burn-in Board(BIB)의 수명 및 신뢰성 데이터를 분석하여 예방 보전 시스템을 구축하고 싶습니다. 이를 통해 BIB 고장으로 인한 Test Downtime을 최소화하고 설비 운영 안정성을 확보할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "BIB 신뢰성 분석",
+     "예방 보전 시스템",
+     "설비 운영 안정성"
+    ]
+   },
+   {
+    "person_id": 34,
+    "name": "안수아",
+    "cl_level": "CL3",
+    "text": "BIB 설계 및 운영 효율화를 통해 MBT 환경에서의 불량 검출 정확도를 높이고, 설비 운영 부담을 줄여 신뢰성 테스트 비용을 절감하는 방안을 강구하고자 합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 운영 효율화",
+     "신뢰성 테스트\n비용 절감"
+    ]
+   },
+   {
+    "person_id": 37,
+    "name": "최주원",
+    "cl_level": "CL3",
+    "text": "HFT 및 CLT 공정에서 발생하는 설비 이상을 Auto Diag 시스템과 연동하여 실시간으로 감지하고, 예측 정비 체계를 도입하여 설비 운영 효율성과 신뢰성 테스트 가동률을 극대화하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "설비 이상 실시간 감지",
+     "예측 정비 체계 도입"
+    ]
+   },
+   {
+    "person_id": 43,
+    "name": "임유나",
+    "cl_level": "CL4",
+    "text": "BIB(Burn-in Board) 및 Handler 설비의 운영 효율성을 AX 기반으로 최적화하여, 설비의 가동률을 높이고 유지보수 비용을 절감하는 방안을 모색하고 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB/Handler 운영\nAX 최적화",
+     "가동률 향상\n비용 절감"
+    ]
+   },
+   {
+    "person_id": 66,
+    "name": "송예린",
+    "cl_level": "CL2",
+    "text": "BIB 로딩 및 언로딩 과정의 자동화율을 높이는 방안을 모색하고 싶습니다. 수작업 최소화를 통해 작업 효율을 개선하고 인적 오류를 줄이는 것이 목표입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 자동화율 향상",
+     "작업 효율 개선"
+    ]
+   },
+   {
+    "person_id": 72,
+    "name": "안주원",
+    "cl_level": "CL3",
+    "text": "BIB의 PCB 설계 최적화를 통해 신호 무결성을 확보하고, 고온 환경에서의 테스트 안정성을 향상시키는 방안을 모색하고자 합니다. 이를 통해 Burn-in 불량 판정의 신뢰도를 높일 수 있습니다.",
+    "horizon": "중기",
+    "quotes": [
+     "BIB PCB 설계 최적화",
+     "신호 무결성 확보"
+    ]
+   },
+   {
+    "person_id": 77,
+    "name": "오수아",
+    "cl_level": "CL3",
+    "text": "MBT(Monitoring Burn-in Test) 과정에서 발생하는 불량의 근본 원인을 파악하기 위해 BIB(Burn-in Board) 설계와 연계된 고장 분석을 심화하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT 불량 근본 원인",
+     "BIB 설계 연계 FA",
+     "고장 분석 심화"
+    ]
+   },
+   {
+    "person_id": 83,
+    "name": "전건우",
+    "cl_level": "CL3",
+    "text": "MBT 및 BIB 보드 운영 효율성을 높이기 위해, 테스트 온도 프로파일 및 전압인가 스펙을 최적화하여 Burn-in 시간을 단축하고 BIB 수명을 연장하는 방안을 연구할 계획입니다.",
+    "horizon": "단기",
+    "quotes": [
+     "MBT·BIB 운영 효율",
+     "Burn-in 시간 단축",
+     "BIB 수명 연장"
+    ]
+   },
+   {
+    "person_id": 90,
+    "name": "전민준",
+    "cl_level": "CL3",
+    "text": "D1b 공정의 MBT(Monitoring Burn-in Test) 효율성을 극대화하기 위해 BIB(Burn-in Board) 설비의 상태를 실시간으로 모니터링하고 예지 보전 시스템을 구축하여 신뢰성 보증에 기여하겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b MBT 효율 극대화",
+     "BIB 실시간 모니터링",
+     "예지 보전 시스템 구축"
+    ]
+   },
+   {
+    "person_id": 92,
+    "name": "안우진",
+    "cl_level": "CL3",
+    "text": "BIB(Burn-in Board) 설비의 운영 효율을 최적화하기 위해 자동화된 모니터링 시스템을 구축하여 설비 가동률을 높이고 불량 발생 가능성을 사전에 예측하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 설비 운영 최적화",
+     "자동 모니터링 시스템",
+     "불량 예측"
+    ]
+   },
+   {
+    "person_id": 104,
+    "name": "서우진",
+    "cl_level": "CL2",
+    "text": "MBT 진행 중 발생하는 BIB (Burn-in Board)의 접촉 저항 변화를 AX 기법으로 분석하여, BIB의 수명 예측 및 교체 주기를 최적화하는 모델을 개발하는 데 참여하고 싶습니다. 이를 통해 테스트 신뢰성을 향상시킬 수 있습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 접촉 저항 AX 분석",
+     "수명 예측 및 교체 최적화"
+    ]
+   },
+   {
+    "person_id": 108,
+    "name": "조가은",
+    "cl_level": "CL2",
+    "text": "BIB 로딩/언로딩 절차를 표준화하고 MBT 모니터링 시스템을 효율적으로 운영하여 테스트 흐름의 병목 현상을 줄이겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 절차 표준화",
+     "MBT 모니터링 효율화",
+     "테스트 병목 개선"
+    ]
+   },
+   {
+    "person_id": 118,
+    "name": "정하은",
+    "cl_level": "CL3",
+    "text": "BIB(Burn-in Board)의 수명 및 성능 관리를 최적화하고, MBT(Monitoring Burn-in Test) PGM과의 연동을 강화하여 테스트 안정성과 효율을 동시에 높이겠습니다. BIB로 인한 불량을 최소화하는 것이 중요합니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 수명/성능 최적화",
+     "MBT PGM 연동 강화"
+    ]
+   },
+   {
+    "person_id": 120,
+    "name": "김채원",
+    "cl_level": "CL3",
+    "text": "BIB(Burn-in Board)의 최적화된 수명 관리 및 성능 검증 프로세스를 수립하여 MBT 테스트의 신뢰성을 확보하고, BIB 관련 불량을 줄이겠습니다. 이는 설비 유지보수 비용 절감에도 도움이 됩니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 수명 관리 최적화",
+     "MBT 테스트 신뢰성 확보"
+    ]
+   },
+   {
+    "person_id": 124,
+    "name": "권하은",
+    "cl_level": "CL4",
+    "text": "BIB 불량 발생 시, 자동 진단(Auto Diag) 시스템에 AX(AI Transformation) 기술을 접목하여 Fault Localization 시간을 단축하고, 분석 정확도를 높이는 솔루션을 개발하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 불량 Auto Diag",
+     "AX 기술 접목",
+     "Fault Localization 단축"
+    ]
+   },
+   {
+    "person_id": 125,
+    "name": "홍선우",
+    "cl_level": "CL4",
+    "text": "MBT Chamber의 과거 운영 데이터와 센서 데이터를 활용하여 설비 고장 및 이상 징후를 사전에 예측하는 AI 기반의 예측 정비 모델을 개발하여 가동률을 극대화할 것입니다.",
+    "horizon": "장기",
+    "quotes": [
+     "MBT Chamber 예측 정비",
+     "AI 기반 모델 개발",
+     "가동률 극대화"
+    ]
+   },
+   {
+    "person_id": 126,
+    "name": "전지호",
+    "cl_level": "CL2",
+    "text": "BIB와 Handler 간의 인터페이스에서 발생하는 경미한 오류에 대해 초기 진단 및 문제 해결 능력을 향상시켜, 비가동 시간을 최소화하는 데 주력하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB-Handler 오류 진단",
+     "문제 해결 능력 향상",
+     "비가동 시간 최소화"
+    ]
+   },
+   {
+    "person_id": 128,
+    "name": "안서연",
+    "cl_level": "CL3",
+    "text": "BIB 부품의 수명을 연장하고 교체 주기를 최적화하기 위해 BIB 사용 패턴 및 고장 데이터를 분석하여 유지보수 비용을 절감하는 방안을 강구하겠습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 부품 수명 연장",
+     "유지보수 비용 절감",
+     "고장 데이터 분석"
+    ]
+   },
+   {
+    "person_id": 129,
+    "name": "송다은",
+    "cl_level": "CL2",
+    "text": "신규 D1b 공정에서 Burn-in Board(BIB) 교체 주기를 최적화하기 위해 MBT(Monitoring Burn-in Test) 데이터를 활용한 예측 모델 구축에 기여하고 싶습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "D1b BIB 교체 주기 최적화",
+     "MBT 데이터 예측 모델"
+    ]
+   },
+   {
+    "person_id": 134,
+    "name": "강도윤",
+    "cl_level": "CL2",
+    "text": "CLT 테스트 공정에서 발생할 수 있는 BIB 손상을 예측하고, 교체 시기를 자동으로 알려주는 시스템을 구현하여 설비 운영의 안정성을 높이겠습니다.",
+    "horizon": "장기",
+    "quotes": [
+     "CLT BIB 손상 예측",
+     "자동 교체 시기 알림"
+    ]
+   },
+   {
+    "person_id": 143,
+    "name": "전하은",
+    "cl_level": "CL3",
+    "text": "Burn-in Board (BIB) 불량으로 인한 CLT 테스트 실패율을 낮추기 위해, BIB 진단 프로그램을 고도화하고 STDF 데이터의 특정 패턴을 분석하여 예방 보전 체계를 구축하고 싶습니다.",
+    "horizon": "단기",
+    "quotes": [
+     "BIB 불량 CLT 실패율 저감",
+     "BIB 진단 프로그램 고도화",
+     "STDF 기반 예방 보전"
+    ]
+   }
+  ]
+ }
+]

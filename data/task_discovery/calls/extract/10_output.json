@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"과제 서술 앞으로의 방향\\n\", \"horizon\": \"단기\", \"quotes\": [\"앞으로의 방향\\n\"]}], \"capability_have\": [], \"capability_gap\": [], \"direction\": null}",
+ "success": true
+}

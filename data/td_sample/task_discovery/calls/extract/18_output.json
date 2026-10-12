@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"BIB(Burn-in Board) 설계·수명 관리\"]}, {\"text\": \"CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"CLT(Chamber형 LFT Test) 조건 정교화\"]}], \"capability_have\": [{\"text\": \"설비 자동화 제어 역량을 실무에 적용해 왔다\", \"quotes\": [\"설비 자동화 제어\"]}, {\"text\": \"통계적 공정관리(SPC) 역량을 실무에 적용해 왔다\", \"quotes\": [\"통계적 공정관리(SPC)\"]}], \"capability_gap\": [{\"text\": \"HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"HFT(High-temp Final Test) 커버리지 확대\"]}], \"direction\": {\"text\": \"BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"BIB(Burn-in Board) 설계·수명 관리\"]}}",
+ "success": true
+}

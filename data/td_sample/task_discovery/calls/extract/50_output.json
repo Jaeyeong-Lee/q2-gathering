@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"Teradyne 플랫폼 멀티사이트 확대\"]}, {\"text\": \"Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"Magnum 테스터 Para 병렬 테스트 효율화\"]}], \"capability_have\": [{\"text\": \"STDF 파싱 자동화 역량을 실무에 적용해 왔다\", \"quotes\": [\"STDF 파싱 자동화\"]}, {\"text\": \"통계적 공정관리(SPC) 역량을 실무에 적용해 왔다\", \"quotes\": [\"통계적 공정관리(SPC)\"]}], \"capability_gap\": [{\"text\": \"신제품 D1b 초기 양산 Yield 안정화 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"신제품 D1b 초기 양산 Yield 안정화\"]}], \"direction\": {\"text\": \"Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"Teradyne 플랫폼 멀티사이트 확대\"]}}",
+ "success": true
+}

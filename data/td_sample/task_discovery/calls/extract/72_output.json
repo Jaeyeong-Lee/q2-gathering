@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"신제품 D1b 초기 양산 Yield 안정화\"]}, {\"text\": \"Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"Magnum 테스터 Para 병렬 테스트 효율화\"]}], \"capability_have\": [{\"text\": \"머신러닝 이상탐지 역량을 실무에 적용해 왔다\", \"quotes\": [\"머신러닝 이상탐지\"]}, {\"text\": \"STDF 파싱 자동화 역량을 실무에 적용해 왔다\", \"quotes\": [\"STDF 파싱 자동화\"]}], \"capability_gap\": [{\"text\": \"테스트 타임 단축을 위한 PGM 구조 최적화 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"테스트 타임 단축을 위한 PGM 구조 최적화\"]}], \"direction\": {\"text\": \"신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"신제품 D1b 초기 양산 Yield 안정화\"]}}",
+ "success": true
+}

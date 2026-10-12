@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"테스트 데이터(STDF) 통합 관리 체계 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"테스트 데이터(STDF) 통합 관리 체계\"]}, {\"text\": \"AX(AI Transformation) 기반 테스트 데이터 분석 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"AX(AI Transformation) 기반 테스트 데이터 분석\"]}], \"capability_have\": [{\"text\": \"ATE 스크립팅 역량을 실무에 적용해 왔다\", \"quotes\": [\"ATE 스크립팅\"]}, {\"text\": \"머신러닝 이상탐지 역량을 실무에 적용해 왔다\", \"quotes\": [\"머신러닝 이상탐지\"]}], \"capability_gap\": [{\"text\": \"D1b 신제품 램프업 기획 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"D1b 신제품 램프업 기획\"]}], \"direction\": {\"text\": \"테스트 데이터(STDF) 통합 관리 체계 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"테스트 데이터(STDF) 통합 관리 체계\"]}}",
+ "success": true
+}

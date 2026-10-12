@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"과제 서술 1. 상반기 성\", \"horizon\": \"단기\", \"quotes\": [\"1. 상반기 성\"]}], \"capability_have\": [], \"capability_gap\": [], \"direction\": null}",
+ "success": true
+}

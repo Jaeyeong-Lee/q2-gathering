@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"Advantest V93000 Test PGM 디버깅 시간 단축\"]}, {\"text\": \"테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"테스트 타임 단축을 위한 PGM 구조 최적화\"]}], \"capability_have\": [{\"text\": \"ATE 스크립팅 역량을 실무에 적용해 왔다\", \"quotes\": [\"ATE 스크립팅\"]}, {\"text\": \"머신러닝 이상탐지 역량을 실무에 적용해 왔다\", \"quotes\": [\"머신러닝 이상탐지\"]}], \"capability_gap\": [{\"text\": \"Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"Magnum 테스터 Para 병렬 테스트 효율화\"]}], \"direction\": {\"text\": \"Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"Advantest V93000 Test PGM 디버깅 시간 단축\"]}}",
+ "success": true
+}

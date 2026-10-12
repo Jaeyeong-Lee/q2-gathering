@@ -1,0 +1,6 @@
+{
+ "stage": "taxonomy",
+ "call_id": "relations",
+ "prompt": "아래는 확정된 역량/방향 카테고리 목록이다. 카테고리 사이의 관계만\n뽑아라. 새 카테고리를 만들거나 이름을 바꾸지 말고, 목록에 있는 name만 쓴다.\ntype은 두 가지뿐이다 — broader는 from이 to의 상위 개념일 때, related는 단순 연관일 때.\n확실하지 않은 관계는 넣지 마라(적게 넣는 편이 낫다). 관계가 없으면 빈 배열.\nJSON 객체로만 답하라: {\"relations\": [{\"from\": \"...\", \"to\": \"...\", \"type\": \"broader\"}]}\n\n카테고리:\n[{\"name\": \"Test PGM 디버깅·구조 최적화\", \"definition\": \"Test PGM 디버깅 관련 과제와 역량을 묶는다.\"}, {\"name\": \"병렬 테스트·멀티사이트 효율화\", \"definition\": \"병렬 테스트 관련 과제와 역량을 묶는다.\"}, {\"name\": \"D1b 신제품 램프업\", \"definition\": \"D1b 신제품 관련 과제와 역량을 묶는다.\"}, {\"name\": \"양산 Yield 안정화\", \"definition\": \"Yield 관련 과제와 역량을 묶는다.\"}, {\"name\": \"Burn-in 신뢰성·BIB 관리\", \"definition\": \"Burn-in 관련 과제와 역량을 묶는다.\"}, {\"name\": \"고온·챔버 테스트 조건 정교화\", \"definition\": \"CLT 관련 과제와 역량을 묶는다.\"}, {\"name\": \"STDF 기반 고장분석 자동화\", \"definition\": \"고장분석 관련 과제와 역량을 묶는다.\"}, {\"name\": \"DPPM 품질 선제진단\", \"definition\": \"DPPM 관련 과제와 역량을 묶는다.\"}, {\"name\": \"AX 기반 테스트 데이터 분석\", \"definition\": \"AX 관련 과제와 역량을 묶는다.\"}, {\"name\": \"설비 운영·자동화 표준화\", \"definition\": \"설비 관련 과제와 역량을 묶는다.\"}]",
+ "timestamp": "2026-08-30T22:49:52+00:00"
+}

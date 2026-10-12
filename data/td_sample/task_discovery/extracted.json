@@ -1,0 +1,5607 @@
+[
+ {
+  "person_id": 1,
+  "name": "안지호",
+  "cl_level": "CL2",
+  "pjt": "기획운영",
+  "part": "기획·운영",
+  "signal_present": true,
+  "direction": {
+   "text": "D1b 신제품 램프업 기획 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "D1b 신제품 램프업 기획"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "설비 운영 지표 표준화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 2,
+  "name": "박주원",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "신제품 D1b 초기 양산 Yield 안정화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 3,
+  "name": "장서연",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 4,
+  "name": "한도윤",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 5,
+  "name": "황하은",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 6,
+  "name": "전건우",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 7,
+  "name": "정지호",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 8,
+  "name": "조선우",
+  "cl_level": "CL4",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "설비 운영 지표 표준화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "설비 운영 지표 표준화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 9,
+  "name": "최소율",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 10,
+  "name": "오수아",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 11,
+  "name": "홍예준",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Advantest V93000 Test PGM 디버깅 시간 단축"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 12,
+  "name": "최소율",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 13,
+  "name": "윤도윤",
+  "cl_level": "CL4",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 14,
+  "name": "조시우",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 15,
+  "name": "강주원",
+  "cl_level": "CL4",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "Magnum 테스터 Para 병렬 테스트 효율화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Magnum 테스터 Para 병렬 테스트 효율화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 16,
+  "name": "서시우",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 17,
+  "name": "황다은",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 18,
+  "name": "홍도윤",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 19,
+  "name": "류예린",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 20,
+  "name": "송유나",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 21,
+  "name": "김건우",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 22,
+  "name": "전예준",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "기획·운영",
+  "signal_present": true,
+  "direction": {
+   "text": "AX(AI Transformation) 기반 테스트 데이터 분석 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "AX(AI Transformation) 기반 테스트 데이터 분석"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ],
+    "ax_mentioned": true
+   },
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "설비 운영 지표 표준화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 23,
+  "name": "권하은",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "기획·운영",
+  "signal_present": true,
+  "direction": {
+   "text": "설비 운영 지표 표준화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "설비 운영 지표 표준화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 24,
+  "name": "이예준",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "AX(AI Transformation) 기반 테스트 데이터 분석 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "AX(AI Transformation) 기반 테스트 데이터 분석"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ],
+    "ax_mentioned": true
+   },
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 25,
+  "name": "홍예린",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 26,
+  "name": "박주원",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "Magnum 테스터 Para 병렬 테스트 효율화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Magnum 테스터 Para 병렬 테스트 효율화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 27,
+  "name": "임하은",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "CLT(Chamber형 LFT Test) 조건 정교화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "CLT(Chamber형 LFT Test) 조건 정교화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 28,
+  "name": "임예린",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "고장분석(FA)",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 29,
+  "name": "신서연",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "양산 Yield 저하 원인 분석·개선 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "양산 Yield 저하 원인 분석·개선"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 30,
+  "name": "윤서연",
+  "cl_level": "CL4",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 31,
+  "name": "오지유",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 32,
+  "name": "조하은",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "기획·운영",
+  "signal_present": true,
+  "direction": {
+   "text": "AX(AI Transformation) 기반 테스트 데이터 분석 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "AX(AI Transformation) 기반 테스트 데이터 분석"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ],
+    "ax_mentioned": true
+   },
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "D1b 신제품 램프업 기획 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 33,
+  "name": "권건우",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 34,
+  "name": "한소율",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 35,
+  "name": "장유나",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "D1b 신제품 램프업 기획 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "D1b 신제품 램프업 기획"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 36,
+  "name": "정서연",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 37,
+  "name": "안우진",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "신제품 D1b 초기 양산 Yield 안정화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 38,
+  "name": "전예린",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Advantest V93000 Test PGM 디버깅 시간 단축"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 39,
+  "name": "강채원",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 40,
+  "name": "강지호",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "CLT(Chamber형 LFT Test) 조건 정교화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "CLT(Chamber형 LFT Test) 조건 정교화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 41,
+  "name": "정다은",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 42,
+  "name": "전지호",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 43,
+  "name": "전주원",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 44,
+  "name": "이건우",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 45,
+  "name": "안선우",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "고장분석(FA)",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 46,
+  "name": "최지호",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "고장분석(FA)",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 47,
+  "name": "김현우",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 48,
+  "name": "최다은",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 49,
+  "name": "조민준",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 50,
+  "name": "최소율",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 51,
+  "name": "강선우",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 52,
+  "name": "윤지유",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 데이터(STDF) 통합 관리 체계 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 데이터(STDF) 통합 관리 체계"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ],
+    "ax_mentioned": true
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "D1b 신제품 램프업 기획 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 53,
+  "name": "정예린",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 54,
+  "name": "홍다은",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "신제품 D1b 초기 양산 Yield 안정화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 55,
+  "name": "임소율",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 56,
+  "name": "서수아",
+  "cl_level": "CL4",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 57,
+  "name": "황예준",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 58,
+  "name": "정예린",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 59,
+  "name": "최시우",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 60,
+  "name": "오채원",
+  "cl_level": "CL2",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "설비 운영 지표 표준화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "설비 운영 지표 표준화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 61,
+  "name": "윤수아",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 62,
+  "name": "서시우",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "Magnum 테스터 Para 병렬 테스트 효율화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Magnum 테스터 Para 병렬 테스트 효율화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 63,
+  "name": "정가은",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Advantest V93000 Test PGM 디버깅 시간 단축"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 64,
+  "name": "권채원",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 65,
+  "name": "박건우",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 66,
+  "name": "임예준",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 67,
+  "name": "안주원",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "신제품 D1b 초기 양산 Yield 안정화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 68,
+  "name": "조선우",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 69,
+  "name": "임유나",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "CLT(Chamber형 LFT Test) 조건 정교화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "CLT(Chamber형 LFT Test) 조건 정교화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 70,
+  "name": "홍가은",
+  "cl_level": "CL4",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 71,
+  "name": "이수아",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "기획·운영",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 데이터(STDF) 통합 관리 체계 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 데이터(STDF) 통합 관리 체계"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "D1b 신제품 램프업 기획 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 72,
+  "name": "권예준",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "신제품 D1b 초기 양산 Yield 안정화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 73,
+  "name": "안서연",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 74,
+  "name": "서시우",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "Magnum 테스터 Para 병렬 테스트 효율화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Magnum 테스터 Para 병렬 테스트 효율화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 75,
+  "name": "황현우",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "고장분석(FA)",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 76,
+  "name": "신가은",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 77,
+  "name": "최가은",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 78,
+  "name": "김하은",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "설비 운영 지표 표준화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "설비 운영 지표 표준화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 79,
+  "name": "서시우",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 80,
+  "name": "임주원",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "양산 Yield 저하 원인 분석·개선 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "양산 Yield 저하 원인 분석·개선"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 81,
+  "name": "홍민준",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 82,
+  "name": "윤지호",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 83,
+  "name": "오소율",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 84,
+  "name": "박시우",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 85,
+  "name": "윤주원",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 86,
+  "name": "오민준",
+  "cl_level": "CL2",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "D1b 신제품 램프업 기획 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "D1b 신제품 램프업 기획"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 87,
+  "name": "신지호",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 88,
+  "name": "신시우",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "D1b 신제품 램프업 기획 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "D1b 신제품 램프업 기획"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "테스트 데이터(STDF) 통합 관리 체계 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "테스트 데이터(STDF) 통합 관리 체계"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 89,
+  "name": "안지호",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 90,
+  "name": "강도윤",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "고장분석(FA)",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 91,
+  "name": "김서연",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 92,
+  "name": "황건우",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "CLT(Chamber형 LFT Test) 조건 정교화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "CLT(Chamber형 LFT Test) 조건 정교화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 93,
+  "name": "권건우",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 94,
+  "name": "임예준",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 95,
+  "name": "송다은",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 96,
+  "name": "임채원",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Advantest V93000 Test PGM 디버깅 시간 단축"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 97,
+  "name": "한민준",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "Magnum 테스터 Para 병렬 테스트 효율화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Magnum 테스터 Para 병렬 테스트 효율화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 98,
+  "name": "신시우",
+  "cl_level": "CL4",
+  "pjt": "기획운영",
+  "part": "기획·운영",
+  "signal_present": true,
+  "direction": {
+   "text": "D1b 신제품 램프업 기획 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "D1b 신제품 램프업 기획"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "설비 운영 지표 표준화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 99,
+  "name": "전건우",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 100,
+  "name": "송주원",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 101,
+  "name": "서다은",
+  "cl_level": "CL3",
+  "pjt": "기획운영",
+  "part": "데이터·AX",
+  "signal_present": true,
+  "direction": {
+   "text": "AX(AI Transformation) 기반 테스트 데이터 분석 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "AX(AI Transformation) 기반 테스트 데이터 분석"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "AX(AI Transformation) 기반 테스트 데이터 분석 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "AX(AI Transformation) 기반 테스트 데이터 분석"
+    ],
+    "ax_mentioned": true
+   },
+   {
+    "text": "D1b 신제품 램프업 기획 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "D1b 신제품 램프업 기획"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "설비 운영 지표 표준화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "설비 운영 지표 표준화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 102,
+  "name": "조다은",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 103,
+  "name": "류현우",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "품질보증(DPPM)",
+  "signal_present": true,
+  "direction": {
+   "text": "BIB(Burn-in Board) 설계·수명 관리 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "BIB(Burn-in Board) 설계·수명 관리"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 104,
+  "name": "박예린",
+  "cl_level": "CL4",
+  "pjt": "양산기술",
+  "part": "양산Yield",
+  "signal_present": true,
+  "direction": {
+   "text": "신제품 D1b 초기 양산 Yield 안정화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "신제품 D1b 초기 양산 Yield 안정화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 105,
+  "name": "황민준",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 106,
+  "name": "오선우",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "고장분석(FA)",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 107,
+  "name": "류다은",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 108,
+  "name": "정시우",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Advantest V93000 Test PGM 디버깅 시간 단축"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "신제품 D1b 초기 양산 Yield 안정화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "신제품 D1b 초기 양산 Yield 안정화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 109,
+  "name": "홍서연",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Advantest V93000 Test PGM 디버깅 시간 단축"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 110,
+  "name": "박도윤",
+  "cl_level": "CL4",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "DPPM 품질 개선을 위한 선제 진단"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": []
+ },
+ {
+  "person_id": 111,
+  "name": "송지호",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "CLT(Chamber형 LFT Test) 조건 정교화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "CLT(Chamber형 LFT Test) 조건 정교화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "CLT(Chamber형 LFT Test) 조건 정교화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "CLT(Chamber형 LFT Test) 조건 정교화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   },
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 112,
+  "name": "전지유",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": false,
+  "direction": null,
+  "future_task": [],
+  "capability_have": [],
+  "capability_gap": []
+ },
+ {
+  "person_id": 113,
+  "name": "김도윤",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "고장분석(FA)",
+  "signal_present": true,
+  "direction": {
+   "text": "STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "STDF 기반 고장분석(FA) 자동화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "STDF 기반 고장분석(FA) 자동화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 114,
+  "name": "강지호",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "병렬테스트효율",
+  "signal_present": true,
+  "direction": {
+   "text": "양산 Yield 저하 원인 분석·개선 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "양산 Yield 저하 원인 분석·개선"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 115,
+  "name": "신서연",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "테스트 타임 단축을 위한 PGM 구조 최적화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "테스트 타임 단축을 위한 PGM 구조 최적화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Magnum 테스터 Para 병렬 테스트 효율화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Magnum 테스터 Para 병렬 테스트 효율화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 116,
+  "name": "조건우",
+  "cl_level": "CL3",
+  "pjt": "공정기술",
+  "part": "설비·Handler",
+  "signal_present": true,
+  "direction": {
+   "text": "HFT(High-temp Final Test) 커버리지 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "HFT(High-temp Final Test) 커버리지 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "BIB(Burn-in Board) 설계·수명 관리 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "BIB(Burn-in Board) 설계·수명 관리"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 117,
+  "name": "황소율",
+  "cl_level": "CL2",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "불명",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "머신러닝 이상탐지 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "머신러닝 이상탐지"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 118,
+  "name": "오하은",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "Test PGM개발",
+  "signal_present": true,
+  "direction": {
+   "text": "양산 Yield 저하 원인 분석·개선 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "양산 Yield 저하 원인 분석·개선"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "파이썬 데이터 분석 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "파이썬 데이터 분석"
+    ]
+   },
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 119,
+  "name": "송지호",
+  "cl_level": "CL2",
+  "pjt": "공정기술",
+  "part": "Burn-in신뢰성",
+  "signal_present": true,
+  "direction": {
+   "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "MBT(Monitoring Burn-in Test) 신뢰성 강화"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "DPPM 품질 개선을 위한 선제 진단"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "ATE 스크립팅 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "ATE 스크립팅"
+    ]
+   },
+   {
+    "text": "STDF 파싱 자동화 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "STDF 파싱 자동화"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "HFT(High-temp Final Test) 커버리지 확대 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "HFT(High-temp Final Test) 커버리지 확대"
+    ]
+   }
+  ]
+ },
+ {
+  "person_id": 120,
+  "name": "이지유",
+  "cl_level": "CL3",
+  "pjt": "양산기술",
+  "part": "ATE운영",
+  "signal_present": true,
+  "direction": {
+   "text": "Teradyne 플랫폼 멀티사이트 확대 방향으로 팀 표준을 만들고 싶다",
+   "quotes": [
+    "Teradyne 플랫폼 멀티사이트 확대"
+   ]
+  },
+  "future_task": [
+   {
+    "text": "Teradyne 플랫폼 멀티사이트 확대 과제를 추진하려 한다",
+    "horizon": "단기",
+    "quotes": [
+     "Teradyne 플랫폼 멀티사이트 확대"
+    ],
+    "ax_mentioned": false
+   },
+   {
+    "text": "양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다",
+    "horizon": "장기",
+    "quotes": [
+     "양산 Yield 저하 원인 분석·개선"
+    ],
+    "ax_mentioned": false
+   }
+  ],
+  "capability_have": [
+   {
+    "text": "통계적 공정관리(SPC) 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "통계적 공정관리(SPC)"
+    ]
+   },
+   {
+    "text": "설비 자동화 제어 역량을 실무에 적용해 왔다",
+    "quotes": [
+     "설비 자동화 제어"
+    ]
+   }
+  ],
+  "capability_gap": [
+   {
+    "text": "Advantest V93000 Test PGM 디버깅 시간 단축 수행에 필요한 역량이 아직 부족하다",
+    "quotes": [
+     "Advantest V93000 Test PGM 디버깅 시간 단축"
+    ]
+   }
+  ]
+ }
+]

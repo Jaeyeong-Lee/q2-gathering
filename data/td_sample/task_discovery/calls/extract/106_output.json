@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"DPPM 품질 개선을 위한 선제 진단 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"DPPM 품질 개선을 위한 선제 진단\"]}, {\"text\": \"HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"HFT(High-temp Final Test) 커버리지 확대\"]}], \"capability_have\": [{\"text\": \"머신러닝 이상탐지 역량을 실무에 적용해 왔다\", \"quotes\": [\"머신러닝 이상탐지\"]}, {\"text\": \"통계적 공정관리(SPC) 역량을 실무에 적용해 왔다\", \"quotes\": [\"통계적 공정관리(SPC)\"]}], \"capability_gap\": [], \"direction\": {\"text\": \"DPPM 품질 개선을 위한 선제 진단 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"DPPM 품질 개선을 위한 선제 진단\"]}}",
+ "success": true
+}

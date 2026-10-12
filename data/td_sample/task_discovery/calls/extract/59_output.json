@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"STDF 기반 고장분석(FA) 자동화\"]}, {\"text\": \"HFT(High-temp Final Test) 커버리지 확대 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"HFT(High-temp Final Test) 커버리지 확대\"]}], \"capability_have\": [{\"text\": \"설비 자동화 제어 역량을 실무에 적용해 왔다\", \"quotes\": [\"설비 자동화 제어\"]}, {\"text\": \"파이썬 데이터 분석 역량을 실무에 적용해 왔다\", \"quotes\": [\"파이썬 데이터 분석\"]}], \"capability_gap\": [{\"text\": \"CLT(Chamber형 LFT Test) 조건 정교화 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"CLT(Chamber형 LFT Test) 조건 정교화\"]}], \"direction\": {\"text\": \"STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"STDF 기반 고장분석(FA) 자동화\"]}}",
+ "success": true
+}

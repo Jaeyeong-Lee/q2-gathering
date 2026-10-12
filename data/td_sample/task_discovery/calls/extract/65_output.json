@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"테스트 타임 단축을 위한 PGM 구조 최적화 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"테스트 타임 단축을 위한 PGM 구조 최적화\"]}, {\"text\": \"신제품 D1b 초기 양산 Yield 안정화 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"신제품 D1b 초기 양산 Yield 안정화\"]}], \"capability_have\": [{\"text\": \"머신러닝 이상탐지 역량을 실무에 적용해 왔다\", \"quotes\": [\"머신러닝 이상탐지\"]}, {\"text\": \"파이썬 데이터 분석 역량을 실무에 적용해 왔다\", \"quotes\": [\"파이썬 데이터 분석\"]}], \"capability_gap\": [{\"text\": \"Advantest V93000 Test PGM 디버깅 시간 단축 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"Advantest V93000 Test PGM 디버깅 시간 단축\"]}], \"direction\": {\"text\": \"테스트 타임 단축을 위한 PGM 구조 최적화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"테스트 타임 단축을 위한 PGM 구조 최적화\"]}}",
+ "success": true
+}

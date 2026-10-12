@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"Advantest V93000 Test PGM 디버깅 시간 단축 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"Advantest V93000 Test PGM 디버깅 시간 단축\"]}, {\"text\": \"양산 Yield 저하 원인 분석·개선 과제를 추진하려 한다\", \"horizon\": \"장기\", \"quotes\": [\"양산 Yield 저하 원인 분석·개선\"]}], \"capability_have\": [{\"text\": \"ATE 스크립팅 역량을 실무에 적용해 왔다\", \"quotes\": [\"ATE 스크립팅\"]}, {\"text\": \"통계적 공정관리(SPC) 역량을 실무에 적용해 왔다\", \"quotes\": [\"통계적 공정관리(SPC)\"]}], \"capability_gap\": [{\"text\": \"신제품 D1b 초기 양산 Yield 안정화 수행에 필요한 역량이 아직 부족하다\", \"quotes\": [\"신제품 D1b 초기 양산 Yield 안정화\"]}], \"direction\": {\"text\": \"Advantest V93000 Test PGM 디버깅 시간 단축 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"Advantest V93000 Test PGM 디버깅 시간 단축\"]}}",
+ "success": true
+}

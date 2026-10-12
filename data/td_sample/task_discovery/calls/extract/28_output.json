@@ -1,0 +1,4 @@
+{
+ "response": "{\"signal_present\": true, \"future_task\": [{\"text\": \"STDF 기반 고장분석(FA) 자동화 과제를 추진하려 한다\", \"horizon\": \"단기\", \"quotes\": [\"STDF 기반 고장분석(FA) 자동화\"]}, {\"text\": \"MBT(Monitoring Burn-in Test) 신뢰성 강화 과제를 추진하려 한다\", \"horizon\": \"불명\", \"quotes\": [\"MBT(Monitoring Burn-in Test) 신뢰성 강화\"]}], \"capability_have\": [{\"text\": \"통계적 공정관리(SPC) 역량을 실무에 적용해 왔다\", \"quotes\": [\"통계적 공정관리(SPC)\"]}, {\"text\": \"ATE 스크립팅 역량을 실무에 적용해 왔다\", \"quotes\": [\"ATE 스크립팅\"]}], \"capability_gap\": [], \"direction\": {\"text\": \"STDF 기반 고장분석(FA) 자동화 방향으로 팀 표준을 만들고 싶다\", \"quotes\": [\"STDF 기반 고장분석(FA) 자동화\"]}}",
+ "success": true
+}
